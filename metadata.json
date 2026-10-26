@@ -1,0 +1,6 @@
+{
+  "name": "Gothic Courtyard v2 — Small Plays Vignette Studio",
+  "description": "Deterministic isometric 3D pixel-diorama environment and frame-inspection workbench implementing the Small Plays / Small Battles vignette pipeline.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
