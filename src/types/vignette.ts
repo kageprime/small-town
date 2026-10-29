@@ -111,8 +111,14 @@ export type CitizenId =
   | 'sera'
   | 'brother-corvus';
 
-export type PortraitExpression =
+export type ReactivePortraitFrame =
   | 'neutral'
+  | 'happy'
+  | 'stern'
+  | 'thinking';
+
+export type PortraitExpression =
+  | ReactivePortraitFrame
   | 'warm'
   | 'thoughtful'
   | 'surprised'

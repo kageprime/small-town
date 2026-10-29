@@ -191,11 +191,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
     nodes: {
       intro: {
         id: 'intro',
-        expression: 'warm',
+        expression: 'happy',
         text: 'Welcome to Vaelenport, Wayfarer! Hear that steady brass pulse beneath the flagstones? The Astrolabe Fountain drives every lock-gate and lantern wire across our three tiers.',
         memoryVariantText: {
           flag: 'awakened_dusk_lanterns',
-          expression: 'warm',
+          expression: 'happy',
           text: 'Ah, the Wayfarer who helped me synchronize the Dusk Lanterns! Every brass pendulum in the Plaza sings in true harmonic phase thanks to your hand.',
         },
         choices: [
@@ -231,11 +231,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       return_visit: {
         id: 'return_visit',
-        expression: 'warm',
+        expression: 'neutral',
         text: 'Good to see your lantern-light again, friend. The clockwork heart of the Plaza beats true.',
         memoryVariantText: {
           flag: 'asked_vaelen_architecture',
-          expression: 'thoughtful',
+          expression: 'thinking',
           text: 'Welcome back, fellow student of stone and brass! Have you climbed the northern steps to the Scholars’ Cloister yet, or walked the Lower Canal Quays?',
         },
         choices: [
@@ -266,7 +266,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       city_lore: {
         id: 'city_lore',
-        expression: 'thoughtful',
+        expression: 'thinking',
         text: 'Three centuries ago, the founders carved the Lower Canal Quays from dark basalt to shelter lantern skiffs. Above it rests this Lantern Plaza, and high to the north rises the Scholars’ Cloister (+1.15m) where Isolde and Brother Corvus keep the archives.',
         choices: [
           {
@@ -286,7 +286,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       lock_hint: {
         id: 'lock_hint',
-        expression: 'solemn',
+        expression: 'stern',
         text: 'Dockmaster Oswin lowered the iron sluice when the tide-mist thickened. Tell him Master Vaelen checked the counterweight—he will gladly crank open the Old Canal Lock for you.',
         choices: [
           {
@@ -298,7 +298,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       community_guide: {
         id: 'community_guide',
-        expression: 'warm',
+        expression: 'neutral',
         text: 'North up the grand staircase, Isolde tends moon-fern elixirs in the Apothecary Conservatory while Brother Corvus studies the Rose Window. Down south on the Quays, Oswin watches the lock gates, and right here by the fountain, Sera chronicles our ballads.',
         choices: [
           {
@@ -310,7 +310,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       after_dusk_promise: {
         id: 'after_dusk_promise',
-        expression: 'surprised',
+        expression: 'happy',
         text: 'Behold how the amber filaments catch the water! Take these three Soul Embers from the Guildhall brazier as my thanks.',
         choices: [
           {
@@ -376,11 +376,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
     nodes: {
       intro: {
         id: 'intro',
-        expression: 'warm',
+        expression: 'neutral',
         text: 'Breathe deeply, traveler. The cedar and moon-sage in our Upper Cloister keep the canal dampness from the lungs. Did you climb the northern stair to seek a tonic, or quiet counsel?',
         memoryVariantText: {
-          flag: ' tasted_isolde_tonic',
-          expression: 'warm',
+          flag: 'tasted_isolde_tonic',
+          expression: 'happy',
           text: 'Your step is lighter since you drank the Silver-Fern draught! The herbs of the Cloister always remember a kindred spirit.',
         },
         choices: [
@@ -416,11 +416,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       return_visit: {
         id: 'return_visit',
-        expression: 'warm',
+        expression: 'happy',
         text: 'Welcome back to the Upper Terrace. Step inside the Conservatory whenever you wish—the roof timber parts to show our distillation tables.',
         memoryVariantText: {
           flag: 'studied_cloister_botany',
-          expression: 'thoughtful',
+          expression: 'thinking',
           text: 'Ah, my favorite naturalist returns! The Starlight Bellflowers opened another petal when the Plaza clock chimed.',
         },
         choices: [
@@ -445,7 +445,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       tonic_shared: {
         id: 'tonic_shared',
-        expression: 'surprised',
+        expression: 'happy',
         text: 'Warm as liquid amber, isn’t it? We harvest the fern-spores where the Cloister mist meets the belltower breeze. Keep these two Soul Embers for your lantern.',
         choices: [
           {
@@ -457,7 +457,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       botany_lore: {
         id: 'botany_lore',
-        expression: 'thoughtful',
+        expression: 'thinking',
         text: 'Glass-leaf bellwort, ember-root, and weeping fen-lily. Because the Cloister sits a full meter above the canal basin, the morning sunlight strikes our arches first while the lower quays still sleep in mist.',
         choices: [
           {
@@ -469,7 +469,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       corvus_insight: {
         id: 'corvus_insight',
-        expression: 'solemn',
+        expression: 'stern',
         text: 'Brother Corvus believes the stained-glass Rose Window is an optical calendar left by the first Tide-Scholars. If you speak with him, ask about the Verse of the Sunken Lock.',
         choices: [
           {
@@ -526,11 +526,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
     nodes: {
       intro: {
         id: 'intro',
-        expression: 'neutral',
+        expression: 'stern',
         text: 'Mind the wet flagstones on the Lower Quays, traveler. The canal runs deep between the embankments, and the eastern Lock Gate holds back the outer fen-tide.',
         memoryVariantText: {
           flag: 'opened_canal_lock',
-          expression: 'warm',
+          expression: 'happy',
           text: 'Ho there, Captain! Since we cranked open the Old Canal Lock, the waterwheel turns twice as briskly and the lantern skiff rides high.',
         },
         choices: [
@@ -572,11 +572,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       return_visit: {
         id: 'return_visit',
-        expression: 'warm',
+        expression: 'neutral',
         text: 'Nothing steadies the spirit like the lap of water against dressed ashlar stone. The jetty fishing line is rigged whenever you fancy casting.',
         memoryVariantText: {
           flag: 'opened_canal_lock',
-          expression: 'warm',
+          expression: 'happy',
           text: 'Listen to that waterwheel hum! Opening the eastern sluice brought fresh silver-carp right up to the southern jetty.',
         },
         choices: [
@@ -601,7 +601,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       lock_opened_node: {
         id: 'lock_opened_node',
-        expression: 'surprised',
+        expression: 'happy',
         text: 'Put your shoulder to the brass capstan... There she swings! Look how the lantern skiff glides along the open channel. Take these Soul Embers dredged from the lock-sill!',
         choices: [
           {
@@ -613,7 +613,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       canal_lore: {
         id: 'canal_lore',
-        expression: 'thoughtful',
+        expression: 'thinking',
         text: 'Two arched bridges span our waterway: the West Guild Bridge leading up to Vaelen’s workshop, and the East Lock-Keeper’s Bridge. Beneath them swim Moon-Scale Koi and Brass-Shell Crabs that feed on fallen lantern embers.',
         choices: [
           {
@@ -679,11 +679,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
     nodes: {
       intro: {
         id: 'intro',
-        expression: 'warm',
+        expression: 'happy',
         text: 'Pluck a string in the Lantern Plaza and the stone arches sing back in thirds! I am Sera, keeper of Vaelenport’s spoken chronicle. What verse shall we add for your arrival?',
         memoryVariantText: {
           flag: 'composed_ballad_with_sera',
-          expression: 'warm',
+          expression: 'happy',
           text: 'There walks the hero of my newest stanza! The whole Plaza has been humming the verse we composed together.',
         },
         choices: [
@@ -720,11 +720,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       return_visit: {
         id: 'return_visit',
-        expression: 'warm',
+        expression: 'neutral',
         text: 'Every hour of the clock changes the light on the canal and the mood of my lute. Have you watched the lanterns ignite at dusk?',
         memoryVariantText: {
           flag: 'awakened_dusk_lanterns',
-          expression: 'surprised',
+          expression: 'happy',
           text: 'When you and Master Vaelen lit the Dusk Lanterns, the whole Plaza shimmered like a gilded manuscript! I wrote three new chords on the spot.',
         },
         choices: [
@@ -748,7 +748,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       after_prelude: {
         id: 'after_prelude',
-        expression: 'warm',
+        expression: 'stern',
         text: 'From the sunken quays to the high rose window—every stone in Vaelenport was laid by hand to welcome travelers home.',
         choices: [
           {
@@ -760,7 +760,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       verse_composed: {
         id: 'verse_composed',
-        expression: 'surprised',
+        expression: 'happy',
         text: '"Where brass-gears turn the silver tide, and lantern-motes in twilight glide..." Splendid meter! Take these two Soul Embers—a patron’s gift for a fellow poet.',
         choices: [
           {
@@ -772,7 +772,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       town_rumors: {
         id: 'town_rumors',
-        expression: 'thoughtful',
+        expression: 'thinking',
         text: 'Master Vaelen spends his afternoons inside the western Guildhall—walk right under the eaves to see his clock-table. Meanwhile, Brother Corvus up in the Cloister has been waiting for someone to decipher the Rose Window inscription.',
         choices: [
           {
@@ -829,11 +829,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
     nodes: {
       intro: {
         id: 'intro',
-        expression: 'solemn',
+        expression: 'neutral',
         text: 'Peace be upon your lantern, Wayfarer. From this northern terrace (+1.15m), all of Vaelenport unfolds like an illuminated parchment—the Plaza below, and the Canal beyond.',
         memoryVariantText: {
           flag: 'isolde_mentioned_corvus',
-          expression: 'warm',
+          expression: 'happy',
           text: 'Ah, Isolde told me a keen-eyed traveler was ascending the Cloister stair! You wish to hear the Verse of the Sunken Lock and the Rose Window?',
         },
         choices: [
@@ -867,11 +867,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       return_visit: {
         id: 'return_visit',
-        expression: 'thoughtful',
+        expression: 'thinking',
         text: 'The stone arches of the Cloister hold the memory of every footstep. What wisdom do you seek today?',
         memoryVariantText: {
           flag: 'deciphered_rose_window',
-          expression: 'warm',
+          expression: 'happy',
           text: 'Greetings, Co-Archivist! Your translation of the Rose Window meridian has illuminated three whole chapters of our city’s founding.',
         },
         choices: [
@@ -894,7 +894,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       rose_deciphered: {
         id: 'rose_deciphered',
-        expression: 'surprised',
+        expression: 'happy',
         text: '"When water, brass, and glass align, the Sanctuary’s heart shall shine." You read the old high-glyphs effortlessly! Please accept these two consecrated Soul Embers.',
         choices: [
           {
@@ -906,7 +906,7 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       },
       cloister_history: {
         id: 'cloister_history',
-        expression: 'solemn',
+        expression: 'stern',
         text: 'When the outer world grew turbulent, artisans, clockmakers, apothecaries, and ferrymen gathered here. We rejected random sprawl and laid out three harmonious tiers so every citizen could live within sight of the Astrolabe Fountain.',
         choices: [
           {

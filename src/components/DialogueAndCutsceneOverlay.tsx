@@ -5,7 +5,6 @@ import {
   Film,
   Flame,
   Heart,
-  MapPin,
   MessageSquare,
   Sparkles,
   Sun,
@@ -20,6 +19,7 @@ import {
   NpcDialogState,
   PlayerTelemetry,
   PortraitExpression,
+  ReactivePortraitFrame,
 } from '../types/vignette';
 import {
   CitizenProfile,
@@ -30,6 +30,12 @@ import {
   saveCommunityMemory,
   VAELENPORT_CITIZENS,
 } from '../scene/dialogueAndCutscenes';
+import {
+  ComputedPortraitFrameState,
+  evaluatePortraitEngineState,
+  REACTIVE_FRAME_DEFINITIONS,
+  REACTIVE_PORTRAIT_FRAMES,
+} from '../scene/characterPortraitEngine';
 import { soundEngine } from '../scene/soundEngine';
 
 interface DialogueAndCutsceneOverlayProps {
@@ -41,164 +47,480 @@ interface DialogueAndCutsceneOverlayProps {
   onSkipCutscene: () => void;
 }
 
-const EXPRESSION_BADGE: Record<
-  PortraitExpression,
-  { label: string; colorClass: string }
-> = {
-  neutral: { label: 'Composed', colorClass: 'text-zinc-300 border-zinc-700 bg-zinc-900/90' },
-  warm: { label: 'Warm & Welcoming', colorClass: 'text-amber-300 border-amber-500/40 bg-amber-950/60' },
-  thoughtful: {
-    label: 'Contemplative',
-    colorClass: 'text-sky-300 border-sky-500/40 bg-sky-950/60',
-  },
-  surprised: {
-    label: 'Inspired',
-    colorClass: 'text-emerald-300 border-emerald-500/40 bg-emerald-950/60',
-  },
-  solemn: {
-    label: 'Solemn',
-    colorClass: 'text-indigo-300 border-indigo-500/40 bg-indigo-950/60',
-  },
-};
-
-const CitizenPortraitSvg: React.FC<{
-  citizen: CitizenProfile;
-  expression: PortraitExpression;
+interface CharacterPortraitEngineProps {
+  npcId?: string | null;
+  citizenId?: CitizenId | null;
+  expression?: PortraitExpression;
+  overrideFrame?: ReactivePortraitFrame | null;
+  onSelectOverrideFrame?: (frame: ReactivePortraitFrame | null) => void;
+  fullText: string;
+  revealedChars: number;
   isSpeaking: boolean;
-}> = ({ citizen, expression, isSpeaking }) => {
-  const browTilt =
-    expression === 'solemn'
-      ? 3
-      : expression === 'surprised'
-        ? -3
-        : expression === 'thoughtful'
-          ? -1.5
-          : 0;
-  const eyeHeight = expression === 'surprised' ? 6 : expression === 'warm' ? 4 : 5;
-  const mouthOpen = isSpeaking ? 4.5 : expression === 'surprised' ? 3.5 : 1.5;
+  compact?: boolean;
+}
+
+/**
+ * Character Portrait Engine component:
+ * Maps NPC IDs to reactive portrait frames ('neutral' | 'happy' | 'stern' | 'thinking')
+ * and renders syllable-synced visemes, eye blinks, brow/gaze shifts, and ambient motifs
+ * alongside the typewriter dialogue text.
+ */
+export const CharacterPortraitEngine: React.FC<CharacterPortraitEngineProps> = ({
+  npcId,
+  citizenId,
+  expression,
+  overrideFrame = null,
+  onSelectOverrideFrame,
+  fullText,
+  revealedChars,
+  isSpeaking,
+  compact = false,
+}) => {
+  const [tickCount, setTickCount] = useState<number>(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setTickCount((prev) => (prev + 1) % 1000);
+    }, 140);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const portraitState: ComputedPortraitFrameState = useMemo(
+    () =>
+      evaluatePortraitEngineState({
+        npcId,
+        citizenId,
+        expression,
+        overrideFrame,
+        fullText,
+        revealedChars,
+        isSpeaking,
+        tickCount,
+      }),
+    [npcId, citizenId, expression, overrideFrame, fullText, revealedChars, isSpeaking, tickCount]
+  );
+
+  const { rig, activeFrame, frameParams, isBlinking, viseme, mouthOpenHeight, mouthWidth, speakingBobY } =
+    portraitState;
+
+  const leftBrowInnerY = 36 + frameParams.browInnerY + frameParams.browAsymmetryLeftY;
+  const leftBrowOuterY = 36 + frameParams.browOuterY + frameParams.browAsymmetryLeftY * 0.5;
+  const rightBrowInnerY = 36 + frameParams.browInnerY;
+  const rightBrowOuterY = 36 + frameParams.browOuterY;
+
+  const effectiveEyeHeight = isBlinking ? 1.2 : frameParams.eyeHeight;
+  const eyeTopY = isBlinking ? 42 : 40;
+  const pupilXLeft = 38.5 + frameParams.pupilOffsetX;
+  const pupilXRight = 55.5 + frameParams.pupilOffsetX;
+  const pupilY = 41 + frameParams.pupilOffsetY;
 
   return (
-    <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border-2 border-amber-500/40 bg-[#14131A] shadow-inner shrink-0">
-      <svg
-        viewBox="0 0 96 96"
-        className="w-full h-full"
-        shapeRendering="crispEdges"
+    <div className="flex flex-col items-center gap-2 shrink-0 select-none">
+      {/* Portrait Frame Box */}
+      <div
+        className={`relative ${
+          compact ? 'w-20 h-20' : 'w-28 h-28 sm:w-32 sm:h-32'
+        } rounded-xl overflow-hidden border-2 bg-[#121118] shadow-inner transition-colors duration-200`}
+        style={{
+          borderColor: frameParams.frameBorderHex,
+          boxShadow: `inset 0 0 18px ${frameParams.auraGlowHex}28`,
+        }}
+        title={`${rig.displayName} (${rig.npcId}) · Frame: ${frameParams.shortLabel} — ${portraitState.flavorNote}`}
       >
-        {/* Subtle Architectural Background Arch */}
-        <rect x="0" y="0" width="96" height="96" fill="#171620" />
-        <circle cx="48" cy="48" r="38" fill={citizen.cloakColorHex} fillOpacity="0.22" />
-        <rect x="8" y="8" width="80" height="80" fill="none" stroke={citizen.trimColorHex} strokeWidth="1.5" strokeOpacity="0.35" />
-
-        {/* Shoulders & Mantle */}
-        <path
-          d="M16 96 L22 66 L74 66 L80 96 Z"
-          fill={citizen.cloakColorHex}
-        />
-        <rect x="34" y="66" width="28" height="30" fill="#23212B" />
-        {/* Brass Collar Trim */}
-        <rect x="26" y="66" width="44" height="5" fill={citizen.trimColorHex} />
-
-        {/* Neck & Sculpted Head */}
-        <rect x="41" y="56" width="14" height="12" fill="#D9B391" />
-        <rect x="30" y="30" width="36" height="30" fill="#E6C3A3" />
-        {/* Cheek Shading */}
-        <rect x="30" y="46" width="6" height="10" fill="#CFA482" />
-        <rect x="60" y="46" width="6" height="10" fill="#CFA482" />
-
-        {/* Distinct Headgear / Hair per Citizen */}
-        {citizen.hatStyle === 'clockmaker' && (
-          <>
-            {/* Master Vaelen: Clockmaker Velvet Beret + Brass Loupe */}
-            <rect x="24" y="18" width="48" height="12" fill={citizen.cloakColorHex} />
-            <rect x="28" y="28" width="40" height="4" fill={citizen.trimColorHex} />
-            {/* White Side-Beard & Mustache */}
-            <rect x="30" y="50" width="8" height="12" fill="#D8D6DF" />
-            <rect x="58" y="50" width="8" height="12" fill="#D8D6DF" />
-            <rect x="38" y="51" width="20" height="4" fill="#D8D6DF" />
-            {/* Brass Spectacle Monocle */}
-            <rect x="50" y="37" width="12" height="10" fill="none" stroke="#F59E0B" strokeWidth="2" />
-          </>
-        )}
-
-        {citizen.hatStyle === 'botanist' && (
-          <>
-            {/* Isolde: Woven Herbalist Hood + Silver-Fern Sprig */}
-            <path d="M24 34 L32 14 L64 14 L72 34 Z" fill={citizen.cloakColorHex} />
-            <rect x="26" y="30" width="8" height="24" fill="#3B2720" />
-            <rect x="62" y="30" width="8" height="24" fill="#3B2720" />
-            <rect x="60" y="20" width="10" height="5" fill="#6EE7B7" />
-          </>
-        )}
-
-        {citizen.hatStyle === 'dockmaster' && (
-          <>
-            {/* Oswin: Weathered Sou'wester Oilskin Cap + Sea-Salt Beard */}
-            <path d="M18 30 L30 16 L66 16 L78 30 Z" fill={citizen.cloakColorHex} />
-            <rect x="22" y="28" width="52" height="4" fill={citizen.trimColorHex} />
-            <rect x="32" y="50" width="32" height="12" fill="#4B4852" />
-          </>
-        )}
-
-        {citizen.hatStyle === 'lutenist' && (
-          <>
-            {/* Sera: Plumed Bardic Cap + Flowing Locks */}
-            <path d="M24 28 L36 14 L72 18 L68 30 Z" fill={citizen.cloakColorHex} />
-            <path d="M64 16 L82 8 L76 22 Z" fill={citizen.trimColorHex} />
-            <rect x="26" y="30" width="6" height="26" fill="#5A2D28" />
-            <rect x="64" y="30" width="6" height="26" fill="#5A2D28" />
-          </>
-        )}
-
-        {citizen.hatStyle === 'archivist' && (
-          <>
-            {/* Brother Corvus: Monastic Cowl + Silver Tonsure */}
-            <path d="M22 36 L30 12 L66 12 L74 36 L68 66 L28 66 Z" fill={citizen.cloakColorHex} fillOpacity="0.45" />
-            <rect x="28" y="20" width="40" height="10" fill={citizen.cloakColorHex} />
-            <rect x="34" y="28" width="28" height="3" fill={citizen.trimColorHex} />
-          </>
-        )}
-
-        {/* Expressive Eyebrows */}
-        <line
-          x1="35"
-          y1={36 + browTilt}
-          x2="44"
-          y2={36 - browTilt}
-          stroke="#2A242E"
-          strokeWidth="2.5"
-        />
-        <line
-          x1="52"
-          y1={36 - browTilt}
-          x2="61"
-          y2={36 + browTilt}
-          stroke="#2A242E"
-          strokeWidth="2.5"
-        />
-
-        {/* Eyes */}
-        <rect x="37" y="40" width="5" height={eyeHeight} fill="#18151C" />
-        <rect x="54" y="40" width="5" height={eyeHeight} fill="#18151C" />
-        <rect x="38" y="40" width="2" height="2" fill="#FFFDF9" />
-        <rect x="55" y="40" width="2" height="2" fill="#FFFDF9" />
-
-        {/* Animated Speaking Mouth */}
-        {expression === 'warm' && !isSpeaking ? (
-          <path d="M42 54 Q48 58 54 54" stroke="#6E3B3B" strokeWidth="2.5" fill="none" />
-        ) : (
-          <rect
-            x="44"
-            y="53"
-            width="8"
-            height={mouthOpen}
-            fill="#6E3B3B"
+        <svg
+          viewBox="0 0 96 96"
+          className="w-full h-full"
+          shapeRendering="crispEdges"
+        >
+          {/* Architectural Backdrop & Frame-Reactive Aura */}
+          <rect x="0" y="0" width="96" height="96" fill={rig.backdropArchHex} />
+          <circle
+            cx="48"
+            cy="48"
+            r="39"
+            fill={frameParams.auraGlowHex}
+            fillOpacity={activeFrame === 'happy' ? '0.24' : '0.15'}
           />
-        )}
-      </svg>
+          <rect
+            x="6"
+            y="6"
+            width="84"
+            height="84"
+            fill="none"
+            stroke={rig.trimColorHex}
+            strokeWidth="1.5"
+            strokeOpacity="0.4"
+          />
 
-      {/* Subtle Corner Affinity / Active Voice Pulse */}
-      {isSpeaking && (
-        <span className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
+          {/* Ambient Frame-Specific Motif Layer */}
+          {frameParams.ambientMotif === 'radiant-motes' && (
+            <>
+              <rect
+                x="14"
+                y={18 - (tickCount % 5)}
+                width="3"
+                height="3"
+                fill="#FDE68A"
+                fillOpacity="0.85"
+              />
+              <rect
+                x="78"
+                y={24 - ((tickCount + 2) % 5)}
+                width="3"
+                height="3"
+                fill="#FBBF24"
+                fillOpacity="0.8"
+              />
+              <rect
+                x="18"
+                y={54 - ((tickCount + 4) % 4)}
+                width="2"
+                height="2"
+                fill="#FEF08A"
+                fillOpacity="0.7"
+              />
+            </>
+          )}
+
+          {frameParams.ambientMotif === 'iron-resolve' && (
+            <>
+              {/* Sharp Crimson/Iron Resolve Corner Brackets */}
+              <path
+                d="M10 20 L10 10 L20 10"
+                stroke="#F43F5E"
+                strokeWidth="2.5"
+                fill="none"
+              />
+              <path
+                d="M86 20 L86 10 L76 10"
+                stroke="#F43F5E"
+                strokeWidth="2.5"
+                fill="none"
+              />
+              <rect x="10" y="10" width="76" height="8" fill="#881337" fillOpacity="0.3" />
+            </>
+          )}
+
+          {frameParams.ambientMotif === 'thought-glyphs' && (
+            <>
+              {/* Contemplative Ellipsis & Meridian Thought Rings */}
+              <circle
+                cx="77"
+                cy="20"
+                r="6"
+                fill="none"
+                stroke="#38BDF8"
+                strokeWidth="1.5"
+                strokeOpacity="0.75"
+              />
+              <rect
+                x="73"
+                y="19"
+                width="2"
+                height="2"
+                fill={tickCount % 3 === 0 ? '#E0F2FE' : '#38BDF8'}
+              />
+              <rect
+                x="76"
+                y="19"
+                width="2"
+                height="2"
+                fill={tickCount % 3 === 1 ? '#E0F2FE' : '#38BDF8'}
+              />
+              <rect
+                x="79"
+                y="19"
+                width="2"
+                height="2"
+                fill={tickCount % 3 === 2 ? '#E0F2FE' : '#38BDF8'}
+              />
+            </>
+          )}
+
+          {/* Shoulders & Mantle (with subtle frame shoulder lift) */}
+          <g transform={`translate(0, ${frameParams.shoulderLiftY})`}>
+            <path
+              d="M15 96 L22 65 L74 65 L81 96 Z"
+              fill={rig.cloakColorHex}
+            />
+            <rect x="34" y="65" width="28" height="31" fill="#1F1D29" />
+            <rect x="25" y="65" width="46" height="5" fill={rig.trimColorHex} />
+            <rect x="44" y="72" width="8" height="8" fill={rig.trimColorHex} fillOpacity="0.7" />
+          </g>
+
+          {/* Character Head Group (reacts to headTiltDeg & speaking syllable bob) */}
+          <g
+            transform={`translate(0, ${speakingBobY}) rotate(${frameParams.headTiltDeg}, 48, 46)`}
+          >
+            {/* Neck & Sculpted Head */}
+            <rect x="41" y="55" width="14" height="12" fill={rig.skinShadowHex} />
+            <rect x="30" y="29" width="36" height="30" fill={rig.skinToneHex} />
+            {/* Cheekbone & Temple Shading */}
+            <rect x="30" y="45" width="6" height="11" fill={rig.skinShadowHex} />
+            <rect x="60" y="45" width="6" height="11" fill={rig.skinShadowHex} />
+
+            {/* Warm Blush Highlight on 'happy' Frame */}
+            {activeFrame === 'happy' && (
+              <>
+                <rect x="32" y="46" width="5" height="3" fill="#F43F5E" fillOpacity="0.35" />
+                <rect x="59" y="46" width="5" height="3" fill="#F43F5E" fillOpacity="0.35" />
+              </>
+            )}
+
+            {/* Stern Brow Shadow Bar on 'stern' Frame */}
+            {activeFrame === 'stern' && (
+              <rect x="31" y="33" width="34" height="4" fill="#18131E" fillOpacity="0.35" />
+            )}
+
+            {/* Distinct Headgear, Hair & Props per Citizen Rig */}
+            {rig.hatStyle === 'clockmaker' && (
+              <>
+                {/* Master Vaelen: Clockmaker Velvet Beret + Brass Loupe */}
+                <rect x="24" y="17" width="48" height="12" fill={rig.cloakColorHex} />
+                <rect x="28" y="27" width="40" height="4" fill={rig.trimColorHex} />
+                {/* White Side-Beard & Mustache */}
+                <rect x="30" y="50" width="8" height="12" fill={rig.hairOrBeardHex} />
+                <rect x="58" y="50" width="8" height="12" fill={rig.hairOrBeardHex} />
+                <rect x="38" y="50" width="20" height="4" fill={rig.hairOrBeardHex} />
+                {/* Brass Spectacle Monocle */}
+                <rect
+                  x="50"
+                  y="36"
+                  width="13"
+                  height="11"
+                  fill="none"
+                  stroke="#F59E0B"
+                  strokeWidth="2"
+                />
+              </>
+            )}
+
+            {rig.hatStyle === 'botanist' && (
+              <>
+                {/* Isolde: Woven Herbalist Hood + Silver-Fern Sprig */}
+                <path d="M24 33 L32 13 L64 13 L72 33 Z" fill={rig.cloakColorHex} />
+                <rect x="26" y="29" width="7" height="25" fill={rig.hairOrBeardHex} />
+                <rect x="63" y="29" width="7" height="25" fill={rig.hairOrBeardHex} />
+                <rect x="59" y="19" width="11" height="5" fill="#6EE7B7" />
+              </>
+            )}
+
+            {rig.hatStyle === 'dockmaster' && (
+              <>
+                {/* Oswin: Weathered Sou'wester Oilskin Cap + Sea-Salt Beard */}
+                <path d="M18 29 L30 15 L66 15 L78 29 Z" fill={rig.cloakColorHex} />
+                <rect x="22" y="27" width="52" height="4" fill={rig.trimColorHex} />
+                <rect x="32" y="50" width="32" height="12" fill={rig.hairOrBeardHex} />
+              </>
+            )}
+
+            {rig.hatStyle === 'lutenist' && (
+              <>
+                {/* Sera: Plumed Bardic Cap + Flowing Locks */}
+                <path d="M24 27 L36 13 L72 17 L68 29 Z" fill={rig.cloakColorHex} />
+                <path d="M64 15 L82 7 L76 21 Z" fill={rig.trimColorHex} />
+                <rect x="26" y="29" width="6" height="26" fill={rig.hairOrBeardHex} />
+                <rect x="64" y="29" width="6" height="26" fill={rig.hairOrBeardHex} />
+              </>
+            )}
+
+            {rig.hatStyle === 'archivist' && (
+              <>
+                {/* Brother Corvus: Monastic Cowl + Silver Tonsure */}
+                <path
+                  d="M22 35 L30 12 L66 12 L74 35 L68 65 L28 65 Z"
+                  fill={rig.cloakColorHex}
+                  fillOpacity="0.45"
+                />
+                <rect x="28" y="19" width="40" height="10" fill={rig.cloakColorHex} />
+                <rect x="34" y="27" width="28" height="3" fill={rig.trimColorHex} />
+              </>
+            )}
+
+            {/* Reactive Eyebrows (neutral, happy, stern, thinking) */}
+            <line
+              x1="34"
+              y1={leftBrowOuterY}
+              x2="44"
+              y2={leftBrowInnerY}
+              stroke="#241E29"
+              strokeWidth="2.6"
+            />
+            <line
+              x1="52"
+              y1={rightBrowInnerY}
+              x2="62"
+              y2={rightBrowOuterY}
+              stroke="#241E29"
+              strokeWidth="2.6"
+            />
+
+            {/* Reactive Eyes & Gaze Tracking */}
+            <rect
+              x="36"
+              y={eyeTopY}
+              width="6"
+              height={effectiveEyeHeight}
+              fill="#16131B"
+            />
+            <rect
+              x="53"
+              y={eyeTopY}
+              width="6"
+              height={effectiveEyeHeight}
+              fill="#16131B"
+            />
+
+            {!isBlinking && (
+              <>
+                {/* Colored Iris & Specular Glint */}
+                <rect
+                  x={pupilXLeft}
+                  y={pupilY}
+                  width="3"
+                  height="3"
+                  fill={rig.eyeIrisHex}
+                />
+                <rect
+                  x={pupilXRight}
+                  y={pupilY}
+                  width="3"
+                  height="3"
+                  fill={rig.eyeIrisHex}
+                />
+                <rect
+                  x={pupilXLeft}
+                  y={pupilY}
+                  width="1.6"
+                  height="1.6"
+                  fill="#FFFDF9"
+                />
+                <rect
+                  x={pupilXRight}
+                  y={pupilY}
+                  width="1.6"
+                  height="1.6"
+                  fill="#FFFDF9"
+                />
+              </>
+            )}
+
+            {/* Lower-Lid Happy Squint Crescents */}
+            {activeFrame === 'happy' && !isBlinking && (
+              <>
+                <line
+                  x1="36"
+                  y1="45"
+                  x2="42"
+                  y2="44"
+                  stroke={rig.skinShadowHex}
+                  strokeWidth="1.5"
+                />
+                <line
+                  x1="53"
+                  y1="44"
+                  x2="59"
+                  y2="45"
+                  stroke={rig.skinShadowHex}
+                  strokeWidth="1.5"
+                />
+              </>
+            )}
+
+            {/* Reactive Mouth & Typewriter Viseme Articulation */}
+            {isSpeaking && viseme !== 'closed' ? (
+              <rect
+                x={48 - mouthWidth / 2}
+                y="52.5"
+                width={mouthWidth}
+                height={mouthOpenHeight}
+                rx={viseme === 'round' ? 2 : 0}
+                fill="#5E2B2E"
+              />
+            ) : frameParams.restingMouthStyle === 'smile' ? (
+              <path
+                d="M41 53 Q48 58.5 55 53"
+                stroke="#5E2B2E"
+                strokeWidth="2.5"
+                fill="none"
+              />
+            ) : frameParams.restingMouthStyle === 'stern-line' ? (
+              <path
+                d="M41 55 Q48 52.5 55 55"
+                stroke="#5E2B2E"
+                strokeWidth="2.5"
+                fill="none"
+              />
+            ) : frameParams.restingMouthStyle === 'pursed' ? (
+              <rect x="45.5" y="53" width="6" height="2.8" fill="#5E2B2E" />
+            ) : (
+              <rect x="43" y="53.5" width="10" height="2" fill="#5E2B2E" />
+            )}
+
+            {/* Thinking Gesture Hand on Chin when in 'thinking' frame */}
+            {activeFrame === 'thinking' && (
+              <rect
+                x="52"
+                y="56"
+                width="8"
+                height="6"
+                fill={rig.skinToneHex}
+                stroke={rig.skinShadowHex}
+                strokeWidth="1"
+              />
+            )}
+          </g>
+        </svg>
+
+        {/* Top-Left Reactive Frame State Pill inside Portrait */}
+        <span
+          className={`absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono-tabular uppercase tracking-wider border ${frameParams.badgeColorClass}`}
+        >
+          {frameParams.shortLabel}
+        </span>
+
+        {/* Bottom-Right Live Syllable Viseme Pulse Indicator */}
+        {isSpeaking && (
+          <span
+            className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 border border-amber-500/40 text-[9px] font-mono-tabular text-amber-300 flex items-center gap-1"
+            title={`Active Typewriter Viseme: ${viseme}`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+            <span>{viseme.toUpperCase()}</span>
+          </span>
+        )}
+      </div>
+
+      {/* Interactive 4-Frame Selector Bar (neutral, happy, stern, thinking) */}
+      {!compact && onSelectOverrideFrame && (
+        <div
+          className="grid grid-cols-4 gap-1 w-full max-w-[148px]"
+          title="Character Portrait Engine: Click to test reactive frames (neutral, happy, stern, thinking)"
+        >
+          {REACTIVE_PORTRAIT_FRAMES.map((frameKey) => {
+            const def = REACTIVE_FRAME_DEFINITIONS[frameKey];
+            const isSelected = activeFrame === frameKey;
+            const isManualOverride = overrideFrame === frameKey;
+            return (
+              <button
+                key={frameKey}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectOverrideFrame(isManualOverride ? null : frameKey);
+                }}
+                className={`px-1 py-0.5 rounded text-[9px] font-mono-tabular text-center border transition-all ${
+                  isSelected
+                    ? `${def.badgeColorClass} font-semibold shadow-sm`
+                    : 'bg-zinc-900/70 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-zinc-200'
+                }`}
+                title={`Switch portrait to '${frameKey}' frame`}
+              >
+                {def.shortLabel.slice(0, 4)}
+              </button>
+            );
+          })}
+        </div>
       )}
     </div>
   );
@@ -219,6 +541,7 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
   const [showUpgradeDrawer, setShowUpgradeDrawer] = useState<boolean>(false);
   const [revealedChars, setRevealedChars] = useState<number>(0);
   const [recentMemoryBanner, setRecentMemoryBanner] = useState<string | null>(null);
+  const [overrideFrame, setOverrideFrame] = useState<ReactivePortraitFrame | null>(null);
 
   const activeDialog: NpcDialogState | null = telemetry.activeNpcDialog;
   const activeCutscene: ActiveCutsceneState | null = telemetry.activeCutscene;
@@ -238,6 +561,7 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
       lastNpcIdRef.current = null;
       setShowUpgradeDrawer(false);
       setRecentMemoryBanner(null);
+      setOverrideFrame(null);
       return;
     }
     if (lastNpcIdRef.current !== activeDialog.npcId) {
@@ -253,6 +577,7 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
       setCurrentNodeId(startNode);
       setShowUpgradeDrawer(false);
       setRevealedChars(0);
+      setOverrideFrame(null);
     }
   }, [activeDialog, citizenProfile]);
 
@@ -377,6 +702,9 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
       soundEngine.playEmberCollect();
     }
 
+    // Clear manual portrait frame override when advancing to a new dialogue node
+    setOverrideFrame(null);
+
     if (choice.triggersCutscene) {
       onCloseNpcDialog();
       onTriggerCutscene(choice.triggersCutscene);
@@ -436,11 +764,18 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
         <div className="w-full bg-[#0B0B0E]/95 border-t border-zinc-800/80 px-6 py-4 pointer-events-auto">
           <div className="max-w-3xl mx-auto flex items-center gap-4">
             {speakerCitizen && (
-              <div className="hidden sm:block scale-90 origin-left">
-                <CitizenPortraitSvg
-                  citizen={speakerCitizen}
-                  expression={activeCutscene.expression || 'warm'}
+              <div className="hidden sm:block">
+                <CharacterPortraitEngine
+                  npcId={`citizen-${speakerCitizen.id}`}
+                  citizenId={speakerCitizen.id}
+                  expression={activeCutscene.expression || 'happy'}
+                  fullText={activeCutscene.subtitle}
+                  revealedChars={Math.max(
+                    1,
+                    Math.floor(activeCutscene.progress * activeCutscene.subtitle.length)
+                  )}
                   isSpeaking={true}
+                  compact={true}
                 />
               </div>
             )}
@@ -478,7 +813,7 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
   }
 
   // ==========================================================================
-  // 2. EXPRESSIVE BRANCHING CHARACTER DIALOGUE BOX
+  // 2. EXPRESSIVE BRANCHING CHARACTER DIALOGUE BOX + PORTRAIT ENGINE
   // ==========================================================================
   if (!activeDialog || !citizenProfile || !currentNode) {
     return null;
@@ -487,7 +822,18 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
   const scheduleSlot = evaluateCitizenSchedule(citizenProfile, telemetry.dayCycleHour);
   const isTyping = revealedChars < resolvedLine.text.length;
   const displayedText = resolvedLine.text.slice(0, revealedChars);
-  const expBadge = EXPRESSION_BADGE[resolvedLine.expression];
+
+  const activePortraitEval = evaluatePortraitEngineState({
+    npcId: activeDialog.npcId,
+    citizenId: activeDialog.citizenId || citizenProfile.id,
+    expression: resolvedLine.expression,
+    overrideFrame,
+    fullText: resolvedLine.text,
+    revealedChars,
+    isSpeaking: isTyping,
+    tickCount: 0,
+  });
+
   const citizenAffinity = memoryStore.affinity[citizenProfile.id] || 1;
 
   const visibleChoices = currentNode.choices.filter((c) => {
@@ -503,19 +849,19 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
   return (
     <div className="fixed inset-x-0 bottom-24 z-40 flex justify-center px-4 pointer-events-none">
       <div className="pointer-events-auto w-full max-w-2xl bg-[#141418]/96 text-zinc-100 border border-amber-500/40 rounded-2xl shadow-2xl overflow-hidden">
-        {/* Top Citizen Identity & Daily Routine Header */}
+        {/* Top Citizen Identity & Reactive Portrait Frame Badge Header */}
         <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 bg-zinc-900/90 border-b border-zinc-800">
           <div className="flex items-center gap-2.5">
             <MessageSquare className="w-4 h-4 text-amber-400 shrink-0" />
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center flex-wrap gap-2">
                 <h2 className="font-display text-base font-semibold text-zinc-100">
                   {citizenProfile.name}
                 </h2>
                 <span
-                  className={`px-2 py-0.5 text-[10px] font-mono-tabular rounded border ${expBadge.colorClass}`}
+                  className={`px-2 py-0.5 text-[10px] font-mono-tabular rounded border ${activePortraitEval.frameParams.badgeColorClass}`}
                 >
-                  {expBadge.label}
+                  {activePortraitEval.frameParams.badgeLabel}
                 </span>
               </div>
               <p className="text-[11px] font-mono-tabular text-amber-300/90">
@@ -567,10 +913,14 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
             </span>
           </span>
 
-          {resolvedLine.usesMemoryFlag && (
+          {resolvedLine.usesMemoryFlag ? (
             <span className="inline-flex items-center gap-1 text-emerald-300 font-medium">
               <BookmarkCheck className="w-3.5 h-3.5 text-emerald-400" />
               <span>{citizenProfile.name} remembers your past actions</span>
+            </span>
+          ) : (
+            <span className="text-zinc-400 truncate max-w-[260px]">
+              {activePortraitEval.flavorNote}
             </span>
           )}
         </div>
@@ -583,23 +933,30 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
           </div>
         )}
 
-        {/* Main Portrait + Typewriter Speech Body */}
+        {/* Main Character Portrait Engine + Typewriter Speech Body */}
         {!showUpgradeDrawer ? (
           <div className="p-5 space-y-4">
-            <div
-              onClick={() => {
-                if (isTyping) setRevealedChars(resolvedLine.text.length);
-              }}
-              className="flex flex-col sm:flex-row items-start gap-4 cursor-pointer"
-              title={isTyping ? 'Click to complete text immediately' : undefined}
-            >
-              <CitizenPortraitSvg
-                citizen={citizenProfile}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              {/* Reactive Character Portrait Engine */}
+              <CharacterPortraitEngine
+                npcId={activeDialog.npcId}
+                citizenId={activeDialog.citizenId || citizenProfile.id}
                 expression={resolvedLine.expression}
+                overrideFrame={overrideFrame}
+                onSelectOverrideFrame={setOverrideFrame}
+                fullText={resolvedLine.text}
+                revealedChars={revealedChars}
                 isSpeaking={isTyping}
               />
 
-              <div className="flex-1 min-h-[84px] p-3.5 bg-zinc-900/80 border border-zinc-800/90 rounded-xl flex flex-col justify-between">
+              {/* Typewriter Dialogue Box */}
+              <div
+                onClick={() => {
+                  if (isTyping) setRevealedChars(resolvedLine.text.length);
+                }}
+                className="flex-1 w-full min-h-[118px] p-3.5 bg-zinc-900/80 border border-zinc-800/90 rounded-xl flex flex-col justify-between cursor-pointer"
+                title={isTyping ? 'Click to complete text immediately' : undefined}
+              >
                 <p className="text-sm sm:text-[15px] text-zinc-100 leading-relaxed">
                   “{displayedText}”
                   {isTyping && (
@@ -607,13 +964,18 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
                   )}
                 </p>
 
-                <div className="flex items-center justify-between pt-2 mt-2 border-t border-zinc-800/60 text-[10px] font-mono-tabular text-zinc-400">
-                  <span className="inline-flex items-center gap-1">
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 mt-2.5 border-t border-zinc-800/60 text-[10px] font-mono-tabular text-zinc-400">
+                  <span className="inline-flex items-center gap-1.5">
                     <Volume2 className="w-3 h-3 text-amber-400" />
-                    <span>Voice Pitch {citizenProfile.voicePitchHz}Hz ({citizenProfile.voiceTimbre})</span>
+                    <span>
+                      Voice {citizenProfile.voicePitchHz}Hz ({citizenProfile.voiceTimbre}) · Frame:{' '}
+                      <strong className="text-zinc-200 uppercase">
+                        {activePortraitEval.activeFrame}
+                      </strong>
+                    </span>
                   </span>
                   <span>
-                    {isTyping ? 'Click box to skip typing' : 'Choose your response below'}
+                    {isTyping ? 'Click text to complete line' : 'Select a response below'}
                   </span>
                 </div>
               </div>
