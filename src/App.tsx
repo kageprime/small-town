@@ -4,7 +4,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { BookOpen, CloudFog, Flame, Heart, Moon, Sun, Volume2, Zap } from 'lucide-react';
+import { Flame, Heart, Zap } from 'lucide-react';
 import {
   CardinalDirection,
   ContactSheetFrame,
@@ -115,7 +115,7 @@ export default function App() {
   const [visitedTiles, setVisitedTiles] = useState<Set<string>>(() => new Set(['0,0']));
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [currentTime, setCurrentTime] = useState<number>(0.0);
-  const [isDockCollapsed, setIsDockCollapsed] = useState<boolean>(false);
+  const [isDockCollapsed, setIsDockCollapsed] = useState<boolean>(true);
   const [isBestiaryOpen, setIsBestiaryOpen] = useState<boolean>(false);
 
   const [isContactSheetOpen, setIsContactSheetOpen] = useState<boolean>(false);
@@ -298,7 +298,8 @@ export default function App() {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === 'h' || e.key === 'H') {
+      if (e.key === 'h' || e.key === 'H' || e.key === 'Tab') {
+        if (e.key === 'Tab') e.preventDefault();
         setIsDockCollapsed((prev) => !prev);
       } else if (e.key === 'r' || e.key === 'R') {
         setConfig((prev) => ({ ...prev, cameraYawIndex: (prev.cameraYawIndex + 1) % 4 }));
@@ -316,158 +317,94 @@ export default function App() {
     Math.min(100, Math.round((telemetry.stamina / telemetry.maxStamina) * 100))
   );
 
+  const isOverlayActive = Boolean(
+    telemetry.activeNpcDialog || telemetry.activeCutscene || isBestiaryOpen || !isDockCollapsed
+  );
+
   return (
     <div className="relative w-screen h-screen overflow-hidden select-none">
-      {/* Top-Left Region Header + Wayfarer Vitality, Stamina & Soul Embers HUD */}
-      <header className="fixed top-4 left-5 z-20 max-w-[calc(100vw-250px)] flex flex-col gap-1.5 pointer-events-none">
-        <div className="inline-flex flex-wrap items-center gap-2.5 px-3.5 py-2 bg-[#161618]/90 text-zinc-100 border border-zinc-800 rounded-xl shadow-lg">
-          <h1 className="font-display text-sm sm:text-base font-semibold tracking-tight whitespace-nowrap shrink-0">
-            {telemetry.isInsideInterior
-              ? `${telemetry.activeBiomeTitle} (Interior Cutaway)`
-              : telemetry.activeBiomeTitle}
-          </h1>
-          <span aria-hidden="true" className="text-zinc-600">
-            ·
-          </span>
-          <div className="flex flex-wrap items-center gap-2 text-xs font-mono-tabular text-zinc-300">
-            <span className="inline-flex items-center gap-1 text-amber-300 font-medium">
-              {telemetry.dayCycleHour >= 6.5 && telemetry.dayCycleHour < 19.5 ? (
-                <Sun className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              ) : (
-                <Moon className="w-3.5 h-3.5 text-indigo-300 shrink-0" />
-              )}
-              <span>
-                {telemetry.formattedClock} · {telemetry.dayPhaseLabel}
-              </span>
-            </span>
-            <span aria-hidden="true" className="text-zinc-600">
-              ·
-            </span>
-            <span>
-              Beacons {telemetry.litBraziers}/{telemetry.totalBraziers} (
-              {telemetry.brazierIntensityMultiplier.toFixed(1)}× Glow)
-            </span>
-            <span aria-hidden="true" className="hidden sm:inline text-zinc-600">
-              ·
-            </span>
-            <span className="hidden sm:inline">
-              Sentinels {telemetry.enemiesDefeated}/{telemetry.totalEnemies}
-            </span>
-            <span aria-hidden="true" className="hidden md:inline text-zinc-600">
-              ·
-            </span>
-            <span className="hidden md:inline">
-              Relics {telemetry.shatteredCount}/{telemetry.totalDestructibles}
-            </span>
-          </div>
-        </div>
-
-        {/* RPG Vitality (HP), Stamina & Soul Embers Strip */}
-        <div className="inline-flex flex-wrap items-center gap-3 px-3 py-1.5 bg-[#161618]/90 text-zinc-200 border border-zinc-800/90 rounded-lg text-xs font-mono-tabular w-fit shadow-md">
-          {/* Health Bar */}
-          <div className="flex items-center gap-1.5">
-            <Heart className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-            <div className="w-20 h-2 bg-zinc-900 rounded-sm overflow-hidden border border-zinc-800">
-              <div
-                className="h-full bg-rose-500 transition-all duration-150"
-                style={{ width: `${hpPct}%` }}
-              />
-            </div>
-            <span className="text-[11px] text-zinc-300">
-              {telemetry.hp}/{telemetry.maxHp}
-            </span>
-          </div>
-
-          {/* Stamina Bar */}
-          <div className="flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <div className="w-16 h-2 bg-zinc-900 rounded-sm overflow-hidden border border-zinc-800">
-              <div
-                className="h-full bg-emerald-400 transition-all duration-75"
-                style={{ width: `${stamPct}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Soul Embers Counter */}
-          <div className="flex items-center gap-1 text-amber-300 font-semibold">
-            <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span>{telemetry.soulEmbers} Soul Embers</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsBestiaryOpen((prev) => !prev)}
-            className="pointer-events-auto inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-amber-300 border border-amber-500/30 rounded text-[11px] font-medium transition-colors"
-            title="Open Bestiary Log & Soul Ember Drop Codex (B)"
-          >
-            <BookOpen className="w-3 h-3 text-amber-400" />
-            <span>
-              Bestiary (
-              {
-                telemetry.bestiary.filter((b) => b.encountered || b.defeatedCount > 0)
-                  .length
-              }
-              /{telemetry.bestiary.length})
-            </span>
-          </button>
-
-          <span className="hidden lg:inline text-zinc-500">·</span>
-          <span className="hidden lg:inline text-[11px] text-zinc-400">
-            WASD Move · Q Evade · J Strike · E Interact · B Bestiary · R Orbit
-          </span>
-        </div>
-
-        {/* Active Ambient Trigger Zone Banner (Mist Bank / Audio Shift) */}
-        {telemetry.activeTriggerZone && (
-          <div className="inline-flex flex-wrap items-center gap-2.5 px-3 py-1.5 bg-[#12181E]/92 text-cyan-200 border border-cyan-800/70 rounded-lg text-xs font-mono-tabular w-fit shadow-md">
-            <CloudFog className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-            <span className="font-semibold text-cyan-100">
-              {telemetry.activeTriggerZone.title}
-            </span>
-            <span className="text-cyan-400/70">·</span>
-            <span className="text-[11px] text-cyan-200/90">
-              {telemetry.activeTriggerZone.subtitle}
-            </span>
-            <span className="text-cyan-400/70">·</span>
-            <span className="text-[11px] text-cyan-300">
-              Mist {Math.round(telemetry.activeTriggerZone.blendWeight * 100)}%
-            </span>
-            {config.soundEnabled && (
-              <>
-                <span className="text-cyan-400/70">·</span>
-                <span className="inline-flex items-center gap-1 text-[11px] text-amber-300">
-                  <Volume2 className="w-3 h-3" />
-                  Audio Shift ({telemetry.activeTriggerZone.audioProfile})
+      {/* Minimal Top-Left RPG Player Vitals & District Cluster */}
+      {!telemetry.activeCutscene && (
+        <header className="fixed top-4 left-4 z-20 flex flex-col gap-1.5 pointer-events-none">
+          <div className="flex items-center gap-3 px-3 py-2 bg-[#121216]/85 backdrop-blur-md border border-white/10 rounded-xl shadow-xl">
+            {/* HP & Stamina Bars */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-2">
+                <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500/30 shrink-0" />
+                <div className="w-24 sm:w-28 h-2 bg-zinc-900/90 rounded-full overflow-hidden border border-white/10">
+                  <div
+                    className="h-full bg-gradient-to-r from-rose-600 to-rose-400 transition-all duration-150"
+                    style={{ width: `${hpPct}%` }}
+                  />
+                </div>
+                <span className="text-[10px] font-mono-tabular text-zinc-300">
+                  {telemetry.hp}
                 </span>
-              </>
-            )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Zap className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <div className="w-20 sm:w-24 h-1.5 bg-zinc-900/90 rounded-full overflow-hidden border border-white/10">
+                  <div
+                    className="h-full bg-emerald-400 transition-all duration-75"
+                    style={{ width: `${stamPct}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="h-6 w-px bg-white/10" />
+
+            {/* Soul Embers Counter */}
+            <div
+              className="flex items-center gap-1.5 pr-1 text-amber-300"
+              title="Soul Embers"
+            >
+              <Flame className="w-4 h-4 text-amber-400 fill-amber-400/20 shrink-0" />
+              <span className="text-sm font-mono-tabular font-semibold">
+                {telemetry.soulEmbers}
+              </span>
+            </div>
           </div>
-        )}
-      </header>
 
-      {/* Top-Right Interactive Plate Grid Mini-Map */}
-      <MiniMap
-        worldMode={config.worldMode}
-        telemetry={telemetry}
-        plateCoord={config.plateCoord}
-        visitedTiles={visitedTiles}
-        cameraYawIndex={config.cameraYawIndex}
-        onSelectLandmarkOrTile={handleSelectMinimapTile}
-        onTravelPlate={handleTravelPlate}
-      />
+          {/* Subtle Location Subtitle */}
+          <div className="px-1 text-xs font-display font-medium text-zinc-200/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+            {telemetry.activeBiomeTitle}
+          </div>
+        </header>
+      )}
 
-      {/* Contextual World Interaction Prompt or Hitstop Feedback Banner */}
-      {(telemetry.nearbyPrompt || telemetry.lastActionToast) && (
-        <div className="fixed top-36 left-5 z-20 pointer-events-none flex flex-wrap items-center gap-2.5">
-          {telemetry.nearbyPrompt && (
-            <div className="px-3 py-1.5 bg-[#161618] text-amber-300 border border-zinc-800 rounded-lg text-xs font-mono-tabular shadow-md">
-              {telemetry.nearbyPrompt}
+      {/* Top-Right Compact Radar & Quick Utility Strip */}
+      {!telemetry.activeCutscene && (
+        <MiniMap
+          worldMode={config.worldMode}
+          telemetry={telemetry}
+          plateCoord={config.plateCoord}
+          visitedTiles={visitedTiles}
+          cameraYawIndex={config.cameraYawIndex}
+          soundEnabled={config.soundEnabled}
+          isMenuOpen={!isDockCollapsed}
+          onSelectLandmarkOrTile={handleSelectMinimapTile}
+          onTravelPlate={handleTravelPlate}
+          onToggleBestiary={() => setIsBestiaryOpen((prev) => !prev)}
+          onToggleSound={() =>
+            handleUpdateConfig({ soundEnabled: !config.soundEnabled })
+          }
+          onToggleMenu={() => setIsDockCollapsed((prev) => !prev)}
+        />
+      )}
+
+      {/* Centered Bottom-Screen Contextual RPG Interaction Prompt */}
+      {!isOverlayActive && (telemetry.nearbyPrompt || telemetry.lastActionToast) && (
+        <div className="fixed bottom-7 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center gap-1.5">
+          {telemetry.lastActionToast && (
+            <div className="px-3.5 py-1 bg-[#121216]/85 backdrop-blur-md text-zinc-200 border border-white/10 rounded-full text-xs font-medium shadow-lg whitespace-nowrap">
+              {telemetry.lastActionToast}
             </div>
           )}
-          {telemetry.lastActionToast && (
-            <div className="px-3 py-1.5 bg-[#161618] text-zinc-200 border border-zinc-800 rounded-lg text-xs font-medium shadow-md">
-              {telemetry.lastActionToast}
+          {telemetry.nearbyPrompt && (
+            <div className="px-4 py-1.5 bg-[#121216]/90 backdrop-blur-md text-amber-200 border border-amber-500/35 rounded-full text-xs font-medium shadow-xl whitespace-nowrap">
+              {telemetry.nearbyPrompt}
             </div>
           )}
         </div>
@@ -508,7 +445,7 @@ export default function App() {
         />
       </main>
 
-      {/* Collapsible Bottom Studio & Open-World Dock */}
+      {/* Hidden-by-Default World & Studio Menu Overlay (Toggled via [H] / [Tab] or Top-Right Button) */}
       <StudioDock
         config={config}
         telemetry={telemetry}

@@ -399,6 +399,9 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
         brazierIntensityMultiplier: dayNight.brazierIntensityMultiplier,
         cameraShakeIntensity: cameraShake.currentIntensity,
         bestiary: combatRig.bestiaryEntries,
+        npcStates: worldRig.getCitizenStateSnapshots
+          ? worldRig.getCitizenStateSnapshots()
+          : [],
         hp: player.hp,
         maxHp: player.maxHp,
         stamina: Math.round(player.stamina),
@@ -635,7 +638,14 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
         effectiveToggles,
         dayNight.brazierIntensityMultiplier,
         dayNight.nightFactor,
-        dayCycleHourRef.current
+        dayCycleHourRef.current,
+        {
+          dt,
+          playerX: player.position.x,
+          playerZ: player.position.z,
+          activeDialogNpcId: player.activeNpcDialog?.npcId ?? null,
+          isCutsceneActive: Boolean(activeCutsceneId),
+        }
       );
 
       postMaterial.uniforms.uOklabLevels.value = cfg.oklabLevels;

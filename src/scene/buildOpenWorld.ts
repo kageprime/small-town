@@ -4,6 +4,7 @@ import {
   CitizenId,
   LandmarkPOI,
   LayerToggles,
+  NpcStateMachineSnapshot,
 } from '../types/vignette';
 import {
   CircleCollider,
@@ -18,6 +19,7 @@ import {
   evaluateCitizenSchedule,
   VAELENPORT_CITIZENS,
 } from './dialogueAndCutscenes';
+import { VaelenportNpcRegistryStateMachine } from './npcStateMachine';
 import { createSeededRng } from './prng';
 
 export type VaelenportWorldEvent =
@@ -29,6 +31,7 @@ export interface VaelenportCityRig extends GothicCourtyardRig {
   getGroundHeight: (x: number, z: number) => number;
   triggerWorldEvent?: (event: VaelenportWorldEvent) => void;
   getCitizenPosition?: (citizenId: CitizenId) => { x: number; z: number } | null;
+  getCitizenStateSnapshots?: () => NpcStateMachineSnapshot[];
 }
 
 /**
@@ -1095,11 +1098,17 @@ export function buildContinuousOpenWorld(
     torsoPivot: THREE.Group;
     headPivot: THREE.Group;
     toolPivot: THREE.Group;
+    promptGem: THREE.Mesh;
     interactable: InteractiveProp;
     phaseOffset: number;
+    latestPrompt: string;
   }
 
   const citizenActors: ScheduledCitizenActor[] = [];
+  const npcStateMachine = new VaelenportNpcRegistryStateMachine(
+    12.0,
+    getOpenWorldGroundHeight
+  );
   const skinCitizenMat = createDappledMaterial('#E2BEA0', 0.6);
 
   (Object.keys(VAELENPORT_CITIZENS) as CitizenId[]).forEach((cid, idx) => {
@@ -1202,6 +1211,19 @@ export function buildContinuousOpenWorld(
     actorGroup.position.set(initSlot.x, groundY, initSlot.z);
     actorGroup.rotation.y = initSlot.facingAngle;
 
+    const defaultPrompt = `Press [E] to Speak with ${profile.name} (${profile.role})`;
+    const actorRecord: ScheduledCitizenActor = {
+      profile,
+      group: actorGroup,
+      torsoPivot,
+      headPivot,
+      toolPivot,
+      promptGem,
+      interactable: null as unknown as InteractiveProp,
+      phaseOffset: idx * 0.2,
+      latestPrompt: defaultPrompt,
+    };
+
     const npcInteractable: InteractiveProp = {
       id: `citizen-${profile.id}`,
       type: 'npc',
@@ -1218,21 +1240,13 @@ export function buildContinuousOpenWorld(
         loreHint: `${initSlot.districtTitle} · ${initSlot.activityLabel}`,
         scheduleActivity: initSlot.activityLabel,
       },
-      getPrompt: () =>
-        `Press [E] to Speak with ${profile.name} (${profile.role})`,
+      getPrompt: () => actorRecord.latestPrompt,
       activate: () => `Speaking with ${profile.name}`,
     };
 
+    actorRecord.interactable = npcInteractable;
     interactables.push(npcInteractable);
-    citizenActors.push({
-      profile,
-      group: actorGroup,
-      torsoPivot,
-      headPivot,
-      toolPivot,
-      interactable: npcInteractable,
-      phaseOffset: idx * 0.2,
-    });
+    citizenActors.push(actorRecord);
   });
 
   // ==========================================================================
@@ -1382,8 +1396,12 @@ export function buildContinuousOpenWorld(
     return { x: found.interactable.x, z: found.interactable.z };
   };
 
+  const getCitizenStateSnapshots = (): NpcStateMachineSnapshot[] => {
+    return npcStateMachine.getSnapshots();
+  };
+
   // ==========================================================================
-  // 8. DETERMINISTIC 60FPS WORLD ANIMATION & CITIZEN SCHEDULE UPDATE
+  // 8. DETERMINISTIC 60FPS WORLD ANIMATION & CITIZEN STATE MACHINE UPDATE
   // ==========================================================================
   const updateAtTime = (
     timeSeconds: number,
@@ -1391,7 +1409,14 @@ export function buildContinuousOpenWorld(
     toggles: LayerToggles,
     brazierIntensityMultiplier = 1.0,
     nightFactor = 0.0,
-    dayCycleHour = 12.0
+    dayCycleHour = 12.0,
+    npcContext?: {
+      dt: number;
+      playerX: number;
+      playerZ: number;
+      activeDialogNpcId: string | null;
+      isCutsceneActive: boolean;
+    }
   ) => {
     const wrappedT = ((timeSeconds % LOOP_DURATION) + LOOP_DURATION) % LOOP_DURATION;
     const normT = wrappedT / LOOP_DURATION;
@@ -1469,43 +1494,53 @@ export function buildContinuousOpenWorld(
       e.mesh.scale.set(s, s, s);
     });
 
-    // 7. Update Scheduled Citizens along their 24-Hour Routines
+    // 7. Update Scheduled Citizens via the NPC State Machine
+    const stepDt = npcContext && npcContext.dt > 0 ? npcContext.dt : 1 / 60;
+    const playerX = npcContext ? npcContext.playerX : 0.0;
+    const playerZ = npcContext ? npcContext.playerZ : 1.25;
+    const activeDialogNpcId = npcContext ? npcContext.activeDialogNpcId : null;
+    const isCutsceneActive = npcContext ? npcContext.isCutsceneActive : false;
+
     citizenActors.forEach((actor) => {
-      const slot = evaluateCitizenSchedule(actor.profile, dayCycleHour);
-      const targetGroundY = getOpenWorldGroundHeight(slot.x, slot.z);
+      const stateEval = npcStateMachine.stepCitizen(actor.profile.id, {
+        dt: stepDt,
+        timeSeconds,
+        dayCycleHour,
+        playerX,
+        playerZ,
+        activeDialogNpcId,
+        isCutsceneActive,
+        getGroundHeight: getOpenWorldGroundHeight,
+      });
 
-      // Smoothly glide citizen toward their scheduled post if transitioning between hours
-      actor.group.position.x += (slot.x - actor.group.position.x) * 0.12;
-      actor.group.position.z += (slot.z - actor.group.position.z) * 0.12;
-      actor.group.position.y = getOpenWorldGroundHeight(
-        actor.group.position.x,
-        actor.group.position.z
-      );
+      if (!stateEval) return;
+      const { snapshot, pose, dynamicPrompt } = stateEval;
 
-      let angleDiff = slot.facingAngle - actor.group.rotation.y;
-      while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
-      while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
-      actor.group.rotation.y += angleDiff * 0.15;
+      actor.group.position.set(snapshot.x, snapshot.y, snapshot.z);
+      actor.group.rotation.y = snapshot.facingAngle;
 
-      // Sync InteractiveProp coordinates so the player can converse with them at any post
-      actor.interactable.x = actor.group.position.x;
-      actor.interactable.z = actor.group.position.z;
+      // Apply procedural state machine rig pose (walking stride, work swing, idle breathing, alert look-at)
+      actor.torsoPivot.position.y = pose.torsoBobY;
+      actor.torsoPivot.rotation.y = pose.torsoTwistY;
+      actor.torsoPivot.rotation.x = pose.torsoLeanX;
+      actor.headPivot.rotation.y = pose.headYaw;
+      actor.headPivot.rotation.x = pose.headPitch;
+      actor.toolPivot.rotation.x = pose.toolPitch;
+      actor.toolPivot.rotation.z = pose.toolRoll;
+
+      actor.promptGem.position.y = pose.promptGemY;
+      actor.promptGem.rotation.y = u * 2.0;
+      actor.promptGem.scale.setScalar(pose.promptGemScale);
+
+      // Sync InteractiveProp coordinates, prompt, and live state machine snapshot
+      actor.latestPrompt = dynamicPrompt;
+      actor.interactable.x = snapshot.x;
+      actor.interactable.z = snapshot.z;
       if (actor.interactable.npcDialog) {
-        actor.interactable.npcDialog.scheduleActivity = slot.activityLabel;
-        actor.interactable.npcDialog.loreHint = `${slot.districtTitle} · ${slot.activityLabel}`;
+        actor.interactable.npcDialog.scheduleActivity = snapshot.scheduleActivity;
+        actor.interactable.npcDialog.loreHint = `${snapshot.districtTitle} · ${snapshot.subBehaviorLabel}`;
+        actor.interactable.npcDialog.npcState = snapshot;
       }
-
-      // Expressive Artisan Work-Idle Animation
-      const workCycle = (normT * 3.0 + actor.phaseOffset) % 1.0;
-      const smoothPhase = workCycle * Math.PI * 2.0;
-      const swing = Math.sin(smoothPhase);
-      actor.toolPivot.rotation.x = -0.2 + swing * 0.38;
-      actor.toolPivot.rotation.z = swing * 0.18;
-      actor.torsoPivot.position.y = 0.72 + Math.abs(swing) * 0.03;
-      actor.torsoPivot.rotation.y = swing * 0.14;
-      actor.headPivot.rotation.y = -swing * 0.1;
-
-      void targetGroundY;
     });
 
     // 8. Canal Water Ripple Rings
@@ -1598,6 +1633,7 @@ export function buildContinuousOpenWorld(
     getGroundHeight: getOpenWorldGroundHeight,
     triggerWorldEvent,
     getCitizenPosition,
+    getCitizenStateSnapshots,
     spawnShatterDebris,
     stepDebrisPhysics,
     respawnDestructibles,

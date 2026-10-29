@@ -142,6 +142,43 @@ export interface ActiveCutsceneState {
   totalKeyframes: number;
 }
 
+export type NpcBehaviorState =
+  | 'idle'
+  | 'working'
+  | 'moving-schedule'
+  | 'moving-patrol'
+  | 'alert-ready'
+  | 'interacting';
+
+export type NpcInteractionReadiness =
+  | 'distant'
+  | 'aware'
+  | 'ready'
+  | 'engaged'
+  | 'busy-cutscene';
+
+export interface NpcStateMachineSnapshot {
+  npcId: string;
+  citizenId: CitizenId;
+  name: string;
+  role: string;
+  state: NpcBehaviorState;
+  interactionReadiness: NpcInteractionReadiness;
+  districtTitle: string;
+  scheduleActivity: string;
+  subBehaviorLabel: string;
+  x: number;
+  y: number;
+  z: number;
+  targetX: number;
+  targetZ: number;
+  facingAngle: number;
+  moveSpeed: number;
+  distanceToPlayer: number;
+  scheduleWindowLabel: string;
+  nextTransitionHour: number;
+}
+
 export interface NpcDialogState {
   npcId: string;
   citizenId?: CitizenId;
@@ -150,6 +187,7 @@ export interface NpcDialogState {
   greeting: string;
   loreHint: string;
   scheduleActivity?: string;
+  npcState?: NpcStateMachineSnapshot;
 }
 
 export interface FishingMinigameState {
@@ -204,6 +242,7 @@ export interface PlayerTelemetry {
   brazierIntensityMultiplier: number;
   cameraShakeIntensity: number;
   bestiary: BestiaryEntry[];
+  npcStates?: NpcStateMachineSnapshot[];
   hp: number;
   maxHp: number;
   stamina: number;

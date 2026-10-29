@@ -73,7 +73,14 @@ export interface GothicCourtyardRig {
     toggles: LayerToggles,
     brazierIntensityMultiplier?: number,
     nightFactor?: number,
-    dayCycleHour?: number
+    dayCycleHour?: number,
+    npcContext?: {
+      dt: number;
+      playerX: number;
+      playerZ: number;
+      activeDialogNpcId: string | null;
+      isCutsceneActive: boolean;
+    }
   ) => void;
   dispose: () => void;
 }
