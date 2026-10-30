@@ -40,9 +40,9 @@ export interface VaelenportCityRig extends GothicCourtyardRig {
 export const OPEN_WORLD_LANDMARKS: LandmarkPOI[] = [
   {
     id: 'lantern-plaza',
-    title: 'Lantern Plaza & Astrolabe Fountain',
-    shortLabel: 'Lantern Plaza',
-    regionName: 'Central Sanctuary Tier (+0.28m)',
+    title: 'The Hold & Spire Gate (Terminus Hub)',
+    shortLabel: 'The Hold',
+    regionName: 'Cinderfall Base · Combine HQ (+0.28m)',
     biome: 'crypt-courtyard',
     x: 0,
     z: 1.2,
@@ -51,9 +51,9 @@ export const OPEN_WORLD_LANDMARKS: LandmarkPOI[] = [
   },
   {
     id: 'clockmaker-guildhall',
-    title: "Master Vaelen's Clockmaker Guildhall",
-    shortLabel: 'Guildhall',
-    regionName: 'West Lantern Plaza (+0.28m)',
+    title: 'The Gilt Bazaar (Sera\'s Fiat Field)',
+    shortLabel: 'Gilt Bazaar',
+    regionName: 'West Terminus · Peace-Bonded Market (+0.28m)',
     biome: 'ossuary-belltower',
     x: -7.5,
     z: -1.8,
@@ -62,9 +62,9 @@ export const OPEN_WORLD_LANDMARKS: LandmarkPOI[] = [
   },
   {
     id: 'lower-canal-quays',
-    title: 'Lower Canal Quays & Gondola Jetty',
-    shortLabel: 'Canal Quays',
-    regionName: 'Southern Waterway Basin (+0.20m)',
+    title: 'Floor 1: The Muster Ward & Choke Span',
+    shortLabel: 'F01 Muster',
+    regionName: 'The Down · 200-Climber Filter (+0.20m)',
     biome: 'sunken-fen',
     x: -2.0,
     z: 11.2,
@@ -73,9 +73,9 @@ export const OPEN_WORLD_LANDMARKS: LandmarkPOI[] = [
   },
   {
     id: 'eastern-canal-lock',
-    title: 'Eastern Canal Lock & Waterwheel',
-    shortLabel: 'Canal Lock',
-    regionName: 'East Sluice Gate (+0.20m)',
+    title: 'Floor 2: The Endless Gala Hall & Bells',
+    shortLabel: 'F02 Gala Hall',
+    regionName: 'The Down · Heir Seven\'s Arena (+0.20m)',
     biome: 'sunken-fen',
     x: 9.5,
     z: 10.4,
@@ -84,9 +84,9 @@ export const OPEN_WORLD_LANDMARKS: LandmarkPOI[] = [
   },
   {
     id: 'scholars-cloister',
-    title: "Scholars' Cloister & Rose Window",
-    shortLabel: 'Cloister',
-    regionName: 'Northern Upper Terrace (+1.15m)',
+    title: 'Floor 0: The Unfinished Block & Door F7',
+    shortLabel: 'F00 Block',
+    regionName: 'The Down · B13 Black Water (+1.15m)',
     biome: 'ossuary-belltower',
     x: -1.8,
     z: -13.5,
@@ -95,9 +95,9 @@ export const OPEN_WORLD_LANDMARKS: LandmarkPOI[] = [
   },
   {
     id: 'apothecary-conservatory',
-    title: "Isolde's Apothecary Conservatory",
-    shortLabel: 'Conservatory',
-    regionName: 'East Cloister Terrace (+1.15m)',
+    title: 'Doc Sable\'s Container Clinic',
+    shortLabel: 'Sable Clinic',
+    regionName: 'Sync/Rot Triage & Ward C Wire (+1.15m)',
     biome: 'apothecary-stall',
     x: 7.4,
     z: -12.8,
@@ -277,42 +277,42 @@ export function buildContinuousOpenWorld(
   };
 
   // ==========================================================================
-  // HAND-CRAFTED ARCHITECTURAL PALETTE MATERIALS
+  // HAND-CRAFTED ARCHITECTURAL PALETTE MATERIALS (LOCKED CINDERFALL PALETTE)
   // ==========================================================================
-  const basaltFoundationMat = createDappledMaterial('#262830', 0.45);
-  const plazaLimestoneMat = createDappledMaterial('#747066', 0.95);
-  const plazaFlagstoneLightMat = createDappledMaterial('#8A8478', 1.0, true);
-  const plazaFlagstoneWarmMat = createDappledMaterial('#7F7668', 0.95, true);
-  const cloisterMarbleMat = createDappledMaterial('#948E82', 0.92);
-  const quayCobbleMat = createDappledMaterial('#565B64', 0.88);
-  const ashlarWallMat = createDappledMaterial('#66625B', 0.78);
-  const ashlarTrimMat = createDappledMaterial('#857F74', 0.85);
-  const darkIronMat = createDappledMaterial('#2A2D36', 0.35);
-  const brassMat = createDappledMaterial('#D49B3E', 0.55);
-  const timberDarkMat = createDappledMaterial('#4A3222', 0.65);
-  const timberWarmMat = createDappledMaterial('#6B472E', 0.7);
-  const roofSlateBlueMat = createDappledMaterial('#354356', 0.85);
-  const roofCrimsonTileMat = createDappledMaterial('#7B2D28', 0.85);
-  const foliageDeepMat = createDappledMaterial('#2D5A44', 0.95);
-  const foliageSageMat = createDappledMaterial('#487D5E', 1.0);
-  const waterCanalMat = createDappledMaterial('#1E4D58', 0.65, true);
-  const waterFountainMat = createDappledMaterial('#2B7280', 0.75, true);
+  const basaltFoundationMat = createDappledMaterial('#141114', 0.35);
+  const plazaLimestoneMat = createDappledMaterial('#1e1a1c', 0.65);
+  const plazaFlagstoneLightMat = createDappledMaterial('#282226', 0.72, true);
+  const plazaFlagstoneWarmMat = createDappledMaterial('#221d20', 0.68, true);
+  const cloisterMarbleMat = createDappledMaterial('#2b2528', 0.68);
+  const quayCobbleMat = createDappledMaterial('#1b181a', 0.65);
+  const ashlarWallMat = createDappledMaterial('#3a3235', 0.58);
+  const ashlarTrimMat = createDappledMaterial('#4d4347', 0.65);
+  const darkIronMat = createDappledMaterial('#141114', 0.28);
+  const brassMat = createDappledMaterial('#e8a020', 0.45);
+  const timberDarkMat = createDappledMaterial('#261e20', 0.52);
+  const timberWarmMat = createDappledMaterial('#382b2d', 0.58);
+  const roofSlateBlueMat = createDappledMaterial('#1e1a1c', 0.62);
+  const roofCrimsonTileMat = createDappledMaterial('#4a201c', 0.62);
+  const foliageDeepMat = createDappledMaterial('#283624', 0.72);
+  const foliageSageMat = createDappledMaterial('#3c5431', 0.75);
+  const waterCanalMat = createDappledMaterial('#111820', 0.48, true);
+  const waterFountainMat = createDappledMaterial('#182430', 0.55, true);
 
   const glassConservatoryMat = new THREE.MeshLambertMaterial({
-    color: '#88D4E8',
+    color: '#5591c7',
     transparent: true,
-    opacity: 0.48,
+    opacity: 0.44,
   });
   materials.push(glassConservatoryMat);
 
-  const flameInnerMat = new THREE.MeshBasicMaterial({ color: '#FFF6D6' });
-  const flameOuterMat = new THREE.MeshBasicMaterial({ color: '#F59E0B' });
-  const roseWindowGlowMat = new THREE.MeshBasicMaterial({ color: '#F59E0B' });
-  const emeraldElixirMat = new THREE.MeshBasicMaterial({ color: '#34D399' });
+  const flameInnerMat = new THREE.MeshBasicMaterial({ color: '#f4efe4' });
+  const flameOuterMat = new THREE.MeshBasicMaterial({ color: '#e8a020' });
+  const roseWindowGlowMat = new THREE.MeshBasicMaterial({ color: '#e5482f' });
+  const emeraldElixirMat = new THREE.MeshBasicMaterial({ color: '#9fd8e8' });
   const waterRippleMat = new THREE.MeshBasicMaterial({
-    color: '#7DD3FC',
+    color: '#5591c7',
     transparent: true,
-    opacity: 0.42,
+    opacity: 0.34,
   });
   materials.push(
     flameInnerMat,
@@ -348,18 +348,27 @@ export function buildContinuousOpenWorld(
   plazaSlab.position.set(0, 0.0, -2.6);
   root.add(plazaSlab);
 
-  // Herringbone & Radial Flagstone Inlays across the Lantern Plaza
-  const tileGeo = trackGeo(new THREE.BoxGeometry(1.35, 0.04, 0.95));
-  for (let gx = -12; gx <= 12; gx += 2) {
-    for (let gz = -9; gz <= 4; gz += 2) {
-      const distCenter = Math.hypot(gx, gz + 0.5);
-      if (distCenter < 2.4) continue; // Leave room for Astrolabe Fountain
+  // Concentric Carved Stone Ring & Dressed Ashlar Walkway Courses across Lantern Plaza
+  const fountainRingOuter = new THREE.Mesh(
+    trackGeo(new THREE.CylinderGeometry(3.4, 3.45, 0.03, 16)),
+    ashlarTrimMat
+  );
+  fountainRingOuter.position.set(0, 0.275, -0.5);
+  root.add(fountainRingOuter);
+
+  const tileGeo = trackGeo(new THREE.BoxGeometry(1.72, 0.025, 1.72));
+  for (let gx = -8; gx <= 8; gx += 1) {
+    for (let gz = -5; gz <= 2; gz += 1) {
+      const worldX = gx * 1.82;
+      const worldZ = gz * 1.82 - 0.5;
+      const distCenter = Math.hypot(worldX, worldZ + 0.5);
+      if (distCenter < 3.45) continue; // Fountain ring
+      if (worldX < -4.2 && worldZ < -0.5) continue; // Inside Guildhall footprint
       const tile = new THREE.Mesh(
         tileGeo,
-        (gx + gz) % 4 === 0 ? plazaFlagstoneLightMat : plazaFlagstoneWarmMat
+        (Math.abs(gx) + Math.abs(gz)) % 2 === 0 ? plazaFlagstoneLightMat : plazaFlagstoneWarmMat
       );
-      tile.position.set(gx * 0.95, 0.27, gz * 0.95);
-      tile.rotation.y = ((gx * 3 + gz) % 2) * 0.04;
+      tile.position.set(worldX, 0.272, worldZ);
       root.add(tile);
     }
   }
@@ -551,7 +560,7 @@ export function buildContinuousOpenWorld(
   skiffLanternGlow.position.set(0.95, 0.85, 0);
   gondolaPivot.add(skiffLanternGlow);
 
-  // Interactive Canal Fishing Spot on the Gondola Jetty
+  // Interactive B13 Black-Water Sump Dredge Line on the Muster Jetty
   interactables.push({
     id: 'canal-jetty-fishing',
     type: 'fishing',
@@ -559,8 +568,8 @@ export function buildContinuousOpenWorld(
     z: 10.1,
     radius: 2.3,
     isActivated: false,
-    getPrompt: () => 'Press [E] to Cast Line from the Lower Canal Gondola Jetty',
-    activate: () => 'Cast fishing line into the Lower Canal basin!',
+    getPrompt: () => 'Press [E] to Drop Dredge-Hook into the B13 Black-Water Sump',
+    activate: () => 'Dropped magnetic dredge-line into the B13 Black-Water Sump!',
   });
 
   // Eastern Mechanical Canal Lock Gate & Rotating Waterwheel (x = 11.2, z = 7.6)
@@ -637,15 +646,15 @@ export function buildContinuousOpenWorld(
     isActivated: false,
     getPrompt: () =>
       canalLockOpen
-        ? 'Press [E] to Close Eastern Canal Lock Sluice'
-        : 'Press [E] to Turn Brass Capstan & Open the Old Canal Lock',
+        ? 'Press [E] to Seal the Muster-to-Gala Flood Bulkhead'
+        : 'Press [E] to Crank Winch & Breach the Floor 2 Gala Hall Bulkhead',
     activate: () => {
       canalLockOpen = !canalLockOpen;
       lockInteractable.isActivated = canalLockOpen;
       lockTargetAngle = canalLockOpen ? 1.18 : 0.0;
       return canalLockOpen
-        ? 'Cranked open the Eastern Canal Lock Gates — the canal surges freely!'
-        : 'Closed the Eastern Canal Lock Gates.';
+        ? 'Breached the Muster Flood Bulkhead — Returned Crawlspace & Floor 2 Gala Hall open!'
+        : 'Sealed the Muster Flood Bulkhead.';
     },
   };
   interactables.push(lockInteractable);
@@ -782,12 +791,26 @@ export function buildContinuousOpenWorld(
   guildRoofLower.scale.set(1.15, 1.0, 0.88);
   guildRoofPivot.add(guildRoofLower);
 
-  const guildClockSpire = new THREE.Mesh(
-    trackGeo(new THREE.CylinderGeometry(0.45, 0.58, 1.8, 6)),
+  const guildCupolaBase = new THREE.Mesh(
+    trackGeo(new THREE.CylinderGeometry(0.52, 0.58, 0.95, 6)),
+    ashlarWallMat
+  );
+  guildCupolaBase.position.set(0, 1.05, 0);
+  guildRoofPivot.add(guildCupolaBase);
+
+  const guildCupolaRoof = new THREE.Mesh(
+    trackGeo(new THREE.ConeGeometry(0.68, 0.95, 6)),
+    roofSlateBlueMat
+  );
+  guildCupolaRoof.position.set(0, 1.95, 0);
+  guildRoofPivot.add(guildCupolaRoof);
+
+  const guildSpireFinial = new THREE.Mesh(
+    trackGeo(new THREE.OctahedronGeometry(0.16, 0)),
     brassMat
   );
-  guildClockSpire.position.set(0, 1.35, 0);
-  guildRoofPivot.add(guildClockSpire);
+  guildSpireFinial.position.set(0, 2.52, 0);
+  guildRoofPivot.add(guildSpireFinial);
 
   // East Plaza: The Hearthside Lute Pavilion (x = 6.2, z = -2.5)
   const pavilionGroup = new THREE.Group();
@@ -877,10 +900,10 @@ export function buildContinuousOpenWorld(
     z: -16.3,
     radius: 2.2,
     isActivated: false,
-    getPrompt: () => 'Press [E] to Toll the Scholars’ Cloister Sanctuary Bell',
+    getPrompt: () => 'Press [E] to Ring the Gala & Floor Zero Bell (Awakens VESTIGE Whisper)',
     activate: () => {
       bellSwingBoost = 1.0;
-      return 'The Scholars’ Cloister Bell resonates across all three tiers of Vaelenport!';
+      return 'The Bronze Spire Bell tolls across the Unfinished Block — VESTIGE stirs in your skull!';
     },
   });
 
@@ -1051,16 +1074,16 @@ export function buildContinuousOpenWorld(
       isActivated: bc.lit,
       getPrompt: () =>
         node.isLit
-          ? 'Press [E] to Douse Sanctuary Brazier'
-          : 'Press [E] to Ignite Sanctuary Brazier',
+          ? 'Press [E] to Dim Crossing Shrine Lamp'
+          : 'Press [E] to Light Crossing Shrine Lamp (+Echo Loyalty)',
       activate: () => {
         node.isLit = !node.isLit;
         inter.isActivated = node.isLit;
         node.flamePivot.visible = node.isLit;
         node.light.intensity = node.isLit ? 2.4 : 0;
         return node.isLit
-          ? 'Ignited Vaelenport Brazier — warm amber light spills across the stone!'
-          : 'Doused Vaelenport Brazier.';
+          ? 'Lit Crossing Shrine Oil-Lamp — Bram, Mercy, and Hush steady their loyalty!'
+          : 'Snuffed Crossing Shrine Oil-Lamp.';
       },
     };
     node.interactable = inter;
@@ -1559,59 +1582,59 @@ export function buildContinuousOpenWorld(
     textures.forEach((t) => t.dispose());
   };
 
-  // Invisible Ambient Trigger Zones tailored to the 3 Districts of Vaelenport
+  // Invisible Ambient Trigger Zones tailored to the Act 1 Spaces of NULLSPIRE: LEVEL ZERO
   const triggerZones: AmbientTriggerZone[] = [
     {
       id: 'zone-lower-canal-mist',
-      title: 'Lower Canal Quays & Lock Basin',
-      subtitle: 'Tidal Canal Mist & Waterwheel Drone',
+      title: 'Floor 1–2: Muster Ward & Endless Gala Hall',
+      subtitle: 'Black-Water Sump & Heir Seven\'s Bronze Bells',
       x: 2.0,
       z: 9.5,
       radius: 10.5,
       effect: 'fen-mist-bank',
       audioProfile: 'fen',
-      mistColorHex: '#7FA8B4',
-      mistDensity: 0.82,
-      lightTintHex: '#67E8F9',
+      mistColorHex: '#3a3235',
+      mistDensity: 0.45,
+      lightTintHex: '#e8a020',
     },
     {
       id: 'zone-conservatory-incense',
-      title: "Isolde's Apothecary Conservatory",
-      subtitle: 'Silver-Fern Botanical Vapor & Glass Chimes',
+      title: "Doc Sable's Container Clinic",
+      subtitle: 'Sync/Rot Centrifuge & Ward C Breath-Graft Line',
       x: 7.4,
       z: -14.5,
       radius: 6.5,
       effect: 'apothecary-incense',
       audioProfile: 'apothecary',
-      mistColorHex: '#6EE7B7',
-      mistDensity: 0.62,
-      lightTintHex: '#A7F3D0',
+      mistColorHex: '#5591c7',
+      mistDensity: 0.42,
+      lightTintHex: '#9fd8e8',
     },
     {
       id: 'zone-cloister-rose-window',
-      title: "Scholars' Cloister Rose Sanctuary",
-      subtitle: 'High Terrace Incense & Belfry Harmonics',
+      title: 'Floor 0: The Unfinished Block & Door F7',
+      subtitle: 'B13 Flooded Concrete & VESTIGE Awakening',
       x: -2.5,
       z: -16.0,
       radius: 7.0,
       effect: 'crypt-chill-veil',
       audioProfile: 'crypt',
-      mistColorHex: '#818CF8',
-      mistDensity: 0.58,
-      lightTintHex: '#C7D2FE',
+      mistColorHex: '#e5482f',
+      mistDensity: 0.42,
+      lightTintHex: '#e5482f',
     },
     {
       id: 'zone-guildhall-hearth',
-      title: "Clockmaker's Guildhall Forge",
-      subtitle: 'Warm Brass-Forge Updraft & Escapement Pulse',
+      title: 'The Hold & Gilt Bazaar (Sera\'s Fiat Field)',
+      subtitle: 'Combine Manifest Scale & Peace-Bonded Market',
       x: -7.5,
       z: -3.2,
       radius: 5.5,
       effect: 'ossuary-ash-surge',
       audioProfile: 'ossuary',
-      mistColorHex: '#FB923C',
-      mistDensity: 0.52,
-      lightTintHex: '#FDBA74',
+      mistColorHex: '#e8a020',
+      mistDensity: 0.42,
+      lightTintHex: '#e8a020',
     },
   ];
 

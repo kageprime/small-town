@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  BookmarkCheck,
-  Film,
   Flame,
   Heart,
   Sparkles,
@@ -22,7 +20,6 @@ import {
   CitizenProfile,
   CommunityMemoryStore,
   DialogueChoiceOption,
-  evaluateCitizenSchedule,
   loadCommunityMemory,
   saveCommunityMemory,
   VAELENPORT_CITIZENS,
@@ -57,8 +54,7 @@ interface CharacterPortraitEngineProps {
 /**
  * Character Portrait Engine component:
  * Maps NPC IDs to reactive portrait frames ('neutral' | 'happy' | 'stern' | 'thinking')
- * and renders syllable-synced visemes, eye blinks, brow/gaze shifts, and ambient motifs
- * alongside the typewriter dialogue text without debug UI clutter.
+ * and renders crisp, pixel-aligned SVG portraits with syllable-synced visemes and eye blinks.
  */
 export const CharacterPortraitEngine: React.FC<CharacterPortraitEngineProps> = ({
   npcId,
@@ -109,19 +105,15 @@ export const CharacterPortraitEngine: React.FC<CharacterPortraitEngineProps> = (
   const pupilY = 41 + frameParams.pupilOffsetY;
 
   return (
-    <div className="flex flex-col items-center shrink-0 select-none">
+    <div className="shrink-0 select-none">
       <div
         className={`relative ${
           compact ? 'w-16 h-16 sm:w-20 sm:h-20' : 'w-24 h-24 sm:w-28 sm:h-28'
-        } rounded-xl overflow-hidden border bg-[#121118] shadow-inner transition-colors duration-300`}
-        style={{
-          borderColor: frameParams.frameBorderHex,
-          boxShadow: `inset 0 0 20px ${frameParams.auraGlowHex}24`,
-        }}
+        } overflow-hidden border border-[#C8B273] bg-[#14120F] shadow-[inset_0_0_0_1px_rgba(200,178,115,0.22)] transition-colors duration-300`}
       >
         <svg
           viewBox="0 0 96 96"
-          className="w-full h-full"
+          className="w-full h-full block"
           shapeRendering="crispEdges"
         >
           {/* Architectural Backdrop & Frame-Reactive Aura */}
@@ -131,17 +123,17 @@ export const CharacterPortraitEngine: React.FC<CharacterPortraitEngineProps> = (
             cy="48"
             r="39"
             fill={frameParams.auraGlowHex}
-            fillOpacity={activeFrame === 'happy' ? '0.24' : '0.15'}
+            fillOpacity={activeFrame === 'happy' ? '0.22' : '0.14'}
           />
           <rect
-            x="5"
-            y="5"
-            width="86"
-            height="86"
+            x="4"
+            y="4"
+            width="88"
+            height="88"
             fill="none"
             stroke={rig.trimColorHex}
-            strokeWidth="1.5"
-            strokeOpacity="0.35"
+            strokeWidth="1"
+            strokeOpacity="0.32"
           />
 
           {/* Ambient Frame-Specific Motif Layer */}
@@ -177,18 +169,17 @@ export const CharacterPortraitEngine: React.FC<CharacterPortraitEngineProps> = (
           {frameParams.ambientMotif === 'iron-resolve' && (
             <>
               <path
-                d="M10 20 L10 10 L20 10"
+                d="M9 18 L9 9 L18 9"
                 stroke="#F43F5E"
-                strokeWidth="2.5"
+                strokeWidth="2"
                 fill="none"
               />
               <path
-                d="M86 20 L86 10 L76 10"
+                d="M87 18 L87 9 L78 9"
                 stroke="#F43F5E"
-                strokeWidth="2.5"
+                strokeWidth="2"
                 fill="none"
               />
-              <rect x="10" y="10" width="76" height="8" fill="#881337" fillOpacity="0.3" />
             </>
           )}
 
@@ -653,20 +644,14 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
     }
   }, [activeCutscene]);
 
-  // Allow Escape key to skip cutscene or close dialogue, or number keys 1-4 to pick choices
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (activeCutscene) {
-          onSkipCutscene();
-        } else if (activeDialog) {
-          onCloseNpcDialog();
-        }
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [activeCutscene, activeDialog, onCloseNpcDialog, onSkipCutscene]);
+  const visibleChoices = useMemo(() => {
+    if (!currentNode) return [];
+    return currentNode.choices.filter((c) => {
+      if (c.requiresMemory && !memoryStore.flags[c.requiresMemory]) return false;
+      if (c.excludesMemory && memoryStore.flags[c.excludesMemory]) return false;
+      return true;
+    });
+  }, [currentNode, memoryStore.flags]);
 
   const handleSelectChoice = (choice: DialogueChoiceOption) => {
     if (!citizenProfile) return;
@@ -724,8 +709,40 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
     setCurrentNodeId(choice.nextNodeId);
   };
 
+  // Allow Escape to close/skip, Space/Enter to complete typing, and 1-4 keys to pick choices
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (activeCutscene) {
+          onSkipCutscene();
+        } else if (activeDialog) {
+          onCloseNpcDialog();
+        }
+        return;
+      }
+
+      if (!activeDialog || showUpgradeDrawer) return;
+
+      if (e.key === ' ' || e.key === 'Enter') {
+        if (!isLineComplete && revealedChars < resolvedLine.text.length) {
+          e.preventDefault();
+          completeCurrentLineImmediately();
+        }
+        return;
+      }
+
+      const num = parseInt(e.key, 10);
+      if (num >= 1 && num <= visibleChoices.length) {
+        e.preventDefault();
+        handleSelectChoice(visibleChoices[num - 1]);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
   // ==========================================================================
-  // 1. IN-ENGINE CINEMATIC LETTERBOX OVERLAY
+  // 1. CLASSICAL CODEX CUTSCENE LETTERBOX
   // ==========================================================================
   if (activeCutscene) {
     const speakerCitizen =
@@ -735,28 +752,30 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
 
     return (
       <div className="fixed inset-0 z-40 pointer-events-none flex flex-col justify-between">
-        {/* Top Letterbox Bar */}
-        <div className="w-full h-14 bg-[#09090C]/95 border-b border-white/10 px-6 flex items-center justify-between pointer-events-auto">
-          <div className="flex items-center gap-3">
-            <Film className="w-4 h-4 text-amber-400 shrink-0" />
-            <h2 className="font-display text-sm sm:text-base font-semibold text-zinc-100 tracking-wide">
+        {/* Top Classical Cinema Bar */}
+        <div className="w-full h-12 bg-[#0B0A08]/95 border-b border-[#3A3327] px-6 sm:px-10 flex items-center justify-between pointer-events-auto">
+          <div className="flex items-center gap-2.5">
+            <span className="text-[9px] text-[#C8B273]">◆</span>
+            <span className="font-display text-xs sm:text-sm tracking-[0.2em] uppercase text-[#EFE7D6]">
               {activeCutscene.title}
-            </h2>
+            </span>
           </div>
 
           <button
             type="button"
             onClick={onSkipCutscene}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 text-xs font-medium transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 text-xs text-[#9E937E] hover:text-[#C8B273] transition-colors whitespace-nowrap shrink-0"
           >
+            <span className="px-1.5 py-0.5 text-[10px] font-mono-tabular bg-[#1C1914] border border-[#4A4132] text-[#C8B273]">
+              Esc
+            </span>
             <span>Skip</span>
-            <span className="text-[10px] font-mono-tabular text-zinc-400">[Esc]</span>
           </button>
         </div>
 
-        {/* Bottom Letterbox Narrative Caption Bar */}
-        <div className="w-full bg-[#09090C]/95 border-t border-white/10 px-6 py-4 pointer-events-auto">
-          <div className="max-w-3xl mx-auto flex items-center gap-4">
+        {/* Bottom Classical Codex Dialogue Window in Letterbox */}
+        <div className="w-full bg-[#0B0A08]/95 border-t border-[#C8B273]/60 px-6 py-5 pointer-events-auto">
+          <div className="max-w-2xl mx-auto flex items-center gap-5">
             {speakerCitizen && (
               <div className="hidden sm:block">
                 <CharacterPortraitEngine
@@ -774,30 +793,17 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
               </div>
             )}
 
-            <div className="flex-1 space-y-1.5">
+            <div className="flex-1 min-w-0 space-y-1.5">
               {activeCutscene.speakerName && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-amber-300 tracking-wide uppercase">
-                    {activeCutscene.speakerName}
-                  </span>
-                  {activeCutscene.speakerRole && (
-                    <span className="text-xs text-zinc-400">
-                      · {activeCutscene.speakerRole}
-                    </span>
-                  )}
+                <div className="font-display text-xs sm:text-sm font-semibold tracking-[0.16em] uppercase text-[#C8B273] flex items-center gap-2">
+                  <span className="text-[8px]">◆</span>
+                  <span>{activeCutscene.speakerName}</span>
                 </div>
               )}
 
-              <p className="text-sm sm:text-base text-zinc-100 leading-relaxed">
+              <p className="text-sm sm:text-base text-[#EFE7D6] leading-[1.7] tracking-[0.015em]">
                 “{activeCutscene.subtitle}”
               </p>
-
-              <div className="w-full h-0.5 bg-zinc-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-amber-400/80 transition-all duration-150"
-                  style={{ width: `${Math.round(activeCutscene.progress * 100)}%` }}
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -806,13 +812,12 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
   }
 
   // ==========================================================================
-  // 2. AUTHENTIC RPG CHARACTER DIALOGUE OVERLAY
+  // 2. MINIMALIST CLASSIC JRPG TEXTBOX OVERLAY
   // ==========================================================================
   if (!activeDialog || !citizenProfile || !currentNode) {
     return null;
   }
 
-  const scheduleSlot = evaluateCitizenSchedule(citizenProfile, telemetry.dayCycleHour);
   const isTyping = !isLineComplete && revealedChars < resolvedLine.text.length;
   const displayedText = isLineComplete
     ? resolvedLine.text
@@ -820,31 +825,67 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
 
   const citizenAffinity = memoryStore.affinity[citizenProfile.id] || 1;
 
-  const visibleChoices = currentNode.choices.filter((c) => {
-    if (c.requiresMemory && !memoryStore.flags[c.requiresMemory]) return false;
-    if (c.excludesMemory && memoryStore.flags[c.excludesMemory]) return false;
-    return true;
-  });
-
   const swordCost = telemetry.upgrades.swordLevel * 5;
   const lanternCost = telemetry.upgrades.lanternLevel * 5;
   const vitalityCost = telemetry.upgrades.vitalityLevel * 5;
 
   return (
-    <div className="fixed inset-x-0 bottom-6 z-40 flex justify-center px-4 pointer-events-none">
-      <div className="pointer-events-auto w-full max-w-2xl bg-[#111115]/95 backdrop-blur-md text-zinc-100 border border-amber-500/30 rounded-2xl shadow-2xl overflow-hidden">
-        {/* Subtle Memory Notification Whisper */}
-        {recentMemoryBanner && (
-          <div className="px-5 py-1.5 bg-amber-500/10 border-b border-amber-500/20 flex items-center gap-2 text-xs text-amber-200">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span>{recentMemoryBanner}</span>
+    <div className="fixed inset-x-0 bottom-6 z-40 flex justify-center px-4 sm:px-6 pointer-events-none">
+      <div className="relative pointer-events-auto w-full max-w-2xl">
+        {/* Docked Classical Codex Speaker Nameplate Tab */}
+        <div className="flex items-center justify-between mb-[-1px] relative z-10">
+          <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[#0B0A08] border border-b-0 border-[#C8B273]">
+            <span className="text-[9px] text-[#C8B273]">◆</span>
+            <span className="font-display text-xs sm:text-sm font-semibold tracking-[0.18em] uppercase text-[#EFE7D6]">
+              {citizenProfile.name}
+            </span>
+            <span className="text-[11px] text-[#9E937E] hidden sm:inline">
+              · {citizenProfile.role}
+            </span>
+            <div
+              className="flex items-center gap-1 pl-1"
+              title={`Sanctuary Affinity: ${citizenAffinity}/5`}
+            >
+              {Array.from({ length: 5 }).map((_, i) => (
+                <span
+                  key={i}
+                  className={`text-[8px] ${
+                    i < citizenAffinity ? 'text-[#C8B273]' : 'text-[#3A3327]'
+                  }`}
+                >
+                  ◆
+                </span>
+              ))}
+            </div>
           </div>
-        )}
 
-        {!showUpgradeDrawer ? (
-          <div className="p-5 space-y-4">
-            {/* Upper Section: Portrait + Nameplate + Speech */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+          {/* Classical Codex Esc Keycap Button */}
+          <button
+            type="button"
+            onClick={onCloseNpcDialog}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs text-[#9E937E] hover:text-[#EFE7D6] bg-[#0B0A08] border border-b-0 border-[#3A3327] transition-colors"
+            title="Close Conversation (Esc)"
+          >
+            <span className="px-1 py-0.2 text-[10px] font-mono-tabular bg-[#1C1914] border border-[#4A4132] text-[#C8B273]">
+              Esc
+            </span>
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Classical Dark-Fantasy Codex Dialogue Box */}
+        <div className="bg-[#0B0A08]/95 backdrop-blur-md text-[#D8D0C1] border border-[#C8B273] shadow-[0_24px_60px_rgba(0,0,0,0.9),inset_0_0_0_1px_rgba(200,178,115,0.22)] px-5 py-5 sm:px-7 sm:py-6">
+          {/* Subtle Chronicle Memory Whisper if triggered */}
+          {recentMemoryBanner && (
+            <div className="mb-3 pb-2 border-b border-[#3A3327] flex items-center gap-2 text-xs text-[#C8B273] italic">
+              <Sparkles className="w-3.5 h-3.5 text-[#C8B273] shrink-0" />
+              <span>{recentMemoryBanner}</span>
+            </div>
+          )}
+
+          {!showUpgradeDrawer ? (
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
+              {/* Crisp Pixel Portrait in Codex Plate */}
               <CharacterPortraitEngine
                 npcId={activeDialog.npcId}
                 citizenId={activeDialog.citizenId || citizenProfile.id}
@@ -854,217 +895,163 @@ export const DialogueAndCutsceneOverlay: React.FC<DialogueAndCutsceneOverlayProp
                 isSpeaking={isTyping}
               />
 
+              {/* Right Column: Spoken Line + Classical Codex Choices */}
               <div className="flex-1 w-full min-w-0 flex flex-col justify-between">
-                {/* Speaker Nameplate Header */}
-                <div className="flex items-start justify-between gap-2 pb-2 mb-2 border-b border-white/10">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2.5">
-                      <h2 className="font-display text-base sm:text-lg font-semibold text-amber-100 tracking-tight truncate">
-                        {citizenProfile.name}
-                      </h2>
-                      <div
-                        className="flex items-center gap-0.5"
-                        title={`Bond with ${citizenProfile.name}: ${citizenAffinity}/5`}
-                      >
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Heart
-                            key={i}
-                            className={`w-3 h-3 ${
-                              i < citizenAffinity
-                                ? 'text-amber-400 fill-amber-400'
-                                : 'text-zinc-700'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-xs text-zinc-400 truncate">
-                      {citizenProfile.role} · {scheduleSlot.districtTitle}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    {resolvedLine.usesMemoryFlag && (
-                      <span
-                        className="inline-flex items-center gap-1 text-[11px] text-emerald-300"
-                        title={`${citizenProfile.name} remembers your past choices`}
-                      >
-                        <BookmarkCheck className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="hidden md:inline">Remembered</span>
-                      </span>
-                    )}
-                    <button
-                      type="button"
-                      onClick={onCloseNpcDialog}
-                      className="p-1 text-zinc-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
-                      title="Leave Conversation (Esc)"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Typewriter Speech Area */}
+                {/* Spoken Typewriter Text */}
                 <div
                   onClick={() => {
                     if (isTyping) completeCurrentLineImmediately();
                   }}
-                  className="min-h-[72px] flex flex-col justify-between cursor-pointer select-text"
+                  className="min-h-[68px] cursor-pointer select-text"
                 >
-                  <p className="text-sm sm:text-[15px] text-zinc-100 leading-relaxed">
+                  <p className="text-[15px] sm:text-base text-[#EFE7D6] leading-[1.75] tracking-[0.015em] font-normal">
                     “{displayedText}”
-                    {isTyping && (
-                      <span className="inline-block w-1.5 h-4 ml-1 align-middle bg-amber-400 animate-pulse" />
+                    {isTyping ? (
+                      <span className="inline-block w-1.5 h-4 ml-1 align-middle bg-[#C8B273] animate-pulse" />
+                    ) : (
+                      <span
+                        aria-hidden="true"
+                        className="inline-block ml-1.5 text-xs text-[#C8B273] animate-bounce"
+                      >
+                        ▾
+                      </span>
                     )}
                   </p>
-                  {isTyping && (
-                    <span className="text-[11px] text-zinc-500 mt-1.5 self-end">
-                      Click to skip
-                    </span>
-                  )}
+                </div>
+
+                {/* Classical Codex Dialogue Choices with Gold Diamond Selection */}
+                <div className="mt-4 pt-3 border-t border-[#2A251D] space-y-1">
+                  {visibleChoices.map((choice) => (
+                    <button
+                      key={choice.id}
+                      type="button"
+                      onClick={() => handleSelectChoice(choice)}
+                      className="w-full text-left py-1.5 px-2.5 border border-transparent hover:border-[#C8B273] hover:bg-[#1B1813]/95 text-xs sm:text-sm text-[#B8B0A0] hover:text-[#F5EEDF] transition-all flex items-center justify-between gap-3 group"
+                    >
+                      <span className="flex items-center gap-2.5 min-w-0">
+                        <span className="text-[9px] text-[#C8B273] opacity-45 group-hover:opacity-100 transition-opacity shrink-0">
+                          ◆
+                        </span>
+                        <span className="leading-snug">{choice.label}</span>
+                      </span>
+
+                      {(choice.triggersCutscene || choice.grantsEmbers) && (
+                        <span className="text-[10px] font-display tracking-[0.14em] uppercase text-[#C8B273] shrink-0">
+                          {choice.grantsEmbers ? `+${choice.grantsEmbers} Embers` : 'Chronicle'}
+                        </span>
+                      )}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
-
-            {/* Dialogue Responses */}
-            <div className="space-y-1.5 pt-1 border-t border-white/10">
-              {visibleChoices.map((choice, idx) => (
-                <button
-                  key={choice.id}
-                  type="button"
-                  onClick={() => handleSelectChoice(choice)}
-                  className="w-full text-left px-3.5 py-2 rounded-xl bg-white/[0.03] hover:bg-amber-500/10 border border-white/10 hover:border-amber-400/40 text-xs sm:text-sm text-zinc-200 hover:text-amber-100 transition-colors flex items-center justify-between gap-3 group"
-                >
-                  <span className="flex items-center gap-2.5 min-w-0">
-                    <span className="w-5 h-5 rounded bg-zinc-900 border border-zinc-700 group-hover:border-amber-400/60 text-[11px] font-mono-tabular text-amber-400 flex items-center justify-center shrink-0">
-                      {idx + 1}
-                    </span>
-                    <span className="font-medium truncate sm:whitespace-normal">
-                      {choice.label}
-                    </span>
-                  </span>
-
-                  {(choice.triggersCutscene || choice.grantsEmbers) && (
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      {choice.triggersCutscene && (
-                        <span className="text-[11px] font-mono-tabular text-amber-300">
-                          Event
-                        </span>
-                      )}
-                      {choice.grantsEmbers && (
-                        <span className="text-[11px] font-mono-tabular text-emerald-300">
-                          +{choice.grantsEmbers} Embers
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
-          /* Soul Ember Sanctuary Craft & Upgrade Drawer */
-          <div className="p-5 space-y-3.5">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
-              <div>
-                <h3 className="font-display text-sm font-semibold text-amber-100">
-                  Sanctuary Tempering — {citizenProfile.name}
-                </h3>
-                <p className="text-xs text-zinc-400">
-                  Channel Soul Embers to temper your Wayfarer armaments
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="inline-flex items-center gap-1 text-xs font-mono-tabular text-amber-300 font-semibold">
-                  <Flame className="w-3.5 h-3.5 text-amber-400" />
-                  {telemetry.soulEmbers}
+          ) : (
+            /* Sanctuary Tempering Sub-Pane in Matching Codex Frame */
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-2.5 border-b border-[#3A3327]">
+                <span className="font-display text-xs sm:text-sm font-semibold text-[#EFE7D6] tracking-[0.18em] uppercase">
+                  SANCTUARY TEMPERING LEDGER
                 </span>
+                <div className="flex items-center gap-5">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-mono-tabular text-[#EFE7D6]">
+                    <Flame className="w-3.5 h-3.5 text-[#C8B273]" />
+                    <span>{telemetry.soulEmbers} Embers</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowUpgradeDrawer(false)}
+                    className="text-xs font-display tracking-wider uppercase text-[#9E937E] hover:text-[#C8B273] transition-colors"
+                  >
+                    ← Return
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button
                   type="button"
-                  onClick={() => setShowUpgradeDrawer(false)}
-                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-zinc-200 transition-colors whitespace-nowrap shrink-0"
+                  disabled={telemetry.soulEmbers < swordCost}
+                  onClick={() => onPurchaseUpgrade('sword')}
+                  className={`flex flex-col justify-between p-3.5 border text-left transition-colors ${
+                    telemetry.soulEmbers >= swordCost
+                      ? 'bg-[#161410] hover:bg-[#1E1A14] border-[#4A4132] hover:border-[#C8B273] text-[#EFE7D6] cursor-pointer'
+                      : 'bg-[#110F0C] border-[#26221B] text-[#6E6658] cursor-not-allowed'
+                  }`}
                 >
-                  Back
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-8 h-8 bg-[#12100D] border border-[#3A3328] flex items-center justify-center">
+                      <Swords className="w-4 h-4 text-[#C8B273]" />
+                    </div>
+                    <span className="text-[11px] font-mono-tabular text-[#C8B273]">
+                      Rank {telemetry.upgrades.swordLevel}
+                    </span>
+                  </div>
+                  <div className="font-display text-xs tracking-wider uppercase mb-0.5">
+                    Silver Broadsword
+                  </div>
+                  <div className="text-[11px] text-[#9E937E] mb-2.5">+15 Cleave Damage</div>
+                  <div className="text-[11px] font-mono-tabular text-[#C8B273] pt-1.5 border-t border-[#2A251D]">
+                    Cost: {swordCost} Embers
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={telemetry.soulEmbers < lanternCost}
+                  onClick={() => onPurchaseUpgrade('lantern')}
+                  className={`flex flex-col justify-between p-3.5 border text-left transition-colors ${
+                    telemetry.soulEmbers >= lanternCost
+                      ? 'bg-[#161410] hover:bg-[#1E1A14] border-[#4A4132] hover:border-[#C8B273] text-[#EFE7D6] cursor-pointer'
+                      : 'bg-[#110F0C] border-[#26221B] text-[#6E6658] cursor-not-allowed'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-8 h-8 bg-[#12100D] border border-[#3A3328] flex items-center justify-center">
+                      <Sun className="w-4 h-4 text-[#C8B273]" />
+                    </div>
+                    <span className="text-[11px] font-mono-tabular text-[#C8B273]">
+                      Rank {telemetry.upgrades.lanternLevel}
+                    </span>
+                  </div>
+                  <div className="font-display text-xs tracking-wider uppercase mb-0.5">
+                    Starlight Lantern
+                  </div>
+                  <div className="text-[11px] text-[#9E937E] mb-2.5">+Radius & Ember Draw</div>
+                  <div className="text-[11px] font-mono-tabular text-[#C8B273] pt-1.5 border-t border-[#2A251D]">
+                    Cost: {lanternCost} Embers
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={telemetry.soulEmbers < vitalityCost}
+                  onClick={() => onPurchaseUpgrade('vitality')}
+                  className={`flex flex-col justify-between p-3.5 border text-left transition-colors ${
+                    telemetry.soulEmbers >= vitalityCost
+                      ? 'bg-[#161410] hover:bg-[#1E1A14] border-[#4A4132] hover:border-[#C8B273] text-[#EFE7D6] cursor-pointer'
+                      : 'bg-[#110F0C] border-[#26221B] text-[#6E6658] cursor-not-allowed'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-8 h-8 bg-[#12100D] border border-[#3A3328] flex items-center justify-center">
+                      <Heart className="w-4 h-4 text-[#B83B32]" />
+                    </div>
+                    <span className="text-[11px] font-mono-tabular text-[#C8B273]">
+                      Rank {telemetry.upgrades.vitalityLevel}
+                    </span>
+                  </div>
+                  <div className="font-display text-xs tracking-wider uppercase mb-0.5">
+                    Wayfarer Vitality
+                  </div>
+                  <div className="text-[11px] text-[#9E937E] mb-2.5">+25 Max HP & Restore</div>
+                  <div className="text-[11px] font-mono-tabular text-[#C8B273] pt-1.5 border-t border-[#2A251D]">
+                    Cost: {vitalityCost} Embers
+                  </div>
                 </button>
               </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              <button
-                type="button"
-                disabled={telemetry.soulEmbers < swordCost}
-                onClick={() => onPurchaseUpgrade('sword')}
-                className={`flex flex-col justify-between p-3 rounded-xl border text-left transition-colors ${
-                  telemetry.soulEmbers >= swordCost
-                    ? 'bg-zinc-900/90 hover:bg-zinc-800 border-amber-500/40 text-zinc-100 cursor-pointer'
-                    : 'bg-zinc-900/40 border-white/5 text-zinc-500 cursor-not-allowed'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <Swords className="w-4 h-4 text-amber-400" />
-                  <span className="text-[11px] font-mono-tabular text-amber-300">
-                    Lv.{telemetry.upgrades.swordLevel}
-                  </span>
-                </div>
-                <div className="text-xs font-semibold mb-0.5">Silver Broadsword</div>
-                <div className="text-[11px] text-zinc-400 mb-2">+15 Cleave Damage & Reach</div>
-                <div className="text-[11px] font-mono-tabular font-semibold text-amber-400">
-                  {swordCost} Embers
-                </div>
-              </button>
-
-              <button
-                type="button"
-                disabled={telemetry.soulEmbers < lanternCost}
-                onClick={() => onPurchaseUpgrade('lantern')}
-                className={`flex flex-col justify-between p-3 rounded-xl border text-left transition-colors ${
-                  telemetry.soulEmbers >= lanternCost
-                    ? 'bg-zinc-900/90 hover:bg-zinc-800 border-amber-500/40 text-zinc-100 cursor-pointer'
-                    : 'bg-zinc-900/40 border-white/5 text-zinc-500 cursor-not-allowed'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <Sun className="w-4 h-4 text-amber-400" />
-                  <span className="text-[11px] font-mono-tabular text-amber-300">
-                    Lv.{telemetry.upgrades.lanternLevel}
-                  </span>
-                </div>
-                <div className="text-xs font-semibold mb-0.5">Starlight Lantern</div>
-                <div className="text-[11px] text-zinc-400 mb-2">
-                  +Radius & Ember Magnet Pull
-                </div>
-                <div className="text-[11px] font-mono-tabular font-semibold text-amber-400">
-                  {lanternCost} Embers
-                </div>
-              </button>
-
-              <button
-                type="button"
-                disabled={telemetry.soulEmbers < vitalityCost}
-                onClick={() => onPurchaseUpgrade('vitality')}
-                className={`flex flex-col justify-between p-3 rounded-xl border text-left transition-colors ${
-                  telemetry.soulEmbers >= vitalityCost
-                    ? 'bg-zinc-900/90 hover:bg-zinc-800 border-amber-500/40 text-zinc-100 cursor-pointer'
-                    : 'bg-zinc-900/40 border-white/5 text-zinc-500 cursor-not-allowed'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <Heart className="w-4 h-4 text-rose-400" />
-                  <span className="text-[11px] font-mono-tabular text-rose-300">
-                    Lv.{telemetry.upgrades.vitalityLevel}
-                  </span>
-                </div>
-                <div className="text-xs font-semibold mb-0.5">Wayfarer Vitality</div>
-                <div className="text-[11px] text-zinc-400 mb-2">
-                  +25 Max HP & Full Restore
-                </div>
-                <div className="text-[11px] font-mono-tabular font-semibold text-amber-400">
-                  {vitalityCost} Embers
-                </div>
-              </button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

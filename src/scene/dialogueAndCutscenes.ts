@@ -88,7 +88,7 @@ export interface CutsceneDefinition {
   keyframes: CutsceneKeyframe[];
 }
 
-const STORAGE_KEY = 'vaelenport_community_memory_v1';
+const STORAGE_KEY = 'nullspire_cinderfall_memory_v1';
 
 export interface CommunityMemoryStore {
   flags: Record<string, boolean>;
@@ -99,11 +99,11 @@ export interface CommunityMemoryStore {
 const DEFAULT_MEMORY_STORE: CommunityMemoryStore = {
   flags: {},
   affinity: {
-    'master-vaelen': 1,
-    isolde: 1,
-    oswin: 1,
-    sera: 1,
-    'brother-corvus': 1,
+    'master-vaelen': 2, // Old Beck
+    isolde: 2, // Doc Sable
+    oswin: 1, // Scout Lark
+    sera: 1, // Broker Sera
+    'brother-corvus': 1, // Auditor Voss
   },
   talkCount: {
     'master-vaelen': 0,
@@ -140,13 +140,13 @@ export function saveCommunityMemory(store: CommunityMemoryStore): void {
 export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
   'master-vaelen': {
     id: 'master-vaelen',
-    name: 'Master Vaelen',
-    role: 'Grand Bellwright & Clockmaker',
-    homeDistrict: 'The Lantern Plaza',
-    voicePitchHz: 215,
+    name: 'Old Beck',
+    role: 'Bearers Combine Manifest Keeper & Mentor',
+    homeDistrict: 'The Hold (Terminus Hub)',
+    voicePitchHz: 185,
     voiceTimbre: 'bellwright',
-    cloakColorHex: '#8E3B2E',
-    trimColorHex: '#E0A94E',
+    cloakColorHex: '#282226',
+    trimColorHex: '#e8a020',
     hatStyle: 'clockmaker',
     defaultRootNodeId: 'intro',
     repeatRootNodeId: 'return_visit',
@@ -157,8 +157,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: -1.8,
         z: -0.8,
         facingAngle: 0.75,
-        districtTitle: 'Astrolabe Fountain (Lantern Plaza)',
-        activityLabel: 'Calibrating the Astrolabe Fountain escapement gears',
+        districtTitle: 'The Hold — Manifest Desk & Core Scale',
+        activityLabel: 'Weighing Floor Zero core-stone on the brass Combine scale',
       },
       {
         startHour: 12,
@@ -166,8 +166,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: -7.5,
         z: -3.2,
         facingAngle: 1.57,
-        districtTitle: "Clockmaker's Guildhall Interior",
-        activityLabel: 'Forging brass mainsprings at the Guildhall workbench',
+        districtTitle: 'The Hold Back-Room & Bunks',
+        activityLabel: 'Updating the two Combine ledgers (the clean book and the oil book)',
       },
       {
         startHour: 18,
@@ -175,8 +175,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: 1.8,
         z: 1.4,
         facingAngle: -0.65,
-        districtTitle: 'Lantern Plaza Promenade',
-        activityLabel: 'Tending the Dusk Beacons & listening to Sera’s lute',
+        districtTitle: 'The Crossing Shrine (The Hold)',
+        activityLabel: 'Trimming lamp-oil wicks for porters who didn\'t make the gate',
       },
       {
         startHour: 0,
@@ -184,47 +184,47 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: -8.2,
         z: -4.2,
         facingAngle: 0.0,
-        districtTitle: "Clockmaker's Guildhall Hearth",
-        activityLabel: 'Studying celestial tide charts by the Guildhall hearth',
+        districtTitle: 'The Hold — Cyan Echo Corner',
+        activityLabel: 'Leaning on his crutch-spear while watching Bram\'s shadow',
       },
     ],
     nodes: {
       intro: {
         id: 'intro',
-        expression: 'happy',
-        text: 'Welcome to Vaelenport, Wayfarer! Hear that steady brass pulse beneath the flagstones? The Astrolabe Fountain drives every lock-gate and lantern wire across our three tiers.',
+        expression: 'stern',
+        text: 'You\'re dripping B13 black water on my manifest, Coffin. Gate pylon still reads you E-rank · 11 · Flat, which means Auditor Voss hasn\'t smelled what woke up behind your eyes. Keep it that way.',
         memoryVariantText: {
           flag: 'awakened_dusk_lanterns',
           expression: 'happy',
-          text: 'Ah, the Wayfarer who helped me synchronize the Dusk Lanterns! Every brass pendulum in the Plaza sings in true harmonic phase thanks to your hand.',
+          text: 'You lit the Crossing Shrine lamps for Bram\'s squad. Eight thousand porters in the Combine, Joss, and not one of \'em forgets a kid who honors the oil book.',
         },
         choices: [
           {
             id: 'ask-city',
-            label: 'Tell me how Vaelenport’s three tiers were built.',
+            label: 'Tell me about the two Combine books and Auditor Voss.',
             nextNodeId: 'city_lore',
             setsMemory: 'asked_vaelen_architecture',
-            memoryNotification: 'Master Vaelen noted your curiosity about Vaelenport’s masonry.',
+            memoryNotification: 'Old Beck trusted you with the truth of the Combine\'s two ledgers.',
             affinityDelta: 1,
           },
           {
             id: 'trigger-dusk-cutscene',
-            label: 'Let us ignite the Dusk Lantern Awakening across the Plaza! [Cutscene]',
+            label: 'Light the Crossing Shrine lamps for the fallen porters. [Cutscene]',
             nextNodeId: 'after_dusk_promise',
             setsMemory: 'awakened_dusk_lanterns',
-            memoryNotification: 'Master Vaelen will remember you awakened the Plaza Lanterns.',
+            memoryNotification: 'Old Beck remembers you lit the Crossing Shrine vigil.',
             affinityDelta: 2,
-            grantsEmbers: 3,
+            grantsEmbers: 15,
             triggersCutscene: 'dusk-lantern-awakening',
           },
           {
             id: 'temper-gear',
-            label: 'Can you temper my Broadsword or Lantern at your forge?',
+            label: 'Weigh my cores & reinforce my Porter Cutlass harness. [Upgrades]',
             nextNodeId: 'OPEN_UPGRADES',
           },
           {
             id: 'farewell',
-            label: 'Keep the gears turning, Master Vaelen.',
+            label: 'Keep the scale honest, Beck.',
             nextNodeId: 'END',
           },
         ],
@@ -232,34 +232,34 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       return_visit: {
         id: 'return_visit',
         expression: 'neutral',
-        text: 'Good to see your lantern-light again, friend. The clockwork heart of the Plaza beats true.',
+        text: 'Scarf\'s looking darker around the collar, Joss. Don\'t let the Laugh talk you into spending blood you owe your sister.',
         memoryVariantText: {
           flag: 'asked_vaelen_architecture',
           expression: 'thinking',
-          text: 'Welcome back, fellow student of stone and brass! Have you climbed the northern steps to the Scholars’ Cloister yet, or walked the Lower Canal Quays?',
+          text: 'Voss\'s clerks came sniffing around Pylon 4 an hour ago. Use the Returned crawlspace on Floor One if you want the Table clock to stay quiet.',
         },
         choices: [
           {
             id: 're-trigger-dusk',
-            label: 'Sound the Dusk Lantern Awakening across the tiers! [Cutscene]',
+            label: 'Relight the Crossing Shrine vigil lamps. [Cutscene]',
             nextNodeId: 'END',
             setsMemory: 'awakened_dusk_lanterns',
             triggersCutscene: 'dusk-lantern-awakening',
           },
           {
             id: 'ask-citizens',
-            label: 'Who else keeps watch over the Sanctuary tiers?',
+            label: 'Who else in the Terminus can we trust?',
             nextNodeId: 'community_guide',
             affinityDelta: 1,
           },
           {
             id: 'temper-gear-2',
-            label: 'I brought Soul Embers for the Guildhall forge. [Upgrades]',
+            label: 'Put these cores on the Combine scale. [Upgrades]',
             nextNodeId: 'OPEN_UPGRADES',
           },
           {
             id: 'leave',
-            label: 'Until the next chime.',
+            label: 'Back to the Spire.',
             nextNodeId: 'END',
           },
         ],
@@ -267,19 +267,19 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       city_lore: {
         id: 'city_lore',
         expression: 'thinking',
-        text: 'Three centuries ago, the founders carved the Lower Canal Quays from dark basalt to shelter lantern skiffs. Above it rests this Lantern Plaza, and high to the north rises the Scholars’ Cloister (+1.15m) where Isolde and Brother Corvus keep the archives.',
+        text: 'One book sits on top of the desk for Auditor Voss: flat scans, taxed cores, docile E-ranks. The second book is rubbed in lamp-oil underneath: every porter lost on Floor Zero, and every crate of stabilizer smuggled to Ward C.',
         choices: [
           {
             id: 'ask-lock',
-            label: 'Why is the eastern Canal Lock gate sealed?',
+            label: 'How do we bypass the Choke-Point toll on Floor One?',
             nextNodeId: 'lock_hint',
             setsMemory: 'vaelen_vouched_for_oswin',
-            memoryNotification: 'You can mention Vaelen’s brass key-seal to Dockmaster Oswin.',
+            memoryNotification: 'Give Old Beck\'s crutch-knock countersign to Scout Lark on Floor One.',
             affinityDelta: 1,
           },
           {
             id: 'back-root',
-            label: 'Let us speak of something else.',
+            label: 'Let\'s talk about something else.',
             nextNodeId: 'return_visit',
           },
         ],
@@ -287,11 +287,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       lock_hint: {
         id: 'lock_hint',
         expression: 'stern',
-        text: 'Dockmaster Oswin lowered the iron sluice when the tide-mist thickened. Tell him Master Vaelen checked the counterweight—he will gladly crank open the Old Canal Lock for you.',
+        text: 'Scout Lark is holding the south sluice near the Muster Ward. Tell him Beck sent the iron crutch-pin—he\'ll crank the Flood Bulkhead open so you don\'t have to pay Rook\'s outriders.',
         choices: [
           {
             id: 'thanks-vaelen',
-            label: 'I will speak with Oswin down on the Lower Quays.',
+            label: 'I\'ll find Lark by the southern Muster span.',
             nextNodeId: 'END',
           },
         ],
@@ -299,11 +299,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       community_guide: {
         id: 'community_guide',
         expression: 'neutral',
-        text: 'North up the grand staircase, Isolde tends moon-fern elixirs in the Apothecary Conservatory while Brother Corvus studies the Rose Window. Down south on the Quays, Oswin watches the lock gates, and right here by the fountain, Sera chronicles our ballads.',
+        text: 'North-east up the concrete steps is Doc Sable\'s Container Clinic—she\'ll wash the Rot out of your veins and wire scrip to Wren\'s hospital ward. West is Sera\'s Gilt Bazaar where blades are peace-bonded. And watch out for Auditor Voss near the north archive.',
         choices: [
           {
             id: 'back-from-guide',
-            label: 'Thank you, Master Vaelen.',
+            label: 'Got it, Beck.',
             nextNodeId: 'return_visit',
           },
         ],
@@ -311,11 +311,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       after_dusk_promise: {
         id: 'after_dusk_promise',
         expression: 'happy',
-        text: 'Behold how the amber filaments catch the water! Take these three Soul Embers from the Guildhall brazier as my thanks.',
+        text: 'Look at Bram\'s shadow standing straighter in the cyan corner. The dead know when they\'re respected. Take this 15k scrip advance from the Combine tin.',
         choices: [
           {
             id: 'end-dusk',
-            label: 'The Plaza looks magnificent.',
+            label: 'For Wren and the Combine.',
             nextNodeId: 'END',
           },
         ],
@@ -325,13 +325,13 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
 
   isolde: {
     id: 'isolde',
-    name: 'Isolde',
-    role: 'Cloister Apothecary & Botanist',
-    homeDistrict: "The Scholars' Cloister",
-    voicePitchHz: 330,
+    name: 'Doc Sable',
+    role: 'Container Clinic Surgeon & Sync Tech',
+    homeDistrict: 'Doc Sable\'s Container Clinic',
+    voicePitchHz: 310,
     voiceTimbre: 'botanist',
-    cloakColorHex: '#256B54',
-    trimColorHex: '#8CE0B8',
+    cloakColorHex: '#282226',
+    trimColorHex: '#5591c7',
     hatStyle: 'botanist',
     defaultRootNodeId: 'intro',
     repeatRootNodeId: 'return_visit',
@@ -342,8 +342,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: 7.4,
         z: -14.2,
         facingAngle: -1.2,
-        districtTitle: 'Apothecary Conservatory (Upper Cloister)',
-        activityLabel: 'Distilling silver-leaf dew in the glass conservatory',
+        districtTitle: 'Container Clinic Surgical Bay',
+        activityLabel: 'Centrifuging Sync-rot plasma & checking the padlocked 6-vial fridge',
       },
       {
         startHour: 13,
@@ -351,8 +351,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: 1.5,
         z: -15.4,
         facingAngle: 0.4,
-        districtTitle: 'Cloister Herb Parterre (+1.15m)',
-        activityLabel: 'Pruning luminous nightshade along the Cloister colonnade',
+        districtTitle: 'Floor Zero Medical Staging Terrace',
+        activityLabel: 'Checking Ward C breath-graft telemetry lines',
       },
       {
         startHour: 18,
@@ -360,8 +360,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: 3.2,
         z: -1.8,
         facingAngle: -2.4,
-        districtTitle: 'Lantern Plaza Fountain Steps',
-        activityLabel: 'Sharing herbal cordials with townsfolk in the Plaza',
+        districtTitle: 'The Hold Triage Bench',
+        activityLabel: 'Stitching porter lacerations after the evening gate shift',
       },
       {
         startHour: 23,
@@ -369,76 +369,76 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: 8.2,
         z: -15.0,
         facingAngle: 3.14,
-        districtTitle: 'Apothecary Conservatory Study',
-        activityLabel: 'Pressing nocturnal moss specimens under lantern glass',
+        districtTitle: 'Container Clinic Cold Storage',
+        activityLabel: 'Guarding the six Middle-grade stabilizer vials under padlock',
       },
     ],
     nodes: {
       intro: {
         id: 'intro',
-        expression: 'neutral',
-        text: 'Breathe deeply, traveler. The cedar and moon-sage in our Upper Cloister keep the canal dampness from the lungs. Did you climb the northern stair to seek a tonic, or quiet counsel?',
+        expression: 'stern',
+        text: 'Sit on the steel table and roll up your sleeve, Vane. Your pulse sounds like a two-stroke engine. I checked Ward C this morning—Wren\'s O2 saturation held at 89%, but that 2,000,000 scrip breath-graft clock isn\'t slowing down.',
         memoryVariantText: {
           flag: 'tasted_isolde_tonic',
           expression: 'happy',
-          text: 'Your step is lighter since you drank the Silver-Fern draught! The herbs of the Cloister always remember a kindred spirit.',
+          text: 'The clean stabilizer flush is holding your Rot down nicely, Joss. Wren sent a note from Ward C—she says don\'t forget to eat real bread.',
         },
         choices: [
           {
             id: 'taste-tonic',
-            label: 'Try a vial of Isolde’s Silver-Fern restorative (+2 Soul Embers).',
+            label: 'Flush my veins with a cold Stabilizer Vial (+12k Scrip credit & Rot wash).',
             nextNodeId: 'tonic_shared',
             excludesMemory: 'tasted_isolde_tonic',
             setsMemory: 'tasted_isolde_tonic',
-            memoryNotification: 'Isolde remembers sharing her prized Silver-Fern draught with you.',
+            memoryNotification: 'Doc Sable opened her padlocked fridge to flush your Sync/Rot.',
             affinityDelta: 2,
-            grantsEmbers: 2,
+            grantsEmbers: 12,
           },
           {
             id: 'ask-conservatory',
-            label: 'What grows inside your glass-and-timber Conservatory?',
+            label: 'What happens if my Sync / Rot hits 100%?',
             nextNodeId: 'botany_lore',
             setsMemory: 'studied_cloister_botany',
-            memoryNotification: 'Isolde appreciates your interest in Sanctuary botany.',
+            memoryNotification: 'Doc Sable explained the clinical threshold of Parasite Rot.',
             affinityDelta: 1,
           },
           {
             id: 'open-barter',
-            label: 'Infuse my Vitality or Lantern with Cloister essences. [Upgrades]',
+            label: 'Reinforce my Vitality or Cutlass surgical edge. [Upgrades]',
             nextNodeId: 'OPEN_UPGRADES',
           },
           {
             id: 'leave',
-            label: 'May your conservatory flourish, Isolde.',
+            label: 'Thanks, Doc. Tell Wren I\'m coming.',
             nextNodeId: 'END',
           },
         ],
       },
       return_visit: {
         id: 'return_visit',
-        expression: 'happy',
-        text: 'Welcome back to the Upper Terrace. Step inside the Conservatory whenever you wish—the roof timber parts to show our distillation tables.',
+        expression: 'neutral',
+        text: 'My container clinic is always open, Coffin. Bring me raw cores or scrip and I\'ll keep the Laugh from eating your optic nerve.',
         memoryVariantText: {
           flag: 'studied_cloister_botany',
           expression: 'thinking',
-          text: 'Ah, my favorite naturalist returns! The Starlight Bellflowers opened another petal when the Plaza clock chimed.',
+          text: 'Keep an eye on your scarf color, Joss. Past 70% Sync, the parasite starts rewriting motor reflexes before you even press the muscle.',
         },
         choices: [
           {
             id: 'ask-corvus',
-            label: 'What is Brother Corvus researching by the Rose Window?',
+            label: 'Why is Auditor Voss stationed near the Floor Zero entry?',
             nextNodeId: 'corvus_insight',
             setsMemory: 'isolde_mentioned_corvus',
             affinityDelta: 1,
           },
           {
             id: 'open-barter-2',
-            label: 'Let us commune over Soul Ember infusions. [Upgrades]',
+            label: 'Calibrate my combat vitals and gear. [Upgrades]',
             nextNodeId: 'OPEN_UPGRADES',
           },
           {
             id: 'goodbye',
-            label: 'Walk in peace, Isolde.',
+            label: 'Stay sharp, Doc Sable.',
             nextNodeId: 'END',
           },
         ],
@@ -446,11 +446,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       tonic_shared: {
         id: 'tonic_shared',
         expression: 'happy',
-        text: 'Warm as liquid amber, isn’t it? We harvest the fern-spores where the Cloister mist meets the belltower breeze. Keep these two Soul Embers for your lantern.',
+        text: 'Breathe through the clove bite. That\'s one of the six Middle-floor vials from my padlocked fridge—courtesy of The Returned. I\'ve also logged 12k scrip toward your kit.',
         choices: [
           {
             id: 'thank-isolde',
-            label: 'It tastes like pine-resin and starlight. Thank you!',
+            label: 'My head feels clearer already. Thank you, Doc.',
             nextNodeId: 'return_visit',
           },
         ],
@@ -458,11 +458,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       botany_lore: {
         id: 'botany_lore',
         expression: 'thinking',
-        text: 'Glass-leaf bellwort, ember-root, and weeping fen-lily. Because the Cloister sits a full meter above the canal basin, the morning sunlight strikes our arches first while the lower quays still sleep in mist.',
+        text: 'Below 40% Sync, VESTIGE is just a passenger lending you leverage. At 70%, black Rot-veins climb your jaw and your red scarf drinks the soot. At 100%, the host hollowed out on Floor Zero forty years ago wakes up wearing your boots.',
         choices: [
           {
             id: 'return-botany',
-            label: 'A wise design by the old architects.',
+            label: 'I\'ll wash the Rot before it hits the collar.',
             nextNodeId: 'return_visit',
           },
         ],
@@ -470,11 +470,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       corvus_insight: {
         id: 'corvus_insight',
         expression: 'stern',
-        text: 'Brother Corvus believes the stained-glass Rose Window is an optical calendar left by the first Tide-Scholars. If you speak with him, ask about the Verse of the Sunken Lock.',
+        text: 'Auditor Voss carries a seventh unfiled dossier in his coat—he calls the suspect "The Door-Breaker." Every time you use a loud Parasite Technique in public, his clock ticks one notch closer to your bunk.',
         choices: [
           {
             id: 'visit-corvus',
-            label: 'I will speak with Brother Corvus under the colonnade.',
+            label: 'I\'ll keep my scan flat around Voss.',
             nextNodeId: 'END',
           },
         ],
@@ -484,13 +484,13 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
 
   oswin: {
     id: 'oswin',
-    name: 'Oswin',
-    role: 'Canal Dockmaster & Lock-Keeper',
-    homeDistrict: 'The Lower Canal Quays',
-    voicePitchHz: 150,
+    name: 'Scout Lark',
+    role: 'Combine Vanguard & B13 Flood Survivor',
+    homeDistrict: 'Floor One: The Muster & Sluice Span',
+    voicePitchHz: 155,
     voiceTimbre: 'dockmaster',
-    cloakColorHex: '#2C4A63',
-    trimColorHex: '#D99B43',
+    cloakColorHex: '#282226',
+    trimColorHex: '#6daa45',
     hatStyle: 'dockmaster',
     defaultRootNodeId: 'intro',
     repeatRootNodeId: 'return_visit',
@@ -501,8 +501,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: 10.5,
         z: 10.2,
         facingAngle: -0.8,
-        districtTitle: 'Eastern Lock Gate (Lower Canal Quays)',
-        activityLabel: 'Inspecting the iron sluice chains & canal waterwheel',
+        districtTitle: 'Floor Two Threshold & East Sluice',
+        activityLabel: 'Watching Heir Seven\'s outriders near the Gala Hall gate',
       },
       {
         startHour: 14,
@@ -510,8 +510,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: -2.4,
         z: 11.4,
         facingAngle: 0.2,
-        districtTitle: 'Southern Gondola Jetty (Lower Quays)',
-        activityLabel: 'Mooring the lantern skiff & mending hemp tow-lines',
+        districtTitle: 'Floor One: The Muster Sump Jetty',
+        activityLabel: 'Dredging sunken porter packs from the black-water basin',
       },
       {
         startHour: 20,
@@ -519,53 +519,53 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: 5.5,
         z: 6.2,
         facingAngle: -2.5,
-        districtTitle: 'East Canal Stone Bridge',
-        activityLabel: 'Keeping night-watch over the canal reflections',
+        districtTitle: 'Muster Choke-Point Bridge',
+        activityLabel: 'Marking Returned white-chalk safe routes across the span',
       },
     ],
     nodes: {
       intro: {
         id: 'intro',
         expression: 'stern',
-        text: 'Mind the wet flagstones on the Lower Quays, traveler. The canal runs deep between the embankments, and the eastern Lock Gate holds back the outer fen-tide.',
+        text: 'Coffin! You pulled me out of the B13 black water with two seconds of air left in my lungs. Floor One\'s Muster Ward is ahead—two hundred climbers went in, and Rook\'s toll-guards are blocking the eastern bulkhead.',
         memoryVariantText: {
           flag: 'opened_canal_lock',
           expression: 'happy',
-          text: 'Ho there, Captain! Since we cranked open the Old Canal Lock, the waterwheel turns twice as briskly and the lantern skiff rides high.',
+          text: 'The Muster Bulkhead is wide open, Joss! The Returned chalk-runners are moving stabilizer crates straight past Rook\'s sentries.',
         },
         choices: [
           {
             id: 'open-lock-vaelen',
-            label: 'Master Vaelen checked the counterweight—let’s open the Old Canal Lock! [Cutscene]',
+            label: 'Old Beck sent the iron crutch-pin—crank open the Muster Bulkhead! [Cutscene]',
             nextNodeId: 'lock_opened_node',
             requiresMemory: 'vaelen_vouched_for_oswin',
             setsMemory: 'opened_canal_lock',
-            memoryNotification: 'Oswin opened the Old Canal Lock at Vaelen’s word.',
+            memoryNotification: 'Lark opened the Floor 1–2 Flood Bulkhead on Beck\'s countersign.',
             affinityDelta: 3,
-            grantsEmbers: 3,
+            grantsEmbers: 18,
             triggersCutscene: 'canal-lock-opening',
           },
           {
             id: 'open-lock-direct',
-            label: 'Help me heave the winch to open the Old Canal Lock! [Cutscene]',
+            label: 'Help me heave the rusted winch to breach the Muster Bulkhead! [Cutscene]',
             nextNodeId: 'lock_opened_node',
             excludesMemory: 'vaelen_vouched_for_oswin',
             setsMemory: 'opened_canal_lock',
-            memoryNotification: 'Oswin remembers you helped crank the heavy iron Lock Gate.',
+            memoryNotification: 'You and Lark forced open the Muster Flood Bulkhead.',
             affinityDelta: 2,
-            grantsEmbers: 2,
+            grantsEmbers: 12,
             triggersCutscene: 'canal-lock-opening',
           },
           {
             id: 'ask-fishing',
-            label: 'What swims in the Lower Canal basin?',
+            label: 'What beasts prowl Floor One and the Gala Hall?',
             nextNodeId: 'canal_lore',
             setsMemory: 'talked_oswin_waters',
             affinityDelta: 1,
           },
           {
             id: 'leave',
-            label: 'Fair tides, Dockmaster.',
+            label: 'Keep your head down, Lark.',
             nextNodeId: 'END',
           },
         ],
@@ -573,28 +573,28 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       return_visit: {
         id: 'return_visit',
         expression: 'neutral',
-        text: 'Nothing steadies the spirit like the lap of water against dressed ashlar stone. The jetty fishing line is rigged whenever you fancy casting.',
+        text: 'If you need extra cores without ticking Voss\'s clock, drop a dredge-line into the B13 sump jetty. Climbers drop heavy pouches when the water rises.',
         memoryVariantText: {
           flag: 'opened_canal_lock',
           expression: 'happy',
-          text: 'Listen to that waterwheel hum! Opening the eastern sluice brought fresh silver-carp right up to the southern jetty.',
+          text: 'With the Muster sluice open, you\'ve got a clean lane straight to Floor Two\'s Gala Hall. Give Heir Seven hell for us.',
         },
         choices: [
           {
             id: 'replay-lock-cutscene',
-            label: 'Show me the Canal Lock & Lantern Skiff passage again. [Cutscene]',
+            label: 'Inspect the Muster Bulkhead breach & Gala Hall approach. [Cutscene]',
             nextNodeId: 'END',
             setsMemory: 'opened_canal_lock',
             triggersCutscene: 'canal-lock-opening',
           },
           {
             id: 'canal-lore-2',
-            label: 'Tell me about the twin stone bridges.',
+            label: 'Remind me how to fight a Pall and a Returnling.',
             nextNodeId: 'canal_lore',
           },
           {
             id: 'farewell',
-            label: 'Keep a dry lantern, Oswin.',
+            label: 'See you back at The Hold, Lark.',
             nextNodeId: 'END',
           },
         ],
@@ -602,11 +602,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       lock_opened_node: {
         id: 'lock_opened_node',
         expression: 'happy',
-        text: 'Put your shoulder to the brass capstan... There she swings! Look how the lantern skiff glides along the open channel. Take these Soul Embers dredged from the lock-sill!',
+        text: 'Hear that iron tooth shear! The crawlspace bypass is live and the Returned clock just ticked in our favor. Take these 18k scrip from the toll chest!',
         choices: [
           {
             id: 'celebrate-lock',
-            label: 'The waterway is open at last.',
+            label: 'Floor Two is wide open.',
             nextNodeId: 'END',
           },
         ],
@@ -614,11 +614,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       canal_lore: {
         id: 'canal_lore',
         expression: 'thinking',
-        text: 'Two arched bridges span our waterway: the West Guild Bridge leading up to Vaelen’s workshop, and the East Lock-Keeper’s Bridge. Beneath them swim Moon-Scale Koi and Brass-Shell Crabs that feed on fallen lantern embers.',
+        text: 'Two rules in The Down: First, if you see a Pall—three nested cloth cones with gold stitch-rings—press [G] to bow before you swing. It never strikes first, and manners stun it cold. Second, a Returnling dies three times: weeping, laughing, then begging for a Chaplain\'s Rite.',
         choices: [
           {
             id: 'back-oswin',
-            label: 'I will try casting a line from the wooden jetty.',
+            label: 'Bow to the Pall, Rite for the Returnling. Understood.',
             nextNodeId: 'return_visit',
           },
         ],
@@ -628,13 +628,13 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
 
   sera: {
     id: 'sera',
-    name: 'Sera',
-    role: 'Plaza Lutenist & City Chronicler',
-    homeDistrict: 'The Lantern Plaza',
-    voicePitchHz: 370,
+    name: 'Broker Sera',
+    role: 'Mistress of the Gilt Bazaar & Fiat Field',
+    homeDistrict: 'The Gilt Bazaar',
+    voicePitchHz: 355,
     voiceTimbre: 'lutenist',
-    cloakColorHex: '#9E2A47',
-    trimColorHex: '#F3C663',
+    cloakColorHex: '#3a2024',
+    trimColorHex: '#e8a020',
     hatStyle: 'lutenist',
     defaultRootNodeId: 'intro',
     repeatRootNodeId: 'return_visit',
@@ -645,8 +645,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: 3.4,
         z: 1.6,
         facingAngle: -0.9,
-        districtTitle: 'Astrolabe Fountain Steps (Plaza)',
-        activityLabel: 'Composing morning preludes beside the fountain spray',
+        districtTitle: 'Spire Gate Return Board',
+        activityLabel: 'Posting survival odds & pricing Floor Two Sigil futures',
       },
       {
         startHour: 14,
@@ -654,8 +654,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: -5.2,
         z: 6.0,
         facingAngle: 0.4,
-        districtTitle: 'West Guild Bridge Parapet',
-        activityLabel: 'Sketching the canal skiffs & singing to passing barges',
+        districtTitle: 'West Span — Gilt Bazaar Approach',
+        activityLabel: 'Enforcing the Peace-Bonded Blade fiat across the market tiers',
       },
       {
         startHour: 19,
@@ -663,8 +663,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: 5.8,
         z: -2.2,
         facingAngle: -1.8,
-        districtTitle: 'Hearthside Lute Pavilion (East Plaza)',
-        activityLabel: 'Performing the Evening Chronicle beneath the paper lanterns',
+        districtTitle: 'Gilt Bazaar Pavilion (4th Dashed Floor)',
+        activityLabel: 'Auctioning unfiled Spire relics under gold lantern light',
       },
       {
         startHour: 0,
@@ -672,48 +672,48 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: 5.2,
         z: -3.2,
         facingAngle: 3.14,
-        districtTitle: 'Hearthside Pavilion Brazier',
-        activityLabel: 'Transcribing traveler tales by warm brazier light',
+        districtTitle: 'Bazaar Counting Table',
+        activityLabel: 'Weighing Gilded Table writs against Returned chalk tallies',
       },
     ],
     nodes: {
       intro: {
         id: 'intro',
         expression: 'happy',
-        text: 'Pluck a string in the Lantern Plaza and the stone arches sing back in thirds! I am Sera, keeper of Vaelenport’s spoken chronicle. What verse shall we add for your arrival?',
+        text: 'Welcome to the Gilt Bazaar, Little Coffin. Three floors of honest theft, plus a fourth floor that doesn\'t exist on Auditor Voss\'s map. Inside my Fiat Field, even Heir Seven\'s Hushblades stay in their scabbards.',
         memoryVariantText: {
           flag: 'composed_ballad_with_sera',
           expression: 'happy',
-          text: 'There walks the hero of my newest stanza! The whole Plaza has been humming the verse we composed together.',
+          text: 'My favorite dark-horse porter! The odds on the Return Board shifted 14 points after your duel in the Gala Hall.',
         },
         choices: [
           {
             id: 'arrival-panorama',
-            label: 'Recite the Prelude of Arrival over Vaelenport! [Intro Cutscene]',
+            label: 'Survey the Terminus, Floor Zero & the Gala Hall! [Act 1 Cutscene]',
             nextNodeId: 'after_prelude',
             setsMemory: 'heard_sera_prelude',
-            memoryNotification: 'Sera performed the Prelude of Vaelenport for you.',
+            memoryNotification: 'Broker Sera briefed you on the full Act 1 layout of Cinderfall.',
             affinityDelta: 2,
             triggersCutscene: 'arrival-intro',
           },
           {
             id: 'choose-verse-dawn',
-            label: 'Compose a verse of "Golden Brass & Morning Bells".',
+            label: 'Place a side-bet on "The E-Rank Door-Breaker" (+15k Scrip).',
             nextNodeId: 'verse_composed',
             setsMemory: 'composed_ballad_with_sera',
-            memoryNotification: 'Sera inscribed your chosen verse into the City Chronicle.',
+            memoryNotification: 'Sera backed your climb on the fourth-floor book.',
             affinityDelta: 2,
-            grantsEmbers: 2,
+            grantsEmbers: 15,
           },
           {
             id: 'ask-rumors',
-            label: 'What news do the citizens whisper today?',
+            label: 'What\'s the word on Rook (Heir Seven) and the Sigil Game?',
             nextNodeId: 'town_rumors',
             affinityDelta: 1,
           },
           {
             id: 'leave',
-            label: 'Play on, Sera.',
+            label: 'Keep my tab open, Sera.',
             nextNodeId: 'END',
           },
         ],
@@ -721,27 +721,27 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       return_visit: {
         id: 'return_visit',
         expression: 'neutral',
-        text: 'Every hour of the clock changes the light on the canal and the mood of my lute. Have you watched the lanterns ignite at dusk?',
+        text: 'Every bell in the Gala Hall changes the price of blood. Need a briefing on the floors or a look at the Return Board?',
         memoryVariantText: {
           flag: 'awakened_dusk_lanterns',
           expression: 'happy',
-          text: 'When you and Master Vaelen lit the Dusk Lanterns, the whole Plaza shimmered like a gilded manuscript! I wrote three new chords on the spot.',
+          text: 'Old Beck told me you lit the Crossing Shrine. Even my bazaar brokers tipped their hats to the Hold tonight.',
         },
         choices: [
           {
             id: 'replay-arrival',
-            label: 'Let us behold the Arrival Panorama over Vaelenport! [Cutscene]',
+            label: 'Run the Cinderfall & Act 1 Floor reconnaissance! [Cutscene]',
             nextNodeId: 'END',
             triggersCutscene: 'arrival-intro',
           },
           {
             id: 'rumors-2',
-            label: 'Share the latest word around the three tiers.',
+            label: 'Tell me the secret of Bell Three in the Gala Hall.',
             nextNodeId: 'town_rumors',
           },
           {
             id: 'leave-2',
-            label: 'May your strings stay in tune.',
+            label: 'Until the market closes.',
             nextNodeId: 'END',
           },
         ],
@@ -749,11 +749,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       after_prelude: {
         id: 'after_prelude',
         expression: 'stern',
-        text: 'From the sunken quays to the high rose window—every stone in Vaelenport was laid by hand to welcome travelers home.',
+        text: 'The Hold at the center, Floor Zero\'s Unfinished Block to the north, and Floor One and Two across the southern span. Own the seams, Coffin.',
         choices: [
           {
             id: 'back-sera',
-            label: 'A worthy sanctuary indeed.',
+            label: 'Time to climb.',
             nextNodeId: 'return_visit',
           },
         ],
@@ -761,11 +761,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       verse_composed: {
         id: 'verse_composed',
         expression: 'happy',
-        text: '"Where brass-gears turn the silver tide, and lantern-motes in twilight glide..." Splendid meter! Take these two Soul Embers—a patron’s gift for a fellow poet.',
+        text: 'Forty-to-one odds against an E-rank surviving Bell Two against Rook. Here\'s 15k scrip up front—make me rich in Bell Three.',
         choices: [
           {
             id: 'thank-sera',
-            label: 'I am honored to be in the Chronicle.',
+            label: 'Watch the balcony in Bell Three.',
             nextNodeId: 'return_visit',
           },
         ],
@@ -773,11 +773,11 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
       town_rumors: {
         id: 'town_rumors',
         expression: 'thinking',
-        text: 'Master Vaelen spends his afternoons inside the western Guildhall—walk right under the eaves to see his clock-table. Meanwhile, Brother Corvus up in the Cloister has been waiting for someone to decipher the Rose Window inscription.',
+        text: 'Rook\'s Hushblades cut the sound out of the room half a second before the steel arrives—watch for the gold glint and deflect. And remember the old Gala charter: "Sigils worn by the bound dead count double." Summon Bram, Mercy, and Hush before the third bell tolls.',
         choices: [
           {
             id: 'back-rumors',
-            label: 'Thank you for the tip, Sera.',
+            label: 'The bound dead count double. I won\'t forget.',
             nextNodeId: 'return_visit',
           },
         ],
@@ -787,13 +787,13 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
 
   'brother-corvus': {
     id: 'brother-corvus',
-    name: 'Brother Corvus',
-    role: 'Sanctuary Archivist & Rose-Window Keeper',
-    homeDistrict: "The Scholars' Cloister",
-    voicePitchHz: 175,
+    name: 'Auditor Voss',
+    role: 'Gilded Table Inquisitor ("The Manifest")',
+    homeDistrict: 'Floor Zero Gate & Audit Overlook',
+    voicePitchHz: 165,
     voiceTimbre: 'archivist',
-    cloakColorHex: '#3B3654',
-    trimColorHex: '#C8B8E8',
+    cloakColorHex: '#141114',
+    trimColorHex: '#e8a020',
     hatStyle: 'archivist',
     defaultRootNodeId: 'intro',
     repeatRootNodeId: 'return_visit',
@@ -804,8 +804,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: -3.2,
         z: -15.8,
         facingAngle: 0.25,
-        districtTitle: 'Rose Window Sanctuary (Upper Cloister)',
-        activityLabel: 'Cataloging stained-glass meridian projections',
+        districtTitle: 'Floor Zero — F7 Unmarked Door Seal',
+        activityLabel: 'Measuring parasite residue around the Unfinished Block',
       },
       {
         startHour: 15,
@@ -813,8 +813,8 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: -0.2,
         z: -10.8,
         facingAngle: 0.0,
-        districtTitle: 'Grand Cloister Balustrade Overlook',
-        activityLabel: 'Overlooking the Lantern Plaza from the upper terrace',
+        districtTitle: 'Spire Gate Audit Overlook',
+        activityLabel: 'Reviewing the 7th unfiled dossier ("The Door-Breaker")',
       },
       {
         startHour: 21,
@@ -822,96 +822,96 @@ export const VAELENPORT_CITIZENS: Record<CitizenId, CitizenProfile> = {
         x: -5.4,
         z: -14.8,
         facingAngle: 0.8,
-        districtTitle: 'Western Cloister Colonnade',
-        activityLabel: 'Reading illuminated folios by sanctuary candelabrum',
+        districtTitle: 'Floor Zero — West Rebar Colonnade',
+        activityLabel: 'Cross-checking Combine porter tallies against gate scans',
       },
     ],
     nodes: {
       intro: {
         id: 'intro',
-        expression: 'neutral',
-        text: 'Peace be upon your lantern, Wayfarer. From this northern terrace (+1.15m), all of Vaelenport unfolds like an illuminated parchment—the Plaza below, and the Canal beyond.',
+        expression: 'stern',
+        text: 'Halt, Carrier #419. J. Vane. Scan reads E-rank · 11 · Flat. Yet my slate shows you walked out of Basement 13 after a Class-3 flood that killed four D-rank vanguards. Explain the discrepancy.',
         memoryVariantText: {
           flag: 'isolde_mentioned_corvus',
-          expression: 'happy',
-          text: 'Ah, Isolde told me a keen-eyed traveler was ascending the Cloister stair! You wish to hear the Verse of the Sunken Lock and the Rose Window?',
+          expression: 'thinking',
+          text: 'Doctor Sable claims your elevated pulse is merely Ward C exhaustion. My seventh file remains open, Porter Vane.',
         },
         choices: [
           {
             id: 'decipher-rose',
-            label: 'Decipher the Rose Window inscription together (+2 Soul Embers).',
+            label: 'Present Old Beck\'s stamped flat-scan manifest (+10k Scrip hazard pay).',
             nextNodeId: 'rose_deciphered',
             excludesMemory: 'deciphered_rose_window',
             setsMemory: 'deciphered_rose_window',
-            memoryNotification: 'Brother Corvus recorded your translation in the Sanctuary Codex.',
-            affinityDelta: 2,
-            grantsEmbers: 2,
+            memoryNotification: 'Your flat-scan alibi passed Auditor Voss\'s inspection.',
+            affinityDelta: 1,
+            grantsEmbers: 10,
           },
           {
             id: 'ask-history',
-            label: 'Why did the scholars build this Cloister above the city?',
+            label: 'What is the Gilded Table searching for in Floor Zero?',
             nextNodeId: 'cloister_history',
             affinityDelta: 1,
           },
           {
             id: 'corvus-upgrades',
-            label: 'Consecrate my equipment with Sanctuary rites. [Upgrades]',
+            label: 'Requisition official Table edge-stones for my cutlass. [Upgrades]',
             nextNodeId: 'OPEN_UPGRADES',
           },
           {
             id: 'leave',
-            label: 'May the archives endure, Brother Corvus.',
+            label: 'Just doing my shift, Auditor.',
             nextNodeId: 'END',
           },
         ],
       },
       return_visit: {
         id: 'return_visit',
-        expression: 'thinking',
-        text: 'The stone arches of the Cloister hold the memory of every footstep. What wisdom do you seek today?',
+        expression: 'stern',
+        text: 'Six files in my case are closed, Porter Vane. The seventh—"The Door-Breaker"—waits only for a single non-flat spike on the pylon.',
         memoryVariantText: {
           flag: 'deciphered_rose_window',
-          expression: 'happy',
-          text: 'Greetings, Co-Archivist! Your translation of the Rose Window meridian has illuminated three whole chapters of our city’s founding.',
+          expression: 'neutral',
+          text: 'Your paperwork is in order, Carrier #419. Do not linger near the seventh door.',
         },
         choices: [
           {
             id: 'cloister-history-2',
-            label: 'Recount the founding of the Scholars’ Cloister.',
+            label: 'Ask about Heir Seven (Rook) and the Floor Two Sigil Game.',
             nextNodeId: 'cloister_history',
           },
           {
             id: 'corvus-upgrades-2',
-            label: 'I seek a Sanctuary blessing for my gear. [Upgrades]',
+            label: 'ClaimCombine requisition upgrades. [Upgrades]',
             nextNodeId: 'OPEN_UPGRADES',
           },
           {
             id: 'farewell',
-            label: 'Clear skies, Brother Corvus.',
+            label: 'Stepping back to the line, Auditor.',
             nextNodeId: 'END',
           },
         ],
       },
       rose_deciphered: {
         id: 'rose_deciphered',
-        expression: 'happy',
-        text: '"When water, brass, and glass align, the Sanctuary’s heart shall shine." You read the old high-glyphs effortlessly! Please accept these two consecrated Soul Embers.',
+        expression: 'neutral',
+        text: '"E-rank · 11 · Flat. Salvage weight: 42 kilos." Hmph. Old Beck\'s ink is dry and the numbers balance. Collect your 10k scrip statutory salvage fee and move along.',
         choices: [
           {
             id: 'thank-corvus',
-            label: 'The stained glass is a masterpiece.',
+            label: 'Thank you, Auditor Voss.',
             nextNodeId: 'return_visit',
           },
         ],
       },
       cloister_history: {
         id: 'cloister_history',
-        expression: 'stern',
-        text: 'When the outer world grew turbulent, artisans, clockmakers, apothecaries, and ferrymen gathered here. We rejected random sprawl and laid out three harmonious tiers so every citizen could live within sight of the Astrolabe Fountain.',
+        expression: 'thinking',
+        text: 'Someone forced the Seventh Unmarked Door in Basement 13 from the inside and bound a Combine shield-bearer\'s echo. Heir Seven—young Rook—has taken personal command of Floor Two\'s Gala Hall to draw the anomaly out.',
         choices: [
           {
             id: 'back-corvus',
-            label: 'You built a true sanctuary.',
+            label: 'Sounds above an E-rank\'s pay grade.',
             nextNodeId: 'return_visit',
           },
         ],
@@ -929,7 +929,6 @@ export function evaluateCitizenSchedule(
     if (slot.startHour <= slot.endHour) {
       if (h >= slot.startHour && h < slot.endHour) return slot;
     } else {
-      // Wraps across midnight (e.g., 20..5)
       if (h >= slot.startHour || h < slot.endHour) return slot;
     }
   }
@@ -939,8 +938,8 @@ export function evaluateCitizenSchedule(
 export const VAELENPORT_CUTSCENES: Record<CutsceneId, CutsceneDefinition> = {
   'arrival-intro': {
     id: 'arrival-intro',
-    title: 'Arrival at Vaelenport Sanctuary',
-    tag: 'Prologue Panorama',
+    title: 'NULLSPIRE: LEVEL ZERO — Act 1 Reconnaissance',
+    tag: 'Cinderfall & The Down',
     keyframes: [
       {
         durationSec: 4.2,
@@ -949,11 +948,11 @@ export const VAELENPORT_CUTSCENES: Record<CutsceneId, CutsceneDefinition> = {
         targetZ: 11.2,
         zoom: 'standard',
         speakerId: 'oswin',
-        speakerName: 'Oswin',
-        speakerRole: 'Canal Dockmaster',
-        expression: 'warm',
+        speakerName: 'Scout Lark',
+        speakerRole: 'B13 Flood Survivor',
+        expression: 'stern',
         subtitle:
-          'From the mist of the Lower Canal Quays, your skiff reaches the dressed stone embankments of Vaelenport.',
+          'South lies Floor One (The Muster) and Floor Two (The Gala Hall)—where 200 climbers fight for 100 writs under Rook\'s gaze.',
       },
       {
         durationSec: 4.4,
@@ -962,11 +961,11 @@ export const VAELENPORT_CUTSCENES: Record<CutsceneId, CutsceneDefinition> = {
         targetZ: 0.0,
         zoom: 'close',
         speakerId: 'master-vaelen',
-        speakerName: 'Master Vaelen',
-        speakerRole: 'Grand Bellwright',
-        expression: 'warm',
+        speakerName: 'Old Beck',
+        speakerRole: 'Combine Manifest Keeper',
+        expression: 'stern',
         subtitle:
-          'Across the arched stone bridge lies the Lantern Plaza, where the brass Astrolabe Fountain marks the city’s pulse.',
+          'At the center stands The Hold: Old Beck\'s manifest scale, the Crossing Shrine, and the cold cyan-fog corner where your Bound Echoes wait.',
         worldEvent: 'ignite-plaza-lanterns',
       },
       {
@@ -976,11 +975,11 @@ export const VAELENPORT_CUTSCENES: Record<CutsceneId, CutsceneDefinition> = {
         targetZ: -14.2,
         zoom: 'standard',
         speakerId: 'isolde',
-        speakerName: 'Isolde',
-        speakerRole: 'Cloister Apothecary',
+        speakerName: 'Doc Sable',
+        speakerRole: 'Container Clinic Surgeon',
         expression: 'thoughtful',
         subtitle:
-          'And high above the grand northern staircase rises the Scholars’ Cloister, fragrant with silver-fern and stained glass.',
+          'North rises Floor Zero (The Unfinished Block) and Doc Sable\'s Container Clinic—where every scrip buys breath for Wren in Ward C.',
         worldEvent: 'toll-cloister-bell',
       },
       {
@@ -990,19 +989,19 @@ export const VAELENPORT_CUTSCENES: Record<CutsceneId, CutsceneDefinition> = {
         targetZ: 2.5,
         zoom: 'standard',
         speakerId: 'sera',
-        speakerName: 'Sera',
-        speakerRole: 'Plaza Chronicler',
+        speakerName: 'Broker Sera',
+        speakerRole: 'Mistress of the Gilt Bazaar',
         expression: 'warm',
         subtitle:
-          'Walk freely among our three tiers, Wayfarer—every citizen has a story waiting for your voice.',
+          'Scan reads E · 11 · FLAT, Coffin. Keep the Table clock low, mind your Sync/Rot, and make the seventy-seven floors pay.',
       },
     ],
   },
 
   'dusk-lantern-awakening': {
     id: 'dusk-lantern-awakening',
-    title: 'The Dusk Lantern Awakening',
-    tag: 'Plaza Story Event',
+    title: 'Vigil of the Crossing Shrine',
+    tag: 'The Hold · Bearers Combine Rite',
     keyframes: [
       {
         durationSec: 3.8,
@@ -1013,11 +1012,11 @@ export const VAELENPORT_CUTSCENES: Record<CutsceneId, CutsceneDefinition> = {
         overrideHour: 18.6,
         overrideTimePreset: 'golden-dusk',
         speakerId: 'master-vaelen',
-        speakerName: 'Master Vaelen',
-        speakerRole: 'Grand Bellwright',
+        speakerName: 'Old Beck',
+        speakerRole: 'Combine Manifest Keeper',
         expression: 'thoughtful',
         subtitle:
-          'Master Vaelen engages the Guildhall master-lever, sending a tremor of warm golden current through the Plaza conduits.',
+          'Old Beck strikes his iron crutch-spear against the Hold floor and pours unrationed lamp-oil into the Crossing Shrine basins.',
       },
       {
         durationSec: 4.4,
@@ -1029,11 +1028,11 @@ export const VAELENPORT_CUTSCENES: Record<CutsceneId, CutsceneDefinition> = {
         overrideTimePreset: 'golden-dusk',
         worldEvent: 'ignite-plaza-lanterns',
         speakerId: 'sera',
-        speakerName: 'Sera',
-        speakerRole: 'Plaza Chronicler',
-        expression: 'surprised',
+        speakerName: 'Mercy (Echo 02)',
+        speakerRole: 'The Lantern · Bound Echo',
+        expression: 'warm',
         subtitle:
-          'One by one, the Astrolabe Fountain braziers and overhead festival lanterns flare into amber brilliance against the twilight!',
+          'Warm Spire-gold light flares across the Terminus flagstones, washing -10% Rot from Joss\'s veins as Bram and Hush step into formation.',
       },
       {
         durationSec: 4.0,
@@ -1045,19 +1044,19 @@ export const VAELENPORT_CUTSCENES: Record<CutsceneId, CutsceneDefinition> = {
         overrideTimePreset: 'golden-dusk',
         worldEvent: 'toll-cloister-bell',
         speakerId: 'brother-corvus',
-        speakerName: 'Brother Corvus',
-        speakerRole: 'Sanctuary Archivist',
-        expression: 'warm',
+        speakerName: 'Auditor Voss',
+        speakerRole: 'Gilded Table Inquisitor',
+        expression: 'stern',
         subtitle:
-          'Up on the Scholars’ Cloister, the Rose Window answers the Plaza beacons with a deep, resonant evening chime.',
+          'High by the Floor Zero pylon, the Seventh Bell tolls—and the unmarked door in Basement 13 answers with a low crimson hum.',
       },
     ],
   },
 
   'canal-lock-opening': {
     id: 'canal-lock-opening',
-    title: 'Opening the Old Canal Lock',
-    tag: 'Waterway Story Event',
+    title: 'Breaching the Muster Flood Bulkhead',
+    tag: 'Floor 1 → Floor 2 Bypass',
     keyframes: [
       {
         durationSec: 3.8,
@@ -1066,11 +1065,11 @@ export const VAELENPORT_CUTSCENES: Record<CutsceneId, CutsceneDefinition> = {
         targetZ: 9.5,
         zoom: 'close',
         speakerId: 'oswin',
-        speakerName: 'Oswin',
-        speakerRole: 'Canal Dockmaster',
+        speakerName: 'Scout Lark',
+        speakerRole: 'B13 Flood Survivor',
         expression: 'thoughtful',
         subtitle:
-          'Together with Dockmaster Oswin, you brace against the brass capstan on the Lower Quays and release the iron pawl.',
+          'Using Old Beck\'s iron crutch-pin, you and Scout Lark jam the Gilded Table scrying gear on the Muster Choke-Point span.',
       },
       {
         durationSec: 4.5,
@@ -1080,11 +1079,11 @@ export const VAELENPORT_CUTSCENES: Record<CutsceneId, CutsceneDefinition> = {
         zoom: 'close',
         worldEvent: 'open-canal-lock',
         speakerId: 'oswin',
-        speakerName: 'Oswin',
-        speakerRole: 'Canal Dockmaster',
+        speakerName: 'Scout Lark',
+        speakerRole: 'B13 Flood Survivor',
         expression: 'surprised',
         subtitle:
-          'With a thunderous groan of counterweights, the massive Eastern Canal Lock gates swing wide and the waterwheel surges!',
+          'The heavy iron Muster Sluice groans open, draining the black-water sump and exposing the direct stair into Floor Two\'s Gala Hall!',
       },
       {
         durationSec: 4.0,
@@ -1093,11 +1092,11 @@ export const VAELENPORT_CUTSCENES: Record<CutsceneId, CutsceneDefinition> = {
         targetZ: 10.2,
         zoom: 'standard',
         speakerId: 'sera',
-        speakerName: 'Sera',
-        speakerRole: 'Plaza Chronicler',
+        speakerName: 'Broker Sera',
+        speakerRole: 'Gilt Bazaar',
         expression: 'warm',
         subtitle:
-          'Lantern reflections ripple freely from the Southern Gondola Jetty all the way beneath the East Lock-Keeper’s Bridge.',
+          'Heir Seven (Rook) waits on the Gala Hall balcony above—and Bell Three is about to ring.',
       },
     ],
   },

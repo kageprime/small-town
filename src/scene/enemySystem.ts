@@ -13,17 +13,17 @@ export type EnemyArchetype = 'sentinel' | 'wraith' | 'gargoyle';
 export const INITIAL_BESTIARY_ENTRIES: BestiaryEntry[] = [
   {
     variantId: 'sentinel-citadel',
-    name: 'Hollow Sentinel',
+    name: 'Floor Zero Husk',
     archetype: 'sentinel',
-    title: 'Sworn Warden of the Citadel Flagstones',
-    regionName: 'Crypt Citadel Courtyard',
+    title: 'Nameless Porter of the Muster Hall',
+    regionName: 'Floor 0 · The Muster Hall',
     maxHp: 5,
-    attackStyle: 'Heavy Halberd Overhead Cleave',
+    attackStyle: 'Rusted Cleaver & Bail-Hook Overhead',
     baseEmberDrop: 12,
     bonusEmberDrop: 4,
     bonusDropChancePct: 35,
     loreText:
-      'Armored in tarnished iron plate, these sleepless wardens still pace the Sunken Crypt flagstones long after the Sanctuary bells fell silent.',
+      'Former E-rank porters who stayed below the Spire Gate past their 90-day contract. Their brass tags are blanked out by salt and ash, yet they still swing heavy salvage hooks at anything carrying a warm lantern.',
     encountered: false,
     timesEncountered: 0,
     defeatedCount: 0,
@@ -31,17 +31,17 @@ export const INITIAL_BESTIARY_ENTRIES: BestiaryEntry[] = [
   },
   {
     variantId: 'sentinel-barrow',
-    name: 'Barrow Halberdier',
+    name: 'Drowned Sump Carrier',
     archetype: 'sentinel',
-    title: 'Root-Bound Watchman of the Western Tombs',
-    regionName: 'Whispering Barrow Hollow',
+    title: 'B13 Floodgate Rigging Warden',
+    regionName: 'Floor 1 · The Drowned Sump',
     maxHp: 5,
-    attackStyle: 'Wide Poleaxe Sweep',
+    attackStyle: 'Sluice-Bar Wide Sweep',
     baseEmberDrop: 12,
     bonusEmberDrop: 6,
     bonusDropChancePct: 40,
     loreText:
-      'Draped in pine-stained cloaks, Barrow Halberdiers guard the sunken barrow mounds and carry dense clusters of ancient Soul Embers.',
+      'Lock-crewmen from the B13 Black-Water blowout whose oilskin coats are weighted with lead ballast. They patrol the flooded catwalks and drop dense pockets of unbanked Spire Scrip when felled.',
     encountered: false,
     timesEncountered: 0,
     defeatedCount: 0,
@@ -49,17 +49,17 @@ export const INITIAL_BESTIARY_ENTRIES: BestiaryEntry[] = [
   },
   {
     variantId: 'wraith-fen-north',
-    name: 'Weeping Fen Wraith',
+    name: 'The Pall (Muster Shroud)',
     archetype: 'wraith',
-    title: 'Mist-Bound Apparition of the Northern Mire',
-    regionName: 'Weeping Fen Mire',
+    title: 'Three-Cone Burial Cloth of the Crossing',
+    regionName: 'Floor 0 · The Muster Hall',
     maxHp: 3,
-    attackStyle: 'Swift Spirit-Staff Lunge',
+    attackStyle: 'Gold-Stitch Constriction Lunge',
     baseEmberDrop: 8,
     bonusEmberDrop: 4,
     bonusDropChancePct: 45,
     loreText:
-      'Drifting weightlessly above the lily-choked peat waters, Fen Wraiths condense cold marsh vapor around their cyan spirit lanterns.',
+      'Three nested cones of dark burial cloth bound by glinting gold stitch-rings. Passive unless struck or crowded—pressing [G] to Bow in respect calms its burial threads and stuns it for 4 seconds.',
     encountered: false,
     timesEncountered: 0,
     defeatedCount: 0,
@@ -67,17 +67,17 @@ export const INITIAL_BESTIARY_ENTRIES: BestiaryEntry[] = [
   },
   {
     variantId: 'wraith-fen-south',
-    name: 'Mire Lantern Wraith',
+    name: 'The Pall (Sump Weave)',
     archetype: 'wraith',
-    title: 'Drowned Censer Bearer of the Jetty',
-    regionName: 'Southern Fen Canal',
+    title: 'Waterlogged Shroud of the Sluice Locks',
+    regionName: 'Floor 1 · The Drowned Sump',
     maxHp: 3,
-    attackStyle: 'Phantom Arc & Frost Surge',
+    attackStyle: 'Phantom Stitch Arc & Mire Surge',
     baseEmberDrop: 8,
     bonusEmberDrop: 6,
     bonusDropChancePct: 50,
     loreText:
-      'Former ferrymen of the Southern Canal whose drowned censers still burn with high-purity Soul Embers beneath the mist bank.',
+      'Stitched by Echo 06 (Stitch - The Needle) before she died, these waterlogged funeral shrouds drift above the black-water locks. Bowing with [G] honors the dead inside and halts their assault.',
     encountered: false,
     timesEncountered: 0,
     defeatedCount: 0,
@@ -85,17 +85,17 @@ export const INITIAL_BESTIARY_ENTRIES: BestiaryEntry[] = [
   },
   {
     variantId: 'gargoyle-ossuary',
-    name: 'Ossuary Gargoyle',
+    name: 'The Returnling',
     archetype: 'gargoyle',
-    title: 'Winged Stone Chimera of the High Belfry',
-    regionName: 'High Ossuary Crag',
+    title: 'Wrong-Door Amalgam of the Deep Sump',
+    regionName: 'Floor 1 · The Drowned Sump',
     maxHp: 4,
-    attackStyle: 'Crushing Obsidian Mace Smash',
+    attackStyle: 'Three-Life Bone-Graft Smash',
     baseEmberDrop: 10,
     bonusEmberDrop: 6,
     bonusDropChancePct: 55,
     loreText:
-      'Carved from volcanic crag basalt and animated by thermal ash updrafts, their stone cores frequently fracture into rich ember clusters.',
+      'Something that crawled back through a Spire door that was never meant to open from the inside. Calcified ash-stone and grafted ribs armor its chest, requiring heavy Ichimonji cleaves or Bloodwage strikes to crack.',
     encountered: false,
     timesEncountered: 0,
     defeatedCount: 0,
@@ -103,17 +103,17 @@ export const INITIAL_BESTIARY_ENTRIES: BestiaryEntry[] = [
   },
   {
     variantId: 'gargoyle-crossroads',
-    name: 'Crag Prowler',
+    name: "Heir Seven's Hushblade",
     archetype: 'gargoyle',
-    title: 'Alchemical Stone Stalker of the Eastern Arch',
-    regionName: 'Crossroads Apothecary',
+    title: 'Gilded Table Inquisitor of the Gala Hall',
+    regionName: 'Floor 2 · The Gala Hall',
     maxHp: 4,
-    attackStyle: 'Leaping Iron-Claw Rend',
+    attackStyle: 'Leaping Gilt-Claw Duelling Rend',
     baseEmberDrop: 10,
     bonusEmberDrop: 4,
     bonusDropChancePct: 50,
     loreText:
-      'Perched near the Apothecary Cloister roofs, Crag Prowlers hoard transmuted ember vials within their winged stone carapaces.',
+      'Dispatched by Heir Seven (Rook) and Auditor Voss to hunt the unindexed E-11 Door-Breaker across the ruined chandeliers of Floor 2. Their porcelain masks conceal high-grade Gilded Table scrip cylinders.',
     encountered: false,
     timesEncountered: 0,
     defeatedCount: 0,
@@ -156,6 +156,7 @@ export interface EnemyAgent {
   isDead: boolean;
   hasTriggeredEncounter: boolean;
   hitFlashTimer: number;
+  stunnedTimer: number;
   attackCooldown: number;
   windupTimer: number;
   strikeActiveTimer: number;
@@ -225,8 +226,26 @@ export interface SanctuaryCombatAndAtmosphereRig {
     damage: number,
     attackerX: number,
     attackerZ: number,
-    spawnDebris: (x: number, y: number, z: number, hex: string) => void
-  ) => { hitCount: number; killedNames: string[]; bonusDropTriggered: boolean };
+    spawnDebris: (x: number, y: number, z: number, hex: string) => void,
+    postureStunSec?: number,
+    knockbackSpeed?: number
+  ) => {
+    hitCount: number;
+    killedNames: string[];
+    killedEnemies: { id: string; variantId: string; name: string; archetype: EnemyArchetype }[];
+    bonusDropTriggered: boolean;
+  };
+  parryEnemyStrikesInRadius: (
+    x: number,
+    z: number,
+    radius: number,
+    spawnDebris?: (x: number, y: number, z: number, hex: string) => void
+  ) => {
+    parriedCount: number;
+    parriedNames: string[];
+  };
+  stunNearbyPalls: (x: number, z: number, radius: number) => number;
+  pullEnemiesToward: (x: number, z: number, radius: number) => number;
   respawnAllEnemies: () => void;
   setFishingBobberState: (
     active: boolean,
@@ -290,25 +309,25 @@ export function createSanctuaryCombatAndAtmosphereRig(
 
   // Shared Enemy Materials
   const darkIronMat = trackMat(
-    new THREE.MeshStandardMaterial({ color: '#2B303C', roughness: 0.65, metalness: 0.35 })
+    new THREE.MeshStandardMaterial({ color: '#282623', roughness: 0.65, metalness: 0.35 })
   );
   const tarnishedSteelMat = trackMat(
-    new THREE.MeshStandardMaterial({ color: '#646E7D', roughness: 0.45, metalness: 0.55 })
+    new THREE.MeshStandardMaterial({ color: '#5E5950', roughness: 0.48, metalness: 0.48 })
   );
   const tatteredCloakMat = trackMat(
-    new THREE.MeshStandardMaterial({ color: '#4A1E24', roughness: 0.88 })
+    new THREE.MeshStandardMaterial({ color: '#4A2220', roughness: 0.88 })
   );
   const wraithRobeMat = trackMat(
-    new THREE.MeshStandardMaterial({ color: '#1F3A42', roughness: 0.85 })
+    new THREE.MeshStandardMaterial({ color: '#292D2A', roughness: 0.88 })
   );
   const gargoyleStoneMat = trackMat(
-    new THREE.MeshStandardMaterial({ color: '#525763', roughness: 0.88 })
+    new THREE.MeshStandardMaterial({ color: '#544F46', roughness: 0.88 })
   );
-  const crimsonEyeMat = trackMat(new THREE.MeshBasicMaterial({ color: '#EF4444' }));
-  const cyanSpiritMat = trackMat(new THREE.MeshBasicMaterial({ color: '#38BDF8' }));
-  const amberEyeMat = trackMat(new THREE.MeshBasicMaterial({ color: '#F59E0B' }));
-  const hitFlashMat = trackMat(new THREE.MeshBasicMaterial({ color: '#FFFFFF' }));
-  const windupGlowMat = trackMat(new THREE.MeshBasicMaterial({ color: '#FB7185' }));
+  const crimsonEyeMat = trackMat(new THREE.MeshBasicMaterial({ color: '#C25444' }));
+  const cyanSpiritMat = trackMat(new THREE.MeshBasicMaterial({ color: '#B5C4A8' }));
+  const amberEyeMat = trackMat(new THREE.MeshBasicMaterial({ color: '#D49B4B' }));
+  const hitFlashMat = trackMat(new THREE.MeshBasicMaterial({ color: '#EFE7D6' }));
+  const windupGlowMat = trackMat(new THREE.MeshBasicMaterial({ color: '#D97757' }));
 
   const hpBgMat = trackMat(
     new THREE.MeshBasicMaterial({ color: '#18181B', side: THREE.DoubleSide })
@@ -427,48 +446,65 @@ export function createSanctuaryCombatAndAtmosphereRig(
       axeBlade.rotation.x = 0.35;
       weaponPivot.add(axeBlade);
     } else if (archetype === 'wraith') {
-      // Fen Wraith: Floating tattered robe cone, cowl, cyan spirit eyes, spirit lantern staff
-      const robe = regMesh(
-        new THREE.Mesh(trackGeo(new THREE.ConeGeometry(0.42, 1.05, 8)), wraithRobeMat)
+      // The Pall: 3 nested burial cloth cones with gold stitch-rings
+      const cone1 = regMesh(
+        new THREE.Mesh(trackGeo(new THREE.ConeGeometry(0.44, 0.85, 8)), wraithRobeMat)
       );
-      robe.position.y = 0.68;
-      bodyPivot.add(robe);
+      cone1.position.y = 0.52;
+      bodyPivot.add(cone1);
 
-      const mantle = regMesh(
-        new THREE.Mesh(trackGeo(new THREE.ConeGeometry(0.36, 0.48, 8)), darkIronMat)
+      const cone2 = regMesh(
+        new THREE.Mesh(trackGeo(new THREE.ConeGeometry(0.35, 0.65, 8)), darkIronMat)
       );
-      mantle.position.y = 1.02;
-      bodyPivot.add(mantle);
+      cone2.position.y = 0.86;
+      bodyPivot.add(cone2);
 
-      const hood = regMesh(
-        new THREE.Mesh(trackGeo(new THREE.DodecahedronGeometry(0.22, 1)), wraithRobeMat)
+      const cone3 = regMesh(
+        new THREE.Mesh(trackGeo(new THREE.ConeGeometry(0.24, 0.48, 8)), wraithRobeMat)
       );
-      hood.position.set(0, 1.26, 0.04);
-      bodyPivot.add(hood);
+      cone3.position.y = 1.18;
+      bodyPivot.add(cone3);
+
+      // Gold stitch-rings binding the burial cones
+      const stitchRing1 = new THREE.Mesh(
+        trackGeo(new THREE.TorusGeometry(0.32, 0.022, 6, 12)),
+        amberEyeMat
+      );
+      stitchRing1.rotation.x = Math.PI / 2;
+      stitchRing1.position.y = 0.68;
+      bodyPivot.add(stitchRing1);
+
+      const stitchRing2 = new THREE.Mesh(
+        trackGeo(new THREE.TorusGeometry(0.23, 0.018, 6, 12)),
+        amberEyeMat
+      );
+      stitchRing2.rotation.x = Math.PI / 2;
+      stitchRing2.position.y = 1.02;
+      bodyPivot.add(stitchRing2);
 
       const eyeGeo = trackGeo(new THREE.BoxGeometry(0.05, 0.03, 0.04));
       const lEye = new THREE.Mesh(eyeGeo, cyanSpiritMat);
-      lEye.position.set(-0.06, 1.26, 0.22);
+      lEye.position.set(-0.06, 1.24, 0.18);
       bodyPivot.add(lEye);
       const rEye = new THREE.Mesh(eyeGeo, cyanSpiritMat);
-      rEye.position.set(0.06, 1.26, 0.22);
+      rEye.position.set(0.06, 1.24, 0.18);
       bodyPivot.add(rEye);
 
       weaponPivot.position.set(0.28, 0.92, 0.16);
       bodyPivot.add(weaponPivot);
 
       const staff = regMesh(
-        new THREE.Mesh(trackGeo(new THREE.CylinderGeometry(0.028, 0.028, 1.35, 6)), darkIronMat)
+        new THREE.Mesh(trackGeo(new THREE.CylinderGeometry(0.024, 0.024, 1.35, 6)), darkIronMat)
       );
       staff.position.set(0, 0.1, 0.22);
       staff.rotation.x = 0.28;
       weaponPivot.add(staff);
 
-      const orb = new THREE.Mesh(trackGeo(new THREE.OctahedronGeometry(0.14, 0)), cyanSpiritMat);
+      const orb = new THREE.Mesh(trackGeo(new THREE.OctahedronGeometry(0.13, 0)), amberEyeMat);
       orb.position.set(0, 0.68, 0.46);
       weaponPivot.add(orb);
     } else {
-      // Ossuary Gargoyle: Muscular stone crouch, wide wings, horned head, stone claws
+      // The Returnling / Heir Seven's Hushblade: Calcified ash-stone torso, bone-graft wings, gilt mask eyes
       const torso = regMesh(
         new THREE.Mesh(trackGeo(new THREE.DodecahedronGeometry(0.34, 1)), gargoyleStoneMat)
       );
@@ -547,6 +583,7 @@ export function createSanctuaryCombatAndAtmosphereRig(
       isDead: false,
       hasTriggeredEncounter: false,
       hitFlashTimer: 0,
+      stunnedTimer: 0,
       attackCooldown: 1.0,
       windupTimer: 0,
       strikeActiveTimer: 0,
@@ -557,14 +594,14 @@ export function createSanctuaryCombatAndAtmosphereRig(
   };
 
   if (isOpenWorld) {
-    buildEnemy('sentinel-citadel', 'sentinel', 'Hollow Sentinel', 8.5, -5.0, 0.0);
-    buildEnemy('sentinel-barrow', 'sentinel', 'Barrow Halberdier', -12.5, 11.5, 1.8);
-    buildEnemy('wraith-fen-north', 'wraith', 'Weeping Fen Wraith', 11.5, 9.5, 0.9);
-    buildEnemy('wraith-fen-south', 'wraith', 'Mire Lantern Wraith', 21.0, 12.5, 2.7);
-    buildEnemy('gargoyle-ossuary', 'gargoyle', 'Ossuary Gargoyle', -14.5, -13.5, 1.2);
-    buildEnemy('gargoyle-crossroads', 'gargoyle', 'Crag Prowler', 13.5, -16.5, 3.6);
+    buildEnemy('sentinel-citadel', 'sentinel', 'Floor Zero Husk', 8.5, -5.0, 0.0);
+    buildEnemy('sentinel-barrow', 'sentinel', 'Drowned Sump Carrier', -12.5, 11.5, 1.8);
+    buildEnemy('wraith-fen-north', 'wraith', 'The Pall (Muster Shroud)', 11.5, 9.5, 0.9);
+    buildEnemy('wraith-fen-south', 'wraith', 'The Pall (Sump Weave)', 21.0, 12.5, 2.7);
+    buildEnemy('gargoyle-ossuary', 'gargoyle', 'The Returnling', -14.5, -13.5, 1.2);
+    buildEnemy('gargoyle-crossroads', 'gargoyle', "Heir Seven's Hushblade", 13.5, -16.5, 3.6);
   } else {
-    buildEnemy('sentinel-citadel', 'sentinel', 'Hollow Sentinel', 3.4, 2.6, 0.0);
+    buildEnemy('sentinel-citadel', 'sentinel', 'Floor Zero Husk', 3.4, 2.6, 0.0);
   }
 
   // ==========================================================================
@@ -666,33 +703,33 @@ export function createSanctuaryCombatAndAtmosphereRig(
   };
 
   // ==========================================================================
-  // REGIONAL WEATHER PARTICLE RIG (Fen Rain, Ossuary Ash, Crypt Mist)
+  // REGIONAL WEATHER PARTICLE RIG (Sanctuary Dust, Canal Dew Motes, Forge Embers)
   // ==========================================================================
   const weatherGroup = new THREE.Group();
   root.add(weatherGroup);
 
   const rainMat = trackMat(
-    new THREE.MeshBasicMaterial({ color: '#93C5FD', transparent: true, opacity: 0.65 })
+    new THREE.MeshBasicMaterial({ color: '#A8A296', transparent: true, opacity: 0.42 })
   );
   const ashMat = trackMat(
-    new THREE.MeshBasicMaterial({ color: '#FB923C', transparent: true, opacity: 0.85 })
+    new THREE.MeshBasicMaterial({ color: '#D49B4B', transparent: true, opacity: 0.72 })
   );
   const mistMat = trackMat(
-    new THREE.MeshBasicMaterial({ color: '#CBD5E1', transparent: true, opacity: 0.45 })
+    new THREE.MeshBasicMaterial({ color: '#C8BFA8', transparent: true, opacity: 0.35 })
   );
 
-  const particleGeo = trackGeo(new THREE.BoxGeometry(0.05, 0.35, 0.05));
+  const particleGeo = trackGeo(new THREE.BoxGeometry(0.032, 0.032, 0.032));
   const weatherParticles: WeatherParticle[] = [];
 
-  for (let i = 0; i < 42; i++) {
+  for (let i = 0; i < 32; i++) {
     const mesh = new THREE.Mesh(particleGeo, mistMat);
     weatherGroup.add(mesh);
     weatherParticles.push({
       mesh,
       offsetX: (Math.random() - 0.5) * 18.0,
-      offsetY: Math.random() * 8.0,
+      offsetY: Math.random() * 6.5,
       offsetZ: (Math.random() - 0.5) * 18.0,
-      speedY: 1.5 + Math.random() * 1.5,
+      speedY: 0.9 + Math.random() * 0.9,
       driftPhase: Math.random() * Math.PI * 2,
     });
   }
@@ -709,7 +746,7 @@ export function createSanctuaryCombatAndAtmosphereRig(
   const mistBankMat = trackMat(
     new THREE.MeshBasicMaterial({
       map: mistTex,
-      color: '#7FA8B4',
+      color: '#9E9585',
       transparent: true,
       opacity: 0.0,
       depthWrite: false,
@@ -717,20 +754,20 @@ export function createSanctuaryCombatAndAtmosphereRig(
     })
   );
 
-  const mistPlaneGeo = trackGeo(new THREE.PlaneGeometry(4.6, 4.6));
+  const mistPlaneGeo = trackGeo(new THREE.PlaneGeometry(3.2, 3.2));
   const mistBillows: MistBillow[] = [];
 
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 12; i++) {
     const mMesh = new THREE.Mesh(mistPlaneGeo, mistBankMat);
     mMesh.rotation.x = -Math.PI / 2;
     mistBankGroup.add(mMesh);
     mistBillows.push({
       mesh: mMesh,
-      angle: (i / 20) * Math.PI * 2,
-      radius: 1.2 + (i % 4) * 2.1,
-      heightOffset: 0.16 + (i % 3) * 0.24,
-      baseScale: 0.85 + (i % 3) * 0.38,
-      speed: (i % 2 === 0 ? 1 : -1) * (0.28 + (i % 4) * 0.08),
+      angle: (i / 12) * Math.PI * 2,
+      radius: 1.8 + (i % 3) * 1.9,
+      heightOffset: 0.12 + (i % 3) * 0.16,
+      baseScale: 0.65 + (i % 3) * 0.25,
+      speed: (i % 2 === 0 ? 1 : -1) * (0.22 + (i % 4) * 0.06),
     });
   }
 
@@ -739,7 +776,7 @@ export function createSanctuaryCombatAndAtmosphereRig(
   let mistBlendWeight = 0.0;
 
   // ==========================================================================
-  // COMBAT ARC DAMAGE & KNOCKBACK
+  // COMBAT ARC DAMAGE, PALL BOW PACIFICATION & CROSSPULL YANK
   // ==========================================================================
   const damageEnemiesInArc = (
     hitX: number,
@@ -748,11 +785,14 @@ export function createSanctuaryCombatAndAtmosphereRig(
     damage: number,
     attackerX: number,
     attackerZ: number,
-    spawnDebris: (x: number, y: number, z: number, hex: string) => void
+    spawnDebris: (x: number, y: number, z: number, hex: string) => void,
+    postureStunSec = 0.25,
+    knockbackSpeed = 5.8
   ) => {
     let hitCount = 0;
     let bonusDropTriggered = false;
     const killedNames: string[] = [];
+    const killedEnemies: { id: string; variantId: string; name: string; archetype: EnemyArchetype }[] = [];
 
     for (const enemy of enemies) {
       if (enemy.isDead) continue;
@@ -762,6 +802,7 @@ export function createSanctuaryCombatAndAtmosphereRig(
         enemy.hp = Math.max(0, enemy.hp - damage);
         enemy.hitFlashTimer = 0.14;
         enemy.windupTimer = 0;
+        enemy.stunnedTimer = Math.max(enemy.stunnedTimer, postureStunSec);
         enemy.hpBarGroup.visible = true;
 
         // Ensure Bestiary Log records encounter upon striking
@@ -777,20 +818,26 @@ export function createSanctuaryCombatAndAtmosphereRig(
         enemy.hpFillMesh.position.x = -0.4 * (1 - ratio);
 
         const pushAngle = Math.atan2(enemy.x - attackerX, enemy.z - attackerZ);
-        enemy.vx = Math.sin(pushAngle) * 5.8;
-        enemy.vz = Math.cos(pushAngle) * 5.8;
+        enemy.vx = Math.sin(pushAngle) * knockbackSpeed;
+        enemy.vz = Math.cos(pushAngle) * knockbackSpeed;
 
         spawnDebris(
           enemy.x,
           enemy.y + 0.6,
           enemy.z,
-          enemy.archetype === 'wraith' ? '#38BDF8' : '#EF4444'
+          enemy.archetype === 'wraith' ? '#9fd8e8' : '#e5482f'
         );
 
         if (enemy.hp <= 0) {
           enemy.isDead = true;
           enemy.group.visible = false;
           killedNames.push(enemy.name);
+          killedEnemies.push({
+            id: enemy.id,
+            variantId: enemy.variantId,
+            name: enemy.name,
+            archetype: enemy.archetype,
+          });
 
           let baseOrbs = enemy.maxHp + 1;
           let bonusOrbs = 0;
@@ -810,7 +857,71 @@ export function createSanctuaryCombatAndAtmosphereRig(
       }
     }
 
-    return { hitCount, killedNames, bonusDropTriggered };
+    return { hitCount, killedNames, killedEnemies, bonusDropTriggered };
+  };
+
+  const parryEnemyStrikesInRadius = (
+    x: number,
+    z: number,
+    radius: number,
+    spawnDebris?: (x: number, y: number, z: number, hex: string) => void
+  ) => {
+    let parriedCount = 0;
+    const parriedNames: string[] = [];
+    for (const enemy of enemies) {
+      if (enemy.isDead) continue;
+      const d = Math.hypot(enemy.x - x, enemy.z - z);
+      if (d <= radius && (enemy.windupTimer > 0 || enemy.strikeActiveTimer > 0 || d <= 2.35)) {
+        parriedCount++;
+        parriedNames.push(enemy.name);
+        enemy.windupTimer = 0;
+        enemy.strikeActiveTimer = 0;
+        enemy.stunnedTimer = Math.max(enemy.stunnedTimer, 2.6);
+        enemy.hitFlashTimer = 0.28;
+        enemy.attackCooldown = 2.2;
+        const recoilAng = Math.atan2(enemy.x - x, enemy.z - z);
+        enemy.vx = Math.sin(recoilAng) * 7.2;
+        enemy.vz = Math.cos(recoilAng) * 7.2;
+        if (spawnDebris) {
+          spawnDebris(enemy.x, enemy.y + 0.75, enemy.z, '#e8a020');
+        }
+      }
+    }
+    return { parriedCount, parriedNames };
+  };
+
+  const stunNearbyPalls = (x: number, z: number, radius: number): number => {
+    let count = 0;
+    for (const enemy of enemies) {
+      if (enemy.isDead) continue;
+      const d = Math.hypot(enemy.x - x, enemy.z - z);
+      if (d <= radius && enemy.archetype === 'wraith') {
+        enemy.stunnedTimer = 4.2;
+        enemy.windupTimer = 0;
+        enemy.strikeActiveTimer = 0;
+        enemy.hitFlashTimer = 0.25;
+        count++;
+      }
+    }
+    return count;
+  };
+
+  const pullEnemiesToward = (x: number, z: number, radius: number): number => {
+    let count = 0;
+    for (const enemy of enemies) {
+      if (enemy.isDead) continue;
+      const d = Math.hypot(enemy.x - x, enemy.z - z);
+      if (d <= radius && d > 0.8) {
+        const pullAng = Math.atan2(x - enemy.x, z - enemy.z);
+        enemy.vx = Math.sin(pullAng) * 14.5;
+        enemy.vz = Math.cos(pullAng) * 14.5;
+        enemy.stunnedTimer = Math.max(enemy.stunnedTimer, 1.25);
+        enemy.windupTimer = 0;
+        enemy.hitFlashTimer = 0.18;
+        count++;
+      }
+    }
+    return count;
   };
 
   const respawnAllEnemies = () => {
@@ -824,6 +935,7 @@ export function createSanctuaryCombatAndAtmosphereRig(
       enemy.vx = 0;
       enemy.vz = 0;
       enemy.windupTimer = 0;
+      enemy.stunnedTimer = 0;
       enemy.hpBarGroup.visible = false;
       enemy.hpFillMesh.scale.x = 1;
       enemy.hpFillMesh.position.x = 0;
@@ -898,35 +1010,8 @@ export function createSanctuaryCombatAndAtmosphereRig(
       mistBlendWeight
     );
 
-    // Animate 3D Sudden Mist Bank around Player / Zone
-    mistBankGroup.visible = mistBlendWeight > 0.015;
-    if (mistBankGroup.visible) {
-      mistBankMat.opacity = Math.min(0.68, mistBlendWeight * 0.62);
-      const centerAnchorX = matchedZone
-        ? THREE.MathUtils.lerp(playerPos.x, matchedZone.x, 0.35)
-        : playerPos.x;
-      const centerAnchorZ = matchedZone
-        ? THREE.MathUtils.lerp(playerPos.z, matchedZone.z, 0.35)
-        : playerPos.z;
-      const baseFloorY = gFn(playerPos.x, playerPos.z);
-
-      for (let i = 0; i < mistBillows.length; i++) {
-        const b = mistBillows[i];
-        const a = b.angle + timeSec * b.speed;
-        const r = b.radius + Math.sin(timeSec * 0.9 + i) * 0.75;
-        const bx = centerAnchorX + Math.cos(a) * r;
-        const bz = centerAnchorZ + Math.sin(a) * r;
-        const by =
-          baseFloorY +
-          b.heightOffset * mistBlendWeight +
-          Math.sin(timeSec * 1.6 + i) * 0.06;
-
-        b.mesh.position.set(bx, by, bz);
-        b.mesh.rotation.z = a * 0.5;
-        const s = b.baseScale * (0.65 + mistBlendWeight * 0.65);
-        b.mesh.scale.set(s, s, 1);
-      }
-    }
+    // Keep ground mist planes disabled by default so Bayer dithering never creates blotchy circles on flagstones
+    mistBankGroup.visible = false;
 
     // 1. Update Enemies
     for (const enemy of enemies) {
@@ -934,6 +1019,9 @@ export function createSanctuaryCombatAndAtmosphereRig(
 
       if (enemy.hitFlashTimer > 0) {
         enemy.hitFlashTimer = Math.max(0, enemy.hitFlashTimer - dt);
+      }
+      if (enemy.stunnedTimer > 0) {
+        enemy.stunnedTimer = Math.max(0, enemy.stunnedTimer - dt);
       }
       if (enemy.attackCooldown > 0) {
         enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
@@ -959,7 +1047,10 @@ export function createSanctuaryCombatAndAtmosphereRig(
         }
       }
 
-      if (enemy.windupTimer > 0) {
+      if (enemy.stunnedTimer > 0) {
+        // Pacified / Crosspull-staggered state (e.g., Bowing [G] before The Pall)
+        enemy.weaponPivot.rotation.x = 0.45;
+      } else if (enemy.windupTimer > 0) {
         enemy.windupTimer -= dt;
         enemy.weaponPivot.rotation.x = -1.25;
         if (enemy.windupTimer <= 0) {
@@ -1018,6 +1109,8 @@ export function createSanctuaryCombatAndAtmosphereRig(
       for (let i = 0; i < enemy.meshes.length; i++) {
         if (enemy.hitFlashTimer > 0) {
           enemy.meshes[i].material = hitFlashMat;
+        } else if (enemy.stunnedTimer > 0) {
+          enemy.meshes[i].material = cyanSpiritMat;
         } else if (enemy.windupTimer > 0 && i === enemy.meshes.length - 1) {
           enemy.meshes[i].material = windupGlowMat;
         } else {
@@ -1074,12 +1167,10 @@ export function createSanctuaryCombatAndAtmosphereRig(
       orb.group.rotation.y += dt * 3.5;
     }
 
-    // 3. Update Regional Weather Particles (automatically reacts to Trigger Zones too!)
+    // 3. Update Regional Weather Particles (delicate motes, no vertical blue sticks)
     let resolvedWeather: Exclude<WeatherPreset, 'auto-regional'> = 'crypt-mist';
     if (weatherMode !== 'auto-regional') {
       resolvedWeather = weatherMode;
-    } else if (matchedZone?.effect === 'fen-mist-bank' || (playerPos.x > 6 && playerPos.z > 6)) {
-      resolvedWeather = 'fen-rain';
     } else if (
       matchedZone?.effect === 'ossuary-ash-surge' ||
       (playerPos.x < -8 && playerPos.z < -8)
@@ -1094,22 +1185,22 @@ export function createSanctuaryCombatAndAtmosphereRig(
       for (const wp of weatherParticles) {
         if (resolvedWeather === 'fen-rain') {
           wp.mesh.material = rainMat;
-          wp.mesh.scale.set(0.45, 2.2, 0.45);
-          wp.offsetY -= wp.speedY * 4.5 * dt;
-          if (wp.offsetY < 0.2) wp.offsetY = 8.5;
+          wp.mesh.scale.set(0.8, 1.8, 0.8);
+          wp.offsetY -= wp.speedY * 3.2 * dt;
+          if (wp.offsetY < 0.2) wp.offsetY = 6.5;
         } else if (resolvedWeather === 'ash-embers') {
           wp.mesh.material = ashMat;
-          wp.mesh.scale.set(0.85, 0.35, 0.85);
+          wp.mesh.scale.set(1.0, 1.0, 1.0);
           wp.offsetY += wp.speedY * 0.55 * dt;
-          if (wp.offsetY > 7.5) wp.offsetY = 0.3;
+          if (wp.offsetY > 6.5) wp.offsetY = 0.3;
         } else {
           wp.mesh.material = mistMat;
-          wp.mesh.scale.set(1.2, 0.35, 1.2);
-          wp.offsetY = 0.55 + Math.sin(timeSec * 1.4 + wp.driftPhase) * 0.35;
+          wp.mesh.scale.set(0.95, 0.95, 0.95);
+          wp.offsetY = 0.65 + Math.sin(timeSec * 1.1 + wp.driftPhase) * 0.45;
         }
 
-        const swayX = Math.sin(timeSec * 1.2 + wp.driftPhase) * 0.6;
-        const swayZ = Math.cos(timeSec * 1.1 + wp.driftPhase) * 0.6;
+        const swayX = Math.sin(timeSec * 0.9 + wp.driftPhase) * 0.45;
+        const swayZ = Math.cos(timeSec * 0.85 + wp.driftPhase) * 0.45;
         wp.mesh.position.set(
           cameraTarget.x + wp.offsetX + swayX,
           cameraTarget.y + wp.offsetY,
@@ -1138,6 +1229,9 @@ export function createSanctuaryCombatAndAtmosphereRig(
     },
     spawnSoulEmbers,
     damageEnemiesInArc,
+    parryEnemyStrikesInRadius,
+    stunNearbyPalls,
+    pullEnemiesToward,
     respawnAllEnemies,
     setFishingBobberState,
     update,

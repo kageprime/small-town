@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NULLSPIRE: LEVEL ZERO — Concept Board</title>
+<meta name="description" content="Visual concept board for NULLSPIRE: LEVEL ZERO — characters, levels, and buildings drawn in code. Brainstorm made visible.">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="dark"]{
+--text-xs:clamp(.75rem,.7rem + .25vw,.875rem);--text-sm:clamp(.875rem,.8rem + .35vw,1rem);
+--text-base:clamp(1rem,.95rem + .25vw,1.125rem);--text-lg:clamp(1.125rem,1rem + .75vw,1.5rem);
+--text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);--text-2xl:clamp(2rem,1.2rem + 2.5vw,3.5rem);
+--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-12:3rem;--space-24:6rem;
+--font-display:'Clash Display','Arial Black',sans-serif;--font-body:'Satoshi','Segoe UI',sans-serif;--font-mono:'JetBrains Mono','Courier New',monospace;
+--color-bg:#141114;--color-surface:#1e1a1c;--color-surface-2:#242027;--color-surface-offset:#171418;
+--color-border:#3a3235;--color-ink:#3a3235;--color-text:#ece4f0;--color-text-muted:#a89ab2;--color-text-faint:#6e6278;
+--color-blood:#e5482f;--color-gold:#e8a020;--color-chalk:#f4efe4;--color-moss:#6daa45;--color-river:#5591c7;
+--radius-md:.75rem;--radius-lg:1.25rem;--shadow-hard:7px 7px 0 #000;--shadow-hard-sm:4px 4px 0 #000;
+--transition-interactive:180ms cubic-bezier(.16,1,.3,1)}
+[data-theme="light"]{--color-bg:#f1ebf4;--color-surface:#faf6fd;--color-surface-2:#fffdf7;--color-surface-offset:#e7dfec;
+--color-border:#1f1b2d;--color-ink:#1f1b2d;--color-text:#221c16;--color-text-muted:#6b5f6e;--color-text-faint:#a297a3;
+--color-blood:#c22e1c;--color-gold:#b07a00;--color-chalk:#221c16;
+--shadow-hard:7px 7px 0 #1f1b2d;--shadow-hard-sm:4px 4px 0 #1f1b2d}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:none;text-size-adjust:none;-webkit-font-smoothing:antialiased;scroll-behavior:smooth;scroll-padding-top:96px}
+body{min-height:100dvh;line-height:1.6;font-family:var(--font-body);font-size:var(--text-base);color:var(--color-text);background-color:var(--color-bg);
+background-image:radial-gradient(color-mix(in oklab,var(--color-blood) 12%,transparent) 1px,transparent 1px);background-size:26px 26px}
+h1,h2,h3{text-wrap:balance;line-height:1.12}p,li,figcaption{text-wrap:pretty}
+::selection{background:var(--color-blood);color:#fff}
+:focus-visible{outline:2px solid var(--color-gold);outline-offset:3px}
+a,button{transition:color var(--transition-interactive),background var(--transition-interactive),transform var(--transition-interactive)}
+button{cursor:pointer;background:none;border:none;color:inherit;font:inherit}
+.top-strip{background:#000;color:#ece4f0;text-align:center;font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:.14em;padding:var(--space-2) var(--space-4);font-weight:700}
+.top-strip b{color:var(--color-blood)}
+[data-theme="light"] .top-strip{background:#1f1b2d;color:#f1ebf4}
+.banner{position:sticky;top:0;z-index:50;background:color-mix(in oklab,var(--color-bg) 88%,transparent);backdrop-filter:blur(12px);border-bottom:3px solid var(--color-ink)}
+.banner-inner{max-width:1200px;margin:0 auto;padding:var(--space-4) var(--space-5);display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:var(--space-3);margin-right:auto;text-decoration:none;color:inherit}
+.brand-name{font-family:var(--font-display);font-weight:700;font-size:var(--text-lg)}
+.brand-name span{color:var(--color-blood)}
+nav.main{display:flex;gap:var(--space-2);flex-wrap:wrap}
+nav.main a{font-size:var(--text-sm);font-weight:700;text-decoration:none;color:var(--color-text-muted);padding:var(--space-2) var(--space-3);border-radius:6px}
+nav.main a:hover{color:var(--color-text);background:var(--color-surface-2)}
+.theme-btn{border:2px solid var(--color-ink);border-radius:6px;padding:var(--space-2) var(--space-3);font-family:var(--font-mono);font-size:var(--text-xs);font-weight:700;box-shadow:3px 3px 0 #000;background:var(--color-surface-2);color:var(--color-text)}
+[data-theme="light"] .theme-btn{box-shadow:3px 3px 0 #1f1b2d}
+.wrap{max-width:1200px;margin:0 auto;padding:0 var(--space-5) var(--space-24)}
+section{padding-block:clamp(var(--space-12),7vw,var(--space-24))}
+.kicker{font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:.18em;color:var(--color-blood);font-weight:700;text-transform:uppercase;margin-bottom:var(--space-3)}
+h2.section-title{font-family:var(--font-display);font-weight:600;font-size:var(--text-xl);margin-bottom:var(--space-2)}
+.section-sub{color:var(--color-text-muted);max-width:68ch;margin-bottom:var(--space-8)}
+.hero{padding-block:clamp(var(--space-12),8vw,var(--space-24));display:grid;gap:var(--space-6)}
+.hero h1{font-family:var(--font-display);font-weight:700;font-size:clamp(2.4rem,1rem + 6vw,5.5rem);line-height:.98}
+.hero h1 .zero{color:var(--color-blood);text-shadow:4px 4px 0 #000}
+.hero-tag{font-size:var(--text-lg);color:var(--color-text-muted);max-width:62ch}
+.hero-tag b{color:var(--color-text)}
+.grid{display:grid;gap:var(--space-6);grid-template-columns:repeat(3,1fr)}
+@media(max-width:1020px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+.card{background:var(--color-surface);border:3px solid var(--color-ink);border-radius:var(--radius-lg);box-shadow:var(--shadow-hard);overflow:hidden;display:flex;flex-direction:column}
+.card-head{padding:var(--space-5);border-bottom:3px solid var(--color-ink)}
+.num{font-family:var(--font-mono);font-size:var(--text-xs);font-weight:700;background:var(--color-surface-2);border:2px solid var(--color-ink);padding:var(--space-2);border-radius:6px;display:inline-block;margin-bottom:var(--space-3);color:var(--color-text)}
+.card h3{font-family:var(--font-display);font-size:var(--text-lg);font-weight:600;margin-bottom:2px}
+.card .role{font-size:var(--text-sm);font-weight:700;color:var(--color-text-muted)}
+.card figure{border-bottom:3px solid var(--color-ink);background:#0c0a0b;padding:var(--space-4)}
+[data-theme="light"] .card figure{background:#141114}
+.card figure svg,.card figure canvas{display:block;width:100%;height:auto}
+.card figure canvas{image-rendering:pixelated;image-rendering:crisp-edges;max-height:340px;object-fit:contain;background:#0c0a0b}
+.card figure canvas.echo{opacity:.9}
+.card figure.ghost{outline:2px dashed rgba(159,216,232,.5);outline-offset:-2px}
+.card-body{padding:var(--space-5);display:grid;gap:var(--space-4);font-size:var(--text-base)}
+.swatches{display:flex;gap:var(--space-2);align-items:center}
+.sw{width:26px;height:26px;border-radius:7px;border:2px solid var(--color-ink)}
+.field{font-size:var(--text-base)}
+.field b{display:block;font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:.12em;text-transform:uppercase;color:var(--color-blood);margin-bottom:2px}
+.note{background:var(--color-surface-offset);border:2px dashed var(--color-border);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);font-size:var(--text-sm)}
+.note b{color:var(--color-gold);font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:.12em;display:block;margin-bottom:2px}
+footer.site{border-top:3px solid var(--color-ink);padding:var(--space-8) var(--space-5);text-align:center;color:var(--color-text-muted);font-size:var(--text-sm)}
+footer.site b{color:var(--color-text)}
+footer.site a{color:inherit}
+</style>
+</head>
+<body>
+<div class="top-strip">NULLSPIRE: LEVEL ZERO <b>•</b> CONCEPT BOARD <b>•</b> PROPER MODELS</div>
+
+<header class="banner">
+<div class="banner-inner">
+<a class="brand" href="index.html" aria-label="Back to world bible">
+<svg width="36" height="36" viewBox="0 0 40 40" fill="none" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="9" fill="#e5482f" stroke="#000" stroke-width="3"/><path d="M13 31 L20 8 L24 20 L27 12 L29 31 Z" fill="#141114" stroke="#f4efe4" stroke-width="2" stroke-linejoin="round"/><path d="M20 8 L22 16" stroke="#e8a020" stroke-width="2" stroke-linecap="round"/></svg>
+<div class="brand-name">CONCEPT<span> BOARD</span></div></a>
+<nav class="main" aria-label="Board sections">
+<a href="#characters">Characters</a><a href="#levels">Levels</a><a href="#buildings">Buildings</a><a href="index.html">World</a><a href="docs.html">Docs</a>
+</nav>
+<button class="theme-btn" data-theme-toggle aria-label="Switch theme">◐ THEME</button>
+</div>
+</header>
+
+<main class="wrap">
+<section class="hero">
+<p class="kicker">Pass two — proper models</p>
+<h1>NO MORE<br>STICK FIGURES.<br><span class="zero">REAL CAST.</span></h1>
+<p class="hero-tag">Every character below is a <b>shaded pixel-art portrait</b> rasterized live from map data — same pipeline as in-game Joss, bigger canvas. Palette-locked, two-tone shading, readable at card size. Echoes share the dashed chalk-cyan treatment. Grain pass nods painterly.</p>
+</section>
+
+<!-- ================= CHARACTERS ================= -->
+<section id="characters">
+<p class="kicker">01 — Characters</p>
+<h2 class="section-title">The cast, modeled</h2>
+<p class="section-sub">Rule held: one accent shape + one color each. Portraits render from the same map format the game engine eats — promote any of these straight into a sprite sheet.</p>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.06 0"/><feComposite operator="over" in2="SourceGraphic"/></filter>
+</defs></svg>
+<div class="grid">
+
+<article class="card"><div class="card-head"><span class="num">JOSS VANE • PROTAGONIST</span><h3>The Porter</h3><p class="role">Lip scar • blood scarf • back-slung cutlass</p></div>
+<figure><canvas data-px="joss" role="img" aria-label="Joss portrait"></canvas></figure>
+<div class="card-body">
+<div class="swatches"><span class="sw" style="background:#f4efe4"></span><span class="sw" style="background:#2e2a33"></span><span class="sw" style="background:#e5482f"></span><span class="sw" style="background:#e8a020"></span></div>
+<p class="field"><b>Accent shape</b>Scarf knot + tail over a porter's coat; cutlass steel kissing the frame's right edge.</p>
+<p class="field"><b>In motion</b>Porter's lope, always slightly loaded. Idle: touches the lip scar when deciding.</p>
+<div class="note"><b>Model note</b>≤12k tris in 3D. Scarf recolors toward black past Sync 70 — readable corruption.</div>
+</div></article>
+
+<article class="card"><div class="card-head"><span class="num">ROOK • RIVAL</span><h3>Heir Seven</h3><p class="role">Crown band • braid • gold yoke coat</p></div>
+<figure><canvas data-px="rook" role="img" aria-label="Rook portrait"></canvas></figure>
+<div class="card-body">
+<div class="swatches"><span class="sw" style="background:#221c16"></span><span class="sw" style="background:#e8a020"></span><span class="sw" style="background:#9aa3ad"></span><span class="sw" style="background:#f4efe4"></span></div>
+<p class="field"><b>Accent shape</b>Gold crown band seated low + braid over one shoulder. Pale blades cross behind.</p>
+<p class="field"><b>In motion</b>Never hurries. Hushblades animate the absence first — dust hangs, then parts.</p>
+<div class="note"><b>Model note</b>≤12k tris. Crown emissive gold; braid is a separate jiggle-bone chain.</div>
+</div></article>
+
+<article class="card"><div class="card-head"><span class="num">BRAM • ECHO 01</span><h3>The Shield</h3><p class="role">Tower shield • visor slit • dry to the end</p></div>
+<figure class="ghost"><canvas data-px="bram" class="echo" role="img" aria-label="Bram echo portrait"></canvas></figure>
+<div class="card-body">
+<div class="swatches"><span class="sw" style="background:#9fd8e8"></span><span class="sw" style="background:#4d7f92"></span><span class="sw" style="background:#141114"></span></div>
+<p class="field"><b>Accent shape</b>Dented tower shield, bigger than he is. Dents read as service record.</p>
+<p class="field"><b>In motion</b>Shield-first glide. Refuses to leave Joss's side even at low loyalty.</p>
+<div class="note"><b>Model note</b>≤8k tris. Loyalty &lt; 30: outline flickers (REFUSE readable at a glance).</div>
+</div></article>
+
+<article class="card"><div class="card-head"><span class="num">MERCY • ECHO 02</span><h3>The Lantern</h3><p class="role">Veil • vigil-lamp • disapproves of VESTIGE</p></div>
+<figure class="ghost"><canvas data-px="mercy" class="echo" role="img" aria-label="Mercy echo portrait"></canvas></figure>
+<div class="card-body">
+<div class="swatches"><span class="sw" style="background:#9fd8e8"></span><span class="sw" style="background:#e8a020"></span></div>
+<p class="field"><b>Accent shape</b>Veil cone + raised vigil-lamp. The lamp's gold is the only warm light the Bound carry.</p>
+<p class="field"><b>In motion</b>Drifts, never steps. Heal pulse expands as a ring (Rot-wash as mechanics).</p>
+<div class="note"><b>Model note</b>≤8k tris. Lamp light = one real point light per scene max.</div>
+</div></article>
+
+<article class="card"><div class="card-head"><span class="num">HUSH • ECHO 03</span><h3>The Blade</h3><p class="role">Cut frames • respects strength only</p></div>
+<figure class="ghost"><canvas data-px="hush" class="echo" role="img" aria-label="Hush echo portrait"></canvas></figure>
+<div class="card-body">
+<div class="swatches"><span class="sw" style="background:#9fd8e8"></span><span class="sw" style="background:#e5482f"></span></div>
+<p class="field"><b>Accent shape</b>Skipped render columns + one red slash: the kill that bound him.</p>
+<p class="field"><b>In motion</b>Teleports between held poses (no walk cycle — budget spent elsewhere).</p>
+<div class="note"><b>Model note</b>≤8k tris. Cut-frame = shader step on opacity, not geometry.</div>
+</div></article>
+
+<article class="card"><div class="card-head"><span class="num">THE PALL • BEAST</span><h3>Cloth Tower</h3><p class="role">Layers = HP • greet to stun</p></div>
+<figure><canvas data-px="pall" role="img" aria-label="Pall concept"></canvas></figure>
+<div class="card-body">
+<div class="swatches"><span class="sw" style="background:#3a2c33"></span><span class="sw" style="background:#e8a020"></span><span class="sw" style="background:#e5482f"></span></div>
+<p class="field"><b>Accent shape</b>Nested cloth cones, gold stitch-rings, one red eye. Sways — handlers read the sway.</p>
+<p class="field"><b>In motion</b>Never strikes first. Each destroyed layer bursts its grievance.</p>
+<div class="note"><b>Model note</b>Layers instanced; destroyed layers detach as particles. ≤8k tris.</div>
+</div></article>
+
+<article class="card"><div class="card-head"><span class="num">RETURNLING • BOSS</span><h3>Three Lives</h3><p class="role">Laughs • returns • negotiates</p></div>
+<figure><canvas data-px="returnling" role="img" aria-label="Returnling concept"></canvas></figure>
+<div class="card-body">
+<div class="swatches"><span class="sw" style="background:#3a3235"></span><span class="sw" style="background:#f4efe4"></span><span class="sw" style="background:#e5482f"></span></div>
+<p class="field"><b>Accent shape</b>Small, barefoot, chalk-white eyes. Life pips float near — the fight's UI is diegetic.</p>
+<p class="field"><b>In motion</b>Life 1 cries, life 2 laughs, life 3 negotiates. Only a genuine rite stops life 4.</p>
+<div class="note"><b>Model note</b>≤8k tris. Eye emissive intensity scales with life number.</div>
+</div></article>
+
+<article class="card"><div class="card-head"><span class="num">TRUHOUND • UTILITY</span><h3>Living Instrument</h3><p class="role">Ears up = truth • barks at lies</p></div>
+<figure><canvas data-px="truhound" role="img" aria-label="Truhound concept"></canvas></figure>
+<div class="card-body">
+<div class="swatches"><span class="sw" style="background:#5a4a3a"></span><span class="sw" style="background:#e5482f"></span></div>
+<p class="field"><b>Accent shape</b>Lean ridgeback, radar ears. Exactly two poses — up and folded. No in-between.</p>
+<p class="field"><b>In motion</b>Sleeps 16 hours, works 8. Bark mixed above everything, never ducked.</p>
+<div class="note"><b>Model note</b>≤5k tris. Ear poses double as quest UI.</div>
+</div></article>
+
+<article class="card"><div class="card-head"><span class="num">VESTIGE • SYSTEM</span><h3>The Interface</h3><p class="role">Black-red tissue • teeth • glitch</p></div>
+<figure><svg viewBox="0 0 200 220" role="img" aria-label="Vestige interface concept"><g filter="url(#grain)">
+<rect x="0" y="0" width="200" height="220" fill="#0c0a0b"/>
+<rect x="30" y="40" width="140" height="140" rx="10" fill="none" stroke="#e5482f" stroke-width="3"/>
+<rect x="30" y="40" width="140" height="26" rx="10" fill="#e5482f" opacity=".25"/>
+<text x="42" y="58" fill="#e5482f" font-family="monospace" font-size="11" font-weight="bold">[ VESTIGE ]</text>
+<text x="42" y="88" fill="#f4efe4" font-family="monospace" font-size="11">Up, Coffin.</text>
+<text x="42" y="108" fill="#f4efe4" font-family="monospace" font-size="11">I'm starving.</text>
+<text x="42" y="128" fill="#e8a020" font-family="monospace" font-size="11">Deal? [Y/N]</text>
+<path d="M42 148 l14 0 M60 148 l8 0 M72 148 l20 0" stroke="#e5482f" stroke-width="3"/>
+<path d="M30 150 l12 8 M170 120 l-10 10 M40 90 l8 -6" stroke="#e5482f" stroke-width="2" opacity=".7"/>
+<rect x="30" y="40" width="140" height="140" rx="10" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4 8" opacity=".6"/>
+</g></svg></figure>
+<div class="card-body">
+<div class="swatches"><span class="sw" style="background:#0c0a0b"></span><span class="sw" style="background:#e5482f"></span><span class="sw" style="background:#e8a020"></span></div>
+<p class="field"><b>Accent shape</b>Terminal window with teeth — glitch bars tear the frame when it lies.</p>
+<p class="field"><b>In motion</b>Types faster when hungry. Stutters on lies (and the hound barks on cue).</p>
+<div class="note"><b>UI note</b>VestigeTerminal.js mirrors this exactly — concept and implementation share geometry.</div>
+</div></article>
+</div>
+</section>
+
+<!-- ================= LEVELS ================= -->
+<section id="levels">
+<p class="kicker">02 — Levels</p>
+<h2 class="section-title">Plans you can run</h2>
+<p class="section-sub">Top-down run diagrams: entry, zones, story room, twist point, boss, extraction. Red door optional, consequences mandatory.</p>
+<div class="grid">
+
+<article class="card"><div class="card-head"><span class="num">RUN 1 • TUTORIAL</span><h3>Floor Zero — Section</h3><p class="role">Vertical slice • 6 grey floors + B13</p></div>
+<figure><svg viewBox="0 0 300 240" role="img" aria-label="Floor Zero section diagram"><g filter="url(#grain)" font-family="monospace" font-size="9">
+<rect x="0" y="0" width="300" height="240" fill="#141114"/>
+<rect x="90" y="14" width="120" height="22" fill="#232024" stroke="#3a3235"/><text x="100" y="29" fill="#a89ab2">F1–F6 · husks ×12</text>
+<rect x="90" y="42" width="120" height="22" fill="#232024" stroke="#3a3235"/><text x="100" y="57" fill="#a89ab2">F7 · door opens itself</text>
+<rect x="90" y="70" width="120" height="30" fill="#3a1a12" stroke="#e5482f"/><text x="100" y="82" fill="#e5482f">BLOOM · lights die up</text><text x="100" y="94" fill="#a89ab2">formation breaks</text>
+<rect x="90" y="106" width="120" height="34" fill="#0a0d12" stroke="#5591c7"/><text x="100" y="120" fill="#5591c7">B13 · black water</text><text x="100" y="132" fill="#a89ab2">6 seconds · choice</text>
+<rect x="90" y="146" width="120" height="24" fill="#1a0c0a" stroke="#e5482f" stroke-dasharray="5 3"/><text x="100" y="162" fill="#e5482f">THE VOICE · deal</text>
+<rect x="96" y="176" width="108" height="22" fill="#12240f" stroke="#6daa45"/><text x="106" y="191" fill="#6daa45">SCAN: E · 11 · FLAT</text>
+<line x1="150" y1="36" x2="150" y2="42" stroke="#3a3235"/><line x1="150" y1="64" x2="150" y2="70" stroke="#3a3235"/><line x1="150" y1="100" x2="150" y2="106" stroke="#3a3235"/><line x1="150" y1="140" x2="150" y2="146" stroke="#3a3235"/><line x1="150" y1="170" x2="150" y2="176" stroke="#3a3235"/>
+<circle cx="228" cy="123" r="4" fill="#e8a020"/><text x="238" y="126" fill="#a89ab2">cores lost</text>
+</g></svg></figure>
+<div class="card-body">
+<p class="field"><b>Run shape</b>Linear descent, scripted loss, real choice. Cutlass-only until the deal.</p>
+<div class="note"><b>Build note</b>First playable slice: floors as data, bloom as trigger volume, choice as timed prompt.</div>
+</div></article>
+
+<article class="card"><div class="card-head"><span class="num">RUN 2 • SURVIVAL</span><h3>Floor One — Muster Ward</h3><p class="role">200 in • 100 writs • 3 days</p></div>
+<figure><svg viewBox="0 0 300 240" role="img" aria-label="Muster ward plan"><g filter="url(#grain)" font-family="monospace" font-size="9">
+<rect x="0" y="0" width="300" height="240" fill="#141114"/>
+<rect x="20" y="20" width="260" height="200" fill="none" stroke="#3a3235" stroke-width="2"/>
+<path d="M20 80 L120 80 L120 140 L60 140 L60 200 M180 20 L180 100 L260 100 M120 140 L180 140 L180 220" stroke="#3a3235" stroke-width="2" fill="none"/>
+<rect x="20" y="196" width="52" height="24" fill="#12240f" stroke="#6daa45"/><text x="26" y="212" fill="#6daa45">IN · 200</text>
+<rect x="228" y="20" width="52" height="24" fill="#241d08" stroke="#e8a020"/><text x="232" y="36" fill="#e8a020">GATE · 100</text>
+<rect x="120" y="86" width="60" height="22" fill="#3a1a12" stroke="#e5482f"/><text x="126" y="101" fill="#e5482f">CHOKE · toll</text>
+<path d="M60 200 L60 220 L120 220 L120 200" stroke="#5591c7" stroke-dasharray="4 3" fill="none"/><text x="126" y="214" fill="#5591c7">crawlspace</text>
+<circle cx="210" cy="160" r="5" fill="#e8a020"/><text x="220" y="163" fill="#a89ab2">cache</text>
+<circle cx="90" cy="60" r="5" fill="#3a3235" stroke="#a89ab2"/><text x="100" y="63" fill="#a89ab2">ward shifts</text>
+</g></svg></figure>
+<div class="card-body">
+<p class="field"><b>Run shape</b>Open ward, rearranging doors, one choke-point economy. Porter craft beats power — scored that way.</p>
+<div class="note"><b>Build note</b>Procedural doors + toll AI + writ counter. Optimal plays logged (Table clock fuel).</div>
+</div></article>
+
+<article class="card"><div class="card-head"><span class="num">RUN 3 • BETRAYAL</span><h3>Floor Two — Gala Hall</h3><p class="role">5 teams • 3 bells • 1 rigged sieve</p></div>
+<figure><svg viewBox="0 0 300 240" role="img" aria-label="Gala hall plan"><g filter="url(#grain)" font-family="monospace" font-size="9">
+<rect x="0" y="0" width="300" height="240" fill="#141114"/>
+<ellipse cx="150" cy="130" rx="110" ry="80" fill="#1e1a1c" stroke="#e8a020" stroke-width="2"/>
+<ellipse cx="150" cy="130" rx="46" ry="32" fill="none" stroke="#e8a020" stroke-dasharray="5 4"/>
+<text x="128" y="134" fill="#e8a020">SIGILS</text>
+<circle cx="80" cy="90" r="7" fill="#5591c7"/><circle cx="220" cy="90" r="7" fill="#e5482f"/><circle cx="80" cy="175" r="7" fill="#6daa45"/><circle cx="220" cy="175" r="7" fill="#a89ab2"/><circle cx="150" cy="60" r="7" fill="#e8a020"/>
+<text x="60" y="205" fill="#a89ab2">5 teams · colors</text>
+<rect x="110" y="8" width="80" height="20" fill="#221c16" stroke="#a89ab2"/><text x="118" y="22" fill="#a89ab2">BALCONY · Rook</text>
+<rect x="20" y="100" width="26" height="60" fill="#0a0d12" stroke="#5591c7"/><text x="22" y="128" fill="#5591c7" font-size="8"> unseen door </text>
+<path d="M150 210 L150 226" stroke="#3a3235" stroke-width="2"/><text x="158" y="222" fill="#a89ab2">bell ×3</text>
+</g></svg></figure>
+<div class="card-body">
+<p class="field"><b>Run shape</b>Single room, three rule-changes, alliance rot timers. Third bell rewards the dead — Joss's arsenal.</p>
+<div class="note"><b>Build note</b>Rematch duel = parry-timing prototype (E33 homage). Ledger logs optimal play.</div>
+</div></article>
+</div>
+</section>
+
+<!-- ================= BUILDINGS ================= -->
+<section id="buildings">
+<p class="kicker">03 — Buildings</p>
+<h2 class="section-title">Architecture with opinions</h2>
+<p class="section-sub">Each building enforces its faction's philosophy in floor plan: the Hold hides, the Bazaar displays, the Gate processes.</p>
+<div class="grid">
+
+<article class="card"><div class="card-head"><span class="num">HUB • THE HOLD</span><h3>Back Room Cutaway</h3><p class="role">Bunks • scale • shrine • two books</p></div>
+<figure><svg viewBox="0 0 300 220" role="img" aria-label="Hold cutaway"><g filter="url(#grain)" font-family="monospace" font-size="9">
+<rect x="0" y="0" width="300" height="220" fill="#141114"/>
+<polygon points="40,170 150,200 260,170 150,140" fill="#232024" stroke="#3a3235"/>
+<polygon points="40,170 40,80 150,110 150,200" fill="#2c282c" stroke="#3a3235"/>
+<polygon points="260,170 260,80 150,110 150,200" fill="#242027" stroke="#3a3235"/>
+<rect x="60" y="120" width="26" height="30" fill="#7a2d20" stroke="#000"/>
+<rect x="92" y="126" width="26" height="24" fill="#7a2d20" stroke="#000"/>
+<rect x="180" y="130" width="44" height="20" fill="#4a3423" stroke="#000"/>
+<rect x="186" y="124" width="32" height="6" fill="#e8a020"/>
+<circle cx="120" cy="168" r="7" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+<circle cx="120" cy="168" r="2" fill="#e8a020"/>
+<text x="52" y="200" fill="#a89ab2">bunks</text><text x="180" y="162" fill="#a89ab2">desk + scale</text><text x="104" y="188" fill="#a89ab2">shrine</text>
+<rect x="150" y="140" width="34" height="34" fill="none" stroke="#5591c7" stroke-dasharray="4 3"/>
+<text x="190" y="160" fill="#5591c7">echo corner (cold)</text>
+</g></svg></figure>
+<div class="card-body">
+<p class="field"><b>Plan logic</b>Two walls only — dollhouse openness for the camera, backs to the world. Echo corner renders cold (fog tint).</p>
+<div class="note"><b>Build note</b>Matches the playable HoldRoom.js shell 1:1 — concept and level share dimensions.</div>
+</div></article>
+
+<article class="card"><div class="card-head"><span class="num">MARKET • GILT BAZAAR</span><h3>Facade Elevation</h3><p class="role">3 floors + 1 denied • fiat enforced</p></div>
+<figure><svg viewBox="0 0 300 220" role="img" aria-label="Bazaar elevation"><g filter="url(#grain)" font-family="monospace" font-size="9">
+<rect x="0" y="0" width="300" height="220" fill="#141114"/>
+<rect x="60" y="150" width="180" height="40" fill="#2c282c" stroke="#3a3235"/>
+<rect x="60" y="105" width="180" height="40" fill="#2c282c" stroke="#3a3235"/>
+<rect x="60" y="60" width="180" height="40" fill="#2c282c" stroke="#3a3235"/>
+<rect x="60" y="22" width="180" height="30" fill="none" stroke="#6e6278" stroke-dasharray="5 4"/>
+<text x="66" y="42" fill="#6e6278">4th floor (denied)</text>
+<rect x="70" y="160" width="26" height="30" fill="#e8a020" opacity=".8"/>
+<rect x="104" y="160" width="26" height="30" fill="#5591c7" opacity=".8"/>
+<rect x="138" y="160" width="26" height="30" fill="#6daa45" opacity=".8"/>
+<rect x="172" y="160" width="26" height="30" fill="#e5482f" opacity=".8"/>
+<rect x="70" y="115" width="160" height="4" fill="#e8a020" opacity=".5"/>
+<rect x="60" y="52" width="180" height="8" fill="#e8a020" opacity=".3"/>
+<text x="66" y="130" fill="#a89ab2">appraisal row</text>
+<text x="66" y="175" fill="#a89ab2">stalls ×40</text>
+<rect x="130" y="190" width="40" height="22" fill="#12240f" stroke="#6daa45"/>
+<text x="136" y="205" fill="#6daa45">FIAT: no blades</text>
+</g></svg></figure>
+<div class="card-body">
+<p class="field"><b>Plan logic</b>Everything visible except power: the 4th floor is dashed (denied), the fiat field is a doorway sign, not a wall.</p>
+<div class="note"><b>Build note</b>Stall grid instanced (40+). Fiat = gameplay volume, flickers in storms (Warden-rent tell).</div>
+</div></article>
+
+<article class="card"><div class="card-head"><span class="num">GATE • SPIRE GATE</span><h3>Perimeter Elevation</h3><p class="role">Queue • wire • board • mountain</p></div>
+<figure><svg viewBox="0 0 300 220" role="img" aria-label="Gate elevation"><g filter="url(#grain)" font-family="monospace" font-size="9">
+<rect x="0" y="0" width="300" height="220" fill="#141114"/>
+<path d="M110 190 L140 30 L160 30 L190 190 Z" fill="#1a1512" stroke="#3a3235"/>
+<path d="M140 30 L150 90 L160 30" fill="#e5482f" opacity=".25"/>
+<circle cx="150" cy="60" r="4" fill="#e5482f"/>
+<line x1="20" y1="170" x2="280" y2="170" stroke="#6e6278" stroke-width="2" stroke-dasharray="8 4"/>
+<rect x="30" y="120" width="10" height="50" fill="#3a3235"/>
+<rect x="260" y="120" width="10" height="50" fill="#3a3235"/>
+<circle cx="35" cy="114" r="5" fill="#cfe4ff"/>
+<circle cx="265" cy="114" r="5" fill="#cfe4ff"/>
+<path d="M35 114 L120 60 M265 114 L180 60" stroke="#cfe4ff" stroke-width="1" opacity=".4"/>
+<circle cx="70" cy="185" r="4" fill="#a89ab2"/><circle cx="85" cy="185" r="4" fill="#a89ab2"/><circle cx="100" cy="185" r="4" fill="#a89ab2"/><circle cx="115" cy="185" r="4" fill="#a89ab2"/>
+<text x="60" y="205" fill="#a89ab2">queue since dawn</text>
+<rect x="200" y="140" width="60" height="26" fill="#221c16" stroke="#e8a020"/>
+<text x="206" y="157" fill="#e8a020">RETURN BOARD</text>
+</g></svg></figure>
+<div class="card-body">
+<p class="field"><b>Plan logic</b>The mountain does the looming; the fence does the talking. Floodlight cones cross over the queue — everyone walks through light to be processed.</p>
+<div class="note"><b>Build note</b>Return board = live UI texture (names move CLIMBING → RETURNED → the unread column).</div>
+</div></article>
+</div>
+</section>
+</main>
+
+<footer class="site">
+<b>NULLSPIRE: LEVEL ZERO</b> — concept board • <a href="index.html"><b>World</b></a> • <a href="docs.html"><b>Docs</b></a> • <a href="progress.html"><b>Progress</b></a><br>
+Next board: echo roster 04–20 • Warden floor concepts • Red Second duel staging
+</footer>
+
+<script>
+(function(){var r=document.documentElement,b=document.querySelector('[data-theme-toggle]'),m=window.matchMedia('(prefers-color-scheme: dark)'),d=m.matches?'dark':'light';function a(t){d=t;r.setAttribute('data-theme',t);b.setAttribute('aria-label','Switch to '+(t==='dark'?'light':'dark')+' mode')}a(d);b.addEventListener('click',function(){a(d==='dark'?'light':'dark')})})();
+</script>
+<script>
+/* Portrait maps — same format the engine eats (PixelSprite). Shading via lowercase keys. */
+const PAL={K:'#221c16',k:'#0f0d0f',C:'#f4efe4',c:'#b9b0a4',B:'#e5482f',b:'#8f1d12',G:'#e8a020',g:'#8a5b00',S:'#9aa3ad',s:'#5a636e',D:'#2e2a33',d:'#1a1720',T:'#4a3423',t:'#2c2018',E:'#9fd8e8',e:'#4d7f92',W:'#ffffff'};
+const PX={
+joss:[
+"........................",
+"........KKKKKK..........",
+"......KKKKKKKKKK........",
+"......KCCCCCCCK.........",
+"......KCKCCKCK..........",
+"......KCCCCCCK..........",
+"......KCCKKCCK..........",
+".......KCCCK...........",
+"........KKK............",
+"...BBBBBBBBBB..........",
+"..BBBBBBBBBBBB.........",
+"..BBBBBbbBBBBB.........",
+"...DDDDDDDDDD..........",
+"..DDDDDDDDDDDD.........",
+"..DDdDDDDDDdDD.........",
+"..DDDDDDDDDDDD.....S...",
+"..DDDGDDDDDGDD.....S...",
+"..DDDDDDDDDDDD.....S...",
+".....GGGGGG........S...",
+"....DDDDDDDD........S...",
+"....DDDDDDDD..........",
+"....DDdDDdDD..........",
+"....DDDDDDDD..........",
+"....DDDDDDDD..........",
+"....DDDDDDDD..........",
+"....TTTTTTTT..........",
+"....TTTTTTTT..........",
+"........................"],
+rook:[
+"........................",
+".........KKK..........",
+".......KKKKKKK........",
+"......GGGGGGGG........",
+"......KKCCCCCKK.......",
+"......KKCKCKCKK.......",
+"......KKCCCCCKK.......",
+".......KKCCCKK...G....",
+"........KKKK....GG....",
+"..SSGG...DDDDDD...GGG.",
+"..SSGGGGDDDDDDDDGGGG..",
+"..SSGDDDDDDDDDDDDDG...",
+"..SSGDDDDDDDDDDDDDG...",
+"...GDDDDDDDDDDDDDDG...",
+"...GDDDDDDDDDDDDDDG.S.",
+"...GDDDDDDDDDDDDDDG...",
+".....GGGGGGGG.........",
+"....DDDDDDDDDD.........",
+"....DDDDDDDDDD.........",
+"....DDDDDDDDDD.........",
+"....TTTTTTTTTT.........",
+"....TTTTTTTTTT.........",
+"........................"],
+bram:[
+"........................",
+"........EEEE..........",
+"......EEEEEEEE........",
+"......EeeeeeeE........",
+"......EEEEEEEE........",
+"......EE....EE........",
+"......EEEEEEEE........",
+".......EEEEEE.........",
+".EEEEEE...............",
+".EeeeeEE..............",
+".EeeKKEE...EEEE.......",
+".EeeeeEE...EeeE.......",
+".EeeeeEE...EEEE.......",
+".EeeKKEE...EEEE.......",
+".EeeeeEE...EEEE.......",
+".EeeeeEE....EEE.......",
+".EEEEEE.....EEE.......",
+"..EEEE......EEE.......",
+".............EEE.......",
+".............EEE.......",
+"........................"],
+mercy:[
+"........................",
+"...........EE.........",
+"..........EEEE........",
+".........EECCEE.......",
+"........EECCCCEE......",
+"........ECCCCCCE......",
+"........ECCCCCCE......",
+"........EECCEE........",
+".......EEECCEEE.......",
+"......EEECCCCEEE......",
+"......EECCCCCCEE..G...",
+".....EECCCCCCCEEEG....",
+".....ECCCCCCCCEE.G....",
+".....ECCCCCCCCEE......",
+".....EEEEEEEEEE.......",
+".....EEEEEEEEEE.......",
+"........................"],
+hush:[
+"........................",
+"..........EE..........",
+".........EEEE.........",
+".........EeeE.........",
+".........EEEE.........",
+"..........EE..........",
+".........EEEE.........",
+"........EEEEEE........",
+"...E....EEEEEE....E...",
+"........EEEEEE..BB....",
+".....E..EEEEEE...B....",
+"........EEEEEE...B....",
+"........EEEEEE....B...",
+".........EEEE.....B...",
+".........EEEE......B..",
+".........EEEE.........",
+".........EEEE.........",
+"........................"],
+pall:[
+"........................",
+"..........EE..........",
+".........EEEE.........",
+"........EEEEEE........",
+"........EBBEEE........",
+".......EEEEEEEE.......",
+"......EEEEEEEEEE......",
+"......EEEGGGEEE.......",
+".....EEEEEEEEEEEE.....",
+".....EEEGGGGGEE.......",
+"....EEEEEEEEEEEEEE....",
+"....EEEGGGGGGGEEE.....",
+"...EEEEEEEEEEEEEEEE...",
+"...EEEGGGGGGGGGGEE....",
+"..EEEEEEEEEEEEEEEEEE..",
+"..EEEEEEEEEEEEEEEEEE..",
+"........................"],
+returnling:[
+"....................",
+"......KKKKKK........",
+".....KCCCCCCK.......",
+".....KWWKKWWK.......",
+".....KWWKKWWK.......",
+".....KCCCCCCK.......",
+"......KCCCCK........",
+".......KKKK.........",
+"......KKKKKK........",
+"......KDDDDK........",
+"......KDDDDK........",
+"......KDDDDK........",
+"......KK..KK........",
+"......KK..KK........",
+"...................."],
+truhound:[
+"............................",
+".....................KK.....",
+"....................KKK.....",
+"....................KKWKKK..",
+".....KKKKKKKKKKKKKKKKKKKK...",
+"....KTTTTTTTTTTTTTTTTTTTTK..",
+"....KTttTTTTTTTTTTTTTTTTK...",
+"....KTTTTTTTTTTTTTTTTTTTTK..",
+"....KKKKKKKKKKKKKKKKKKKK....",
+"....KK....KK....KK....KK....",
+"....KK....KK....KK....KK....",
+"....KK....KK....KK....KK....",
+"............................"]};
+function drawPortrait(canvas,rows){
+const w=Math.max(...rows.map(r=>r.length));
+const cv=document.createElement('canvas');cv.width=w;cv.height=rows.length;
+const ctx=cv.getContext('2d');
+rows.forEach((row,y)=>{for(let x=0;x<row.length;x++){const col=PAL[row[x]];if(!col)continue;ctx.fillStyle=col;ctx.fillRect(x,y,1,1);}});
+canvas.width=w;canvas.height=rows.length;
+const c2=canvas.getContext('2d');c2.imageSmoothingEnabled=false;c2.drawImage(cv,0,0);
+}
+document.querySelectorAll('canvas[data-px]').forEach(c=>{const r=PX[c.dataset.px];if(r)drawPortrait(c,r);});
+</script>
+</body>
+</html>

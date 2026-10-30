@@ -194,13 +194,13 @@ export function createPostProcessMaterial(
           return;
         }
 
-        // Apply Day-Night Global Scene Tint (preserving bright warm brazier/lantern highlights)
+        // Apply Day-Night Global Scene Tint (preserving warm brazier/lantern highlights & natural stone balance)
         float sampleLuma = luma(centerSample.rgb);
-        float warmGlowMask = smoothstep(0.55, 0.92, centerSample.r) * smoothstep(0.05, 0.35, centerSample.r - centerSample.b);
-        float effectiveTintWeight = uGlobalTintStrength * (1.0 - warmGlowMask * 0.78);
+        float warmGlowMask = smoothstep(0.50, 0.90, centerSample.r) * smoothstep(0.05, 0.35, centerSample.r - centerSample.b);
+        float effectiveTintWeight = uGlobalTintStrength * 0.65 * (1.0 - warmGlowMask * 0.82);
         vec3 tintedSample = mix(
           centerSample.rgb,
-          centerSample.rgb * mix(vec3(1.0), uGlobalTint * 1.25, 0.65) + uGlobalTint * sampleLuma * 0.22,
+          centerSample.rgb * mix(vec3(1.0), uGlobalTint * 1.15, 0.55) + uGlobalTint * sampleLuma * 0.14,
           effectiveTintWeight
         );
 
@@ -213,17 +213,22 @@ export function createPostProcessMaterial(
         vec3 lab = linearToOklab(lin);
 
         float bayer = bayer4x4(pixelCoord) * uBayerStrength;
-        float levels = max(2.0, uOklabLevels);
+        float levels = max(3.0, uOklabLevels);
 
-        lab.x = clamp(floor((lab.x + bayer / (levels * 1.35)) * levels + 0.5) / levels, 0.04, 0.98);
-        float chromaLevels = max(3.0, floor(levels * 1.15));
-        lab.y = floor((lab.y + bayer * 0.018) * chromaLevels + 0.5) / chromaLevels;
-        lab.z = floor((lab.z + bayer * 0.018) * chromaLevels + 0.5) / chromaLevels;
+        // Quantize perceptual lightness L with subtle ordered Bayer dithering
+        lab.x = clamp(floor((lab.x + bayer / (levels * 1.65)) * levels + 0.5) / levels, 0.04, 0.96);
+
+        // Preserve cohesive dark-fantasy chroma (OKLab a/b live in [-0.14, +0.14];
+        // use fine perceptual chroma steps and gentle desaturation so stone never snaps to neon yellow/magenta)
+        float chromaRestraint = 0.84;
+        float fineChromaSteps = max(48.0, floor(levels * 8.0));
+        lab.y = floor((lab.y * chromaRestraint + bayer * 0.002) * fineChromaSteps + 0.5) / fineChromaSteps;
+        lab.z = floor((lab.z * chromaRestraint + bayer * 0.002) * fineChromaSteps + 0.5) / fineChromaSteps;
 
         vec3 quantLinear = clamp(oklabToLinear(lab), 0.0, 1.0);
         vec3 quantSrgb = linearToSrgb(quantLinear);
 
-        vec3 outlineColor = quantSrgb * 0.24 + vec3(0.05, 0.04, 0.07);
+        vec3 outlineColor = quantSrgb * 0.25 + vec3(0.04, 0.04, 0.03);
         vec3 finalRgb = mix(quantSrgb, outlineColor, edgeMask);
 
         gl_FragColor = vec4(finalRgb, 1.0);

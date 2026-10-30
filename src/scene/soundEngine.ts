@@ -224,26 +224,86 @@ class SoundEngine {
     if (!ctx) return;
 
     const now = ctx.currentTime;
-    const baseFreq = 190 + comboStep * 45;
-
     const osc = ctx.createOscillator();
     const metal = ctx.createOscillator();
     const gain = ctx.createGain();
     const metalGain = ctx.createGain();
 
+    if (comboStep === 3) {
+      // Strike 3: Ashina Shadowrush Spin + Piercing Thrust Stinger (double whoosh + high steel needle ring)
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(210, now);
+      osc.frequency.exponentialRampToValueAtTime(480, now + 0.08);
+      osc.frequency.exponentialRampToValueAtTime(115, now + 0.22);
+
+      metal.type = 'sine';
+      metal.frequency.setValueAtTime(1320, now + 0.04);
+      metal.frequency.exponentialRampToValueAtTime(680, now + 0.24);
+
+      gain.gain.setValueAtTime(0.065, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.23);
+
+      metalGain.gain.setValueAtTime(0.032, now + 0.04);
+      metalGain.gain.exponentialRampToValueAtTime(0.0008, now + 0.25);
+
+      osc.connect(gain);
+      metal.connect(metalGain);
+      gain.connect(ctx.destination);
+      metalGain.connect(ctx.destination);
+
+      osc.start(now);
+      metal.start(now + 0.04);
+      osc.stop(now + 0.24);
+      metal.stop(now + 0.26);
+      return;
+    }
+
+    if (comboStep === 0 || comboStep === 4) {
+      // Strike 4: Ichimonji Overhead Guillotine Finisher (heavy wind-up whoosh + deep sub-bass cleave boom)
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(145, now);
+      osc.frequency.exponentialRampToValueAtTime(38, now + 0.28);
+
+      metal.type = 'triangle';
+      metal.frequency.setValueAtTime(740, now + 0.06);
+      metal.frequency.exponentialRampToValueAtTime(190, now + 0.3);
+
+      gain.gain.setValueAtTime(0.085, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.29);
+
+      metalGain.gain.setValueAtTime(0.04, now + 0.06);
+      metalGain.gain.exponentialRampToValueAtTime(0.0008, now + 0.31);
+
+      osc.connect(gain);
+      metal.connect(metalGain);
+      gain.connect(ctx.destination);
+      metalGain.connect(ctx.destination);
+
+      osc.start(now);
+      metal.start(now + 0.06);
+      osc.stop(now + 0.3);
+      metal.stop(now + 0.32);
+      return;
+    }
+
+    // Strike 1 (Kesagiri downward cut) vs Strike 2 (Gyaku-Kesagiri rising reverse fang)
+    const isRising = comboStep === 2;
+    const startFreq = isRising ? 185 : 265;
+    const endFreq = isRising ? 340 : 92;
+
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(baseFreq, now);
-    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.35, now + 0.14);
+    osc.frequency.setValueAtTime(startFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.15);
 
     metal.type = 'sine';
-    metal.frequency.setValueAtTime(baseFreq * 4.2, now);
-    metal.frequency.exponentialRampToValueAtTime(baseFreq * 2.8, now + 0.16);
+    metal.frequency.setValueAtTime(isRising ? 780 : 960, now);
+    metal.frequency.exponentialRampToValueAtTime(isRising ? 1180 : 540, now + 0.17);
 
-    gain.gain.setValueAtTime(0.055, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    gain.gain.setValueAtTime(0.058, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
 
-    metalGain.gain.setValueAtTime(0.02, now);
-    metalGain.gain.exponentialRampToValueAtTime(0.0008, now + 0.17);
+    metalGain.gain.setValueAtTime(0.024, now);
+    metalGain.gain.exponentialRampToValueAtTime(0.0008, now + 0.18);
 
     osc.connect(gain);
     metal.connect(metalGain);
@@ -252,8 +312,84 @@ class SoundEngine {
 
     osc.start(now);
     metal.start(now);
-    osc.stop(now + 0.16);
-    metal.stop(now + 0.18);
+    osc.stop(now + 0.17);
+    metal.stop(now + 0.19);
+  }
+
+  public playSwordSwingById(
+    strikeId:
+      | 'light-kesagiri'
+      | 'light-rising'
+      | 'heavy-cleave'
+      | 'thrust-shadowrush'
+      | 'overhead-ichimonji'
+  ) {
+    if (strikeId === 'heavy-cleave') {
+      const ctx = this.ensureContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const metal = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const metalGain = ctx.createGain();
+
+      // Heavy Cleave: deep rear-hip coil into broad horizontal cleaver roar + bronze harmonic wake
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(165, now);
+      osc.frequency.exponentialRampToValueAtTime(290, now + 0.09);
+      osc.frequency.exponentialRampToValueAtTime(58, now + 0.27);
+
+      metal.type = 'triangle';
+      metal.frequency.setValueAtTime(620, now + 0.05);
+      metal.frequency.exponentialRampToValueAtTime(260, now + 0.28);
+
+      gain.gain.setValueAtTime(0.078, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+      metalGain.gain.setValueAtTime(0.038, now + 0.05);
+      metalGain.gain.exponentialRampToValueAtTime(0.0008, now + 0.29);
+
+      osc.connect(gain);
+      metal.connect(metalGain);
+      gain.connect(ctx.destination);
+      metalGain.connect(ctx.destination);
+
+      osc.start(now);
+      metal.start(now + 0.05);
+      osc.stop(now + 0.29);
+      metal.stop(now + 0.3);
+      return;
+    }
+
+    const stepMap = {
+      'light-kesagiri': 1,
+      'light-rising': 2,
+      'thrust-shadowrush': 3,
+      'overhead-ichimonji': 4,
+    } as const;
+    this.playSwordSwing(stepMap[strikeId]);
+  }
+
+  public playDeflectParry(perfectParry = false) {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const freqs = perfectParry ? [1174.66, 1760.0, 2637.02] : [880.0, 1318.51];
+    freqs.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = idx === 0 ? 'triangle' : 'sine';
+      const t0 = now + idx * 0.012;
+      osc.frequency.setValueAtTime(freq, t0);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.94, t0 + 0.22);
+      gain.gain.setValueAtTime((perfectParry ? 0.068 : 0.044) / (idx * 0.5 + 1), t0);
+      gain.gain.exponentialRampToValueAtTime(0.0007, t0 + (perfectParry ? 0.28 : 0.16));
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t0);
+      osc.stop(t0 + 0.3);
+    });
   }
 
   public playDodgeRoll() {

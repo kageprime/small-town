@@ -33,14 +33,14 @@ interface MiniMapProps {
 }
 
 function getSectorBiomeColor(gx: number, gz: number, isVisited: boolean, isCurrent: boolean): string {
-  if (isCurrent) return '#D97706';
-  if (!isVisited) return '#18181C';
+  if (isCurrent) return '#594C31';
+  if (!isVisited) return '#12100D';
 
-  if (gx >= 1 && gz >= 1) return '#243E46';
-  if (gx <= -1 && gz <= -1) return '#363B44';
-  if (gx >= 1 && gz <= -1) return '#44352E';
-  if (gx <= -1 && gz >= 1) return '#293B2E';
-  return '#324234';
+  if (gx >= 1 && gz >= 1) return '#233033';
+  if (gx <= -1 && gz <= -1) return '#2D2A26';
+  if (gx >= 1 && gz <= -1) return '#332A22';
+  if (gx <= -1 && gz >= 1) return '#253027';
+  return '#2C2821';
 }
 
 export const MiniMap: React.FC<MiniMapProps> = ({
@@ -82,31 +82,31 @@ export const MiniMap: React.FC<MiniMapProps> = ({
   return (
     <aside
       aria-label="Compass Radar & Quick Menu"
-      className="fixed top-4 right-4 z-20 w-36 flex flex-col gap-1.5 select-none pointer-events-auto"
+      className="fixed top-4 right-4 z-20 w-40 flex flex-col gap-1.5 select-none pointer-events-auto"
     >
-      {/* Compact Radar Frame */}
-      <div className="bg-[#121216]/85 backdrop-blur-md text-zinc-100 border border-white/10 rounded-xl shadow-xl p-2">
+      {/* Classical Codex Cartographer Frame */}
+      <div className="bg-[#0B0A08]/94 backdrop-blur-md text-[#D8D0C1] border border-[#3A3327] shadow-[0_12px_30px_rgba(0,0,0,0.85),inset_0_0_0_1px_rgba(200,178,115,0.14)] p-2.5">
         {/* Clock & District Header */}
-        <div className="flex items-center justify-between gap-1 pb-1.5 mb-1.5 border-b border-white/10 text-[11px]">
+        <div className="flex items-center justify-between gap-1 pb-1.5 mb-2 border-b border-[#2A251D] text-[10px]">
           <span
-            className="font-medium text-zinc-200 truncate"
+            className="font-display tracking-[0.14em] uppercase text-[#EFE7D6] truncate"
             title={telemetry.nearestLandmarkTitle}
           >
             {telemetry.nearestLandmarkTitle}
           </span>
-          <span className="inline-flex items-center gap-1 font-mono-tabular text-amber-300 shrink-0">
+          <span className="inline-flex items-center gap-1 font-mono-tabular text-[#C8B273] shrink-0">
             {isDaylight ? (
-              <Sun className="w-3 h-3 text-amber-400" />
+              <Sun className="w-3 h-3 text-[#C8B273]" />
             ) : (
-              <Moon className="w-3 h-3 text-indigo-300" />
+              <Moon className="w-3 h-3 text-[#9E937E]" />
             )}
             <span>{telemetry.formattedClock}</span>
           </span>
         </div>
 
-        {/* 7x7 Radar Grid */}
-        <div className="relative aspect-square w-full bg-zinc-950/90 p-1 rounded-lg border border-white/5 overflow-hidden">
-          <span className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8px] font-mono-tabular text-zinc-500 pointer-events-none z-10">
+        {/* 7x7 Sanctuary Sector Grid */}
+        <div className="relative aspect-square w-full bg-[#14120F] p-1 border border-[#2A251D] overflow-hidden">
+          <span className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8px] font-display tracking-widest text-[#8A8070] pointer-events-none z-10">
             N
           </span>
 
@@ -131,23 +131,23 @@ export const MiniMap: React.FC<MiniMapProps> = ({
                       )
                     }
                     title={poi ? poi.title : `Sector (${gx}, ${gz})`}
-                    className={`relative flex items-center justify-center rounded-[1.5px] transition-opacity ${
+                    className={`relative flex items-center justify-center transition-opacity ${
                       isCurrent
-                        ? 'ring-1 ring-amber-300 z-10'
+                        ? 'ring-1 ring-[#C8B273] z-10'
                         : isVisited
                         ? 'hover:brightness-125'
-                        : 'opacity-60 hover:opacity-100'
+                        : 'opacity-65 hover:opacity-100'
                     }`}
                     style={{ backgroundColor: bgColor }}
                   >
                     {poi && (
                       <span
-                        className={`w-1 h-1 rounded-full ${
+                        className={`w-1 h-1 rotate-45 ${
                           isCurrent
-                            ? 'bg-white'
+                            ? 'bg-[#EFE7D6]'
                             : isVisited
-                            ? 'bg-amber-300'
-                            : 'bg-zinc-600'
+                            ? 'bg-[#C8B273]'
+                            : 'bg-[#5A5244]'
                         }`}
                       />
                     )}
@@ -157,7 +157,7 @@ export const MiniMap: React.FC<MiniMapProps> = ({
             )}
           </div>
 
-          {/* Player Position Dot */}
+          {/* Player Position Diamond */}
           {worldMode === 'open-world' && (
             <div
               className="absolute w-2.5 h-2.5 -ml-1.25 -mt-1.25 pointer-events-none z-20 flex items-center justify-center transition-transform duration-75"
@@ -167,21 +167,21 @@ export const MiniMap: React.FC<MiniMapProps> = ({
                 transform: `rotate(${telemetry.facingAngle}rad)`,
               }}
             >
-              <div className="w-2 h-2 rounded-full bg-white border border-amber-500 shadow-xs" />
+              <div className="w-2 h-2 rotate-45 bg-[#EFE7D6] border border-[#0B0A08]" />
             </div>
           )}
         </div>
       </div>
 
-      {/* Discreet 3-Icon HUD Utility Bar (Codex, Sound, World Menu) */}
-      <div className="grid grid-cols-3 gap-1 bg-[#121216]/85 backdrop-blur-md border border-white/10 rounded-lg p-1 shadow-lg">
+      {/* Classical 3-Button Codex Utility Strip (Bestiary [B], Audio, Sanctuary Menu [H]) */}
+      <div className="grid grid-cols-3 gap-1 bg-[#0B0A08]/94 backdrop-blur-md border border-[#3A3327] p-1 shadow-xl">
         <button
           type="button"
           onClick={onToggleBestiary}
           title="Bestiary Codex (B)"
-          className="flex items-center justify-center gap-1 py-1 rounded text-[10px] font-medium text-zinc-300 hover:text-amber-300 hover:bg-white/5 transition-colors"
+          className="flex items-center justify-center gap-1.5 py-1 bg-[#14120F] hover:bg-[#1E1A14] border border-transparent hover:border-[#C8B273] text-[10px] font-mono-tabular text-[#D8D0C1] hover:text-[#EFE7D6] transition-colors"
         >
-          <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+          <BookOpen className="w-3 h-3 text-[#C8B273]" />
           <span>B</span>
         </button>
 
@@ -189,26 +189,26 @@ export const MiniMap: React.FC<MiniMapProps> = ({
           type="button"
           onClick={onToggleSound}
           title={soundEnabled ? 'Mute Audio' : 'Unmute Audio'}
-          className="flex items-center justify-center py-1 rounded text-zinc-300 hover:text-amber-300 hover:bg-white/5 transition-colors"
+          className="flex items-center justify-center py-1 bg-[#14120F] hover:bg-[#1E1A14] border border-transparent hover:border-[#C8B273] text-[#D8D0C1] hover:text-[#C8B273] transition-colors"
         >
           {soundEnabled ? (
-            <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+            <Volume2 className="w-3.5 h-3.5 text-[#C8B273]" />
           ) : (
-            <VolumeX className="w-3.5 h-3.5 text-zinc-500" />
+            <VolumeX className="w-3.5 h-3.5 text-[#6E6658]" />
           )}
         </button>
 
         <button
           type="button"
           onClick={onToggleMenu}
-          title="World & Studio Menu (H)"
-          className={`flex items-center justify-center gap-1 py-1 rounded text-[10px] font-medium transition-colors ${
+          title="Sanctuary Codex & Settings (H)"
+          className={`flex items-center justify-center gap-1.5 py-1 text-[10px] font-mono-tabular border transition-colors ${
             isMenuOpen
-              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-              : 'text-zinc-300 hover:text-white hover:bg-white/5'
+              ? 'bg-[#1B1813] text-[#EFE7D6] border-[#C8B273]'
+              : 'bg-[#14120F] hover:bg-[#1E1A14] text-[#D8D0C1] border-transparent hover:border-[#C8B273]'
           }`}
         >
-          <Sliders className="w-3.5 h-3.5" />
+          <Sliders className="w-3 h-3 text-[#C8B273]" />
           <span>H</span>
         </button>
       </div>

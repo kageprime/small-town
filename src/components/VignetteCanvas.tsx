@@ -9,11 +9,25 @@ import {
   CutoutBackgroundTone,
   CutsceneId,
   LoopSeamMetrics,
+  PendingBindOffer,
   PlayerTelemetry,
   RenderPassMode,
   VignetteConfig,
   VignetteEnvApi,
 } from '../types/vignette';
+import {
+  BoundEchoEntry,
+  EchoFsmState,
+  INITIAL_BOUND_ECHOES,
+  INITIAL_JOSS_MEMORIES,
+  JossMemoryEntry,
+  NullspireFloorZone,
+  ParasiteTechId,
+  VESTIGE_WHISPER_DEALS,
+  VestigeWhisperDeal,
+  WARDEN_ACCORDS,
+  WardenAccordEntry,
+} from '../data/nullspireData';
 import {
   buildGothicCourtyard,
   GothicCourtyardRig,
@@ -35,6 +49,12 @@ import { soundEngine } from '../scene/soundEngine';
 import { BIOME_TITLES, computePlateSeed, resolvePlateBiome } from '../scene/prng';
 import { evaluateDayNightCycle } from '../scene/dayNightCycle';
 import { createScreenSpaceCameraShake } from '../scene/cameraShake';
+import {
+  createPixelFxWorldManager,
+  PixelFxId,
+  STRIKE_ID_TO_PIXELFX,
+} from '../scene/pixelFxEngine';
+import { STRIKE_CHOREOGRAPHY_REGISTRY } from '../scene/combatChoreography';
 import { worldPosToTile } from './MiniMap';
 
 interface VignetteCanvasProps {
@@ -141,12 +161,13 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
 
     const initCfg = configRef.current;
 
-    // Compute fullscreen aspect-matched low-res pixel dimensions (~270px vertical resolution, upscaled to 100% viewport)
+    // Compute fullscreen aspect-matched pixel dimensions from active config.internalHeight
     const computePixelDimensions = () => {
       const viewW = Math.max(320, window.innerWidth);
       const viewH = Math.max(240, window.innerHeight);
       const aspect = viewW / viewH;
-      const lowH = initCfg.internalHeight; // 280
+      const targetH = Math.max(240, configRef.current.internalHeight || 540);
+      const lowH = Math.min(viewH, targetH);
       const lowW = Math.max(200, Math.round(lowH * aspect));
       return { viewW, viewH, lowW, lowH, aspect };
     };
@@ -357,6 +378,227 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
       worldRig.getGroundHeight
     );
 
+    const pixelFxManager = createPixelFxWorldManager(scene);
+
+    const spawnStrikePixelFx = () => {
+      const tel = player.activeStrikeTelemetry;
+      const spec = STRIKE_CHOREOGRAPHY_REGISTRY[tel.strikeId];
+      const fxId = STRIKE_ID_TO_PIXELFX[tel.strikeId];
+      const offsetDist = spec.archetype === 'overhead' ? 1.15 : spec.archetype === 'thrust' ? 1.05 : 0.65;
+      const fxX = player.position.x + Math.sin(player.facingAngle) * offsetDist;
+      const fxZ = player.position.z + Math.cos(player.facingAngle) * offsetDist;
+      const fxY =
+        spec.archetype === 'overhead'
+          ? player.position.y + 0.08
+          : player.position.y + 0.76;
+      pixelFxManager.spawnFx(fxId, fxX, fxY, fxZ, {
+        facingAngle: player.facingAngle,
+        planeTiltX: spec.slashPlane.rotXEnd * 0.45,
+        planeRollZ: spec.slashPlane.rotZ * 0.65,
+      });
+    };
+
+    // ========================================================================
+    // NULLSPIRE: LEVEL ZERO — VESTIGE, ECHOES, WREN FUND & RACING CLOCKS STATE
+    // ========================================================================
+    let jossLevel = 11;
+    const scanReadout = 'E · 11 · FLAT';
+    let syncRotPct = 18;
+    let wrenScripFund = 145000;
+    const wrenScripGoal = 2000000;
+    let tableClock = 2; // Gilded Table "Find the Door-Breaker" 0..8
+    let returnedClock = 2; // The Returned "Recruit the Door-Breaker" 0..6
+    let redSecondRemaining = 0;
+    let bloodwageRemaining = 0;
+    let boundEchoes: BoundEchoEntry[] = INITIAL_BOUND_ECHOES.map((e) => ({ ...e }));
+    let wardenAccords: WardenAccordEntry[] = WARDEN_ACCORDS.map((w) => ({ ...w }));
+    let memories: JossMemoryEntry[] = INITIAL_JOSS_MEMORIES.map((m) => ({ ...m }));
+    let whisperDeals: VestigeWhisperDeal[] = VESTIGE_WHISPER_DEALS.map((d) => ({ ...d }));
+    let activeWhisperDeal: VestigeWhisperDeal | null = null;
+    let pendingBindOffer: PendingBindOffer | null = null;
+    let memoryTithePending = false;
+    let truhoundEarState: 'idle' | 'perked-truth' | 'drooped-lie' = 'idle';
+
+    const syncSummonedEchoVisuals = () => {
+      const summoned = boundEchoes
+        .filter((e) => e.isSummoned && e.isBound)
+        .slice(0, 3)
+        .map((e) => ({ id: e.id, name: e.name, fsmState: e.fsmState }));
+      player.setSummonedEchoVisuals(summoned);
+    };
+    syncSummonedEchoVisuals();
+
+    const adjustSyncRot = (delta: number) => {
+      syncRotPct = Math.max(0, Math.min(100, Math.round(syncRotPct + delta)));
+      player.setScarfRotRatio(syncRotPct);
+      if (syncRotPct >= 75) {
+        // High Rot makes Gilded Table & Returned clocks tick faster
+        tableClock = Math.min(8, tableClock + 1);
+      }
+    };
+
+    // Hook player combat & world events to NULLSPIRE systems
+    player.onEnemyKilled = (killedEnemy) => {
+      wrenScripFund = Math.min(wrenScripGoal, wrenScripFund + 8500);
+      jossLevel += 1;
+      // Pick an unbound Echo (or a bound Echo to rank up) for 73% BIND Offer
+      const unboundPool = boundEchoes.filter((e) => !e.isBound);
+      const targetEcho =
+        unboundPool.length > 0
+          ? unboundPool[Math.floor(Math.random() * unboundPool.length)]
+          : boundEchoes[Math.floor(Math.random() * boundEchoes.length)];
+
+      pendingBindOffer = {
+        enemyId: killedEnemy.id,
+        enemyName: killedEnemy.name,
+        echoId: targetEcho.id,
+        echoName: targetEcho.name,
+        echoEpithet: targetEcho.epithet,
+        chancePct: 73,
+      };
+      pixelFxManager.spawnFx(
+        'pickups/bind-remnant-burst',
+        player.position.x + Math.sin(player.facingAngle) * 1.1,
+        player.position.y + 0.85,
+        player.position.z + Math.cos(player.facingAngle) * 1.1
+      );
+      emitTelemetry(latestNearbyPrompt);
+    };
+
+    player.onPlayerDeathIntercept = () => {
+      if (!memoryTithePending) {
+        memoryTithePending = true;
+        emitTelemetry(latestNearbyPrompt);
+        return true;
+      }
+      return false;
+    };
+
+    player.onBellRung = () => {
+      const nextDeal =
+        whisperDeals.find((d) => !d.accepted && !d.refused) || whisperDeals[0];
+      if (nextDeal) {
+        activeWhisperDeal = { ...nextDeal };
+        truhoundEarState = nextDeal.isLie ? 'drooped-lie' : 'perked-truth';
+        emitTelemetry(latestNearbyPrompt);
+      }
+    };
+
+    player.onShrineLit = () => {
+      boundEchoes = boundEchoes.map((e) =>
+        e.isBound ? { ...e, loyalty: Math.min(100, e.loyalty + 6) } : e
+      );
+      emitTelemetry(latestNearbyPrompt);
+    };
+
+    player.onDeflectSuccess = (parriedCount) => {
+      boundEchoes = boundEchoes.map((e) =>
+        e.id === '01' || e.id === '03'
+          ? { ...e, loyalty: Math.min(100, e.loyalty + (parriedCount > 0 ? 5 : 2)) }
+          : e
+      );
+      pixelFxManager.spawnFx(
+        'combat/sekiro-deflect',
+        player.position.x + Math.sin(player.facingAngle) * 0.75,
+        player.position.y + 0.95,
+        player.position.z + Math.cos(player.facingAngle) * 0.75,
+        { scaleMultiplier: parriedCount > 0 ? 1.25 : 0.95 }
+      );
+      emitTelemetry(latestNearbyPrompt);
+    };
+
+    const executeParasiteTech = (techId: ParasiteTechId) => {
+      if (techId === 'gapstep') {
+        if (player.stamina < 18) {
+          player.setToast('Need 18 Stamina for Gapstep [1]');
+          emitTelemetry(latestNearbyPrompt);
+          return;
+        }
+        const blinkDist = 3.6;
+        const targetX = player.position.x + Math.sin(player.facingAngle) * blinkDist;
+        const targetZ = player.position.z + Math.cos(player.facingAngle) * blinkDist;
+        pixelFxManager.spawnFx(
+          'shadow/gapstep-sigil',
+          player.position.x,
+          player.position.y + 0.06,
+          player.position.z,
+          { facingAngle: player.facingAngle }
+        );
+        player.teleportTo(targetX, targetZ, worldRig.getGroundHeight);
+        pixelFxManager.spawnFx(
+          'shadow/gapstep-sigil',
+          player.position.x,
+          player.position.y + 0.06,
+          player.position.z,
+          { facingAngle: player.facingAngle }
+        );
+        adjustSyncRot(2);
+        soundEngine.playDodgeRoll();
+        player.setToast('GAPSTEP [1] — Blinked 3.6m through the seam (+2% Sync/Rot)');
+      } else if (techId === 'bloodwage') {
+        if (player.hp <= 15) {
+          player.setToast('HP too low for Bloodwage [2] (Requires >15 HP)');
+          emitTelemetry(latestNearbyPrompt);
+          return;
+        }
+        player.setHp(player.hp - 12);
+        bloodwageRemaining = 6.0;
+        player.setBloodwageActive(true);
+        pixelFxManager.spawnFx(
+          'status/bloodwage-burn',
+          player.position.x,
+          player.position.y + 0.88,
+          player.position.z
+        );
+        adjustSyncRot(3);
+        soundEngine.playBrazierIgnite(true);
+        player.setToast('BLOODWAGE [2] — Paid 12 HP for 1.65× Crimson Cleave (6s · +3% Sync/Rot)');
+      } else if (techId === 'crosspull') {
+        const pulled = combatRig.pullEnemiesToward(player.position.x, player.position.z, 7.8);
+        pixelFxManager.spawnFx(
+          'shadow/crosspull-grasp',
+          player.position.x,
+          player.position.y + 0.06,
+          player.position.z,
+          { facingAngle: player.facingAngle }
+        );
+        adjustSyncRot(3);
+        soundEngine.playImpactShatter();
+        player.setToast(
+          pulled > 0
+            ? `CROSSPULL [3] — Yanked ${pulled} foe${pulled > 1 ? 's' : ''} into cleaver range! (+3% Sync/Rot)`
+            : 'CROSSPULL [3] — Lashed spatial seam (+3% Sync/Rot)'
+        );
+      } else if (techId === 'call-bound') {
+        const orderCycle: EchoFsmState[] = ['FOLLOW', 'FIGHT', 'HOLD-DOOR'];
+        const currentOrder = boundEchoes.find((e) => e.isSummoned)?.fsmState || 'FOLLOW';
+        const nextOrder =
+          orderCycle[(orderCycle.indexOf(currentOrder) + 1) % orderCycle.length] || 'FIGHT';
+        boundEchoes = boundEchoes.map((e) =>
+          e.isSummoned && e.fsmState !== 'REFUSE' ? { ...e, fsmState: nextOrder } : e
+        );
+        syncSummonedEchoVisuals();
+        adjustSyncRot(2);
+        soundEngine.playEmberCollect();
+        player.setToast(`CALL THE BOUND [4] — Retainers shifted to [${nextOrder}] (+2% Sync/Rot)`);
+      } else if (techId === 'red-second') {
+        redSecondRemaining = 2.4;
+        adjustSyncRot(6);
+        soundEngine.playBellToll();
+        player.setToast('THE RED SECOND [F] — 2.4s Spire Time Dilation Active! (+6% Sync/Rot)');
+      }
+      emitTelemetry(latestNearbyPrompt);
+    };
+
+    const resolveZoneFromLandmark = (poiId: string): NullspireFloorZone => {
+      if (poiId === 'apothecary-plaza') return 'clinic';
+      if (poiId === 'gilded-bazaar') return 'gilt-bazaar';
+      if (poiId === 'weeping-fen-dock') return 'floor-1-sump';
+      if (poiId === 'ossuary-belfry') return 'floor-2-gala';
+      if (poiId === 'barrow-hollow') return 'floor-0-muster';
+      return 'the-hold';
+    };
+
     const emitTelemetry = (nearbyPrompt: string | null) => {
       const braziers = worldRig.interactables.filter((i) => i.type === 'brazier');
       const litCount = braziers.filter((b) => b.isActivated).length;
@@ -429,6 +671,27 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
         activeTriggerZone: combatRig.activeZoneTelemetry
           ? { ...combatRig.activeZoneTelemetry }
           : null,
+        // NULLSPIRE: LEVEL ZERO Telemetry
+        jossLevel,
+        scanReadout,
+        syncRotPct,
+        wrenScripFund,
+        wrenScripGoal,
+        tableClock,
+        returnedClock,
+        activeZoneId: resolveZoneFromLandmark(nearestPoi.id),
+        redSecondRemaining: Number(redSecondRemaining.toFixed(1)),
+        bloodwageRemaining: Number(bloodwageRemaining.toFixed(1)),
+        deflectWindowActive:
+          player.activeStrikeTelemetry.isDeflecting || player.isInvulnerable,
+        activeStrike: player.activeStrikeTelemetry,
+        boundEchoes: boundEchoes.map((e) => ({ ...e })),
+        activeWhisperDeal: activeWhisperDeal ? { ...activeWhisperDeal } : null,
+        pendingBindOffer: pendingBindOffer ? { ...pendingBindOffer } : null,
+        memoryTithePending,
+        memories: memories.map((m) => ({ ...m })),
+        wardenAccords: wardenAccords.map((w) => ({ ...w })),
+        truhoundEarState,
       });
     };
 
@@ -516,9 +779,67 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
       } else if (e.code === 'KeyJ') {
         e.preventDefault();
         player.triggerAttack(worldRig, combatRig);
+        spawnStrikePixelFx();
+        emitTelemetry(latestNearbyPrompt);
+      } else if (e.code === 'KeyU') {
+        e.preventDefault();
+        player.triggerAttack(worldRig, combatRig, 'heavy');
+        spawnStrikePixelFx();
+        emitTelemetry(latestNearbyPrompt);
+      } else if (e.code === 'KeyI') {
+        e.preventDefault();
+        player.triggerAttack(worldRig, combatRig, 'thrust');
+        spawnStrikePixelFx();
+        emitTelemetry(latestNearbyPrompt);
+      } else if (e.code === 'KeyO') {
+        e.preventDefault();
+        player.triggerAttack(worldRig, combatRig, 'overhead');
+        spawnStrikePixelFx();
+        emitTelemetry(latestNearbyPrompt);
+      } else if (e.code === 'KeyK') {
+        e.preventDefault();
+        player.triggerDeflect(worldRig, combatRig);
+        pixelFxManager.spawnFx(
+          'combat/sekiro-deflect',
+          player.position.x + Math.sin(player.facingAngle) * 0.72,
+          player.position.y + 0.92,
+          player.position.z + Math.cos(player.facingAngle) * 0.72
+        );
+        emitTelemetry(latestNearbyPrompt);
       } else if (e.code === 'KeyE') {
         e.preventDefault();
         player.triggerInteract(worldRig, combatRig);
+      } else if (e.code === 'Digit1') {
+        e.preventDefault();
+        executeParasiteTech('gapstep');
+      } else if (e.code === 'Digit2') {
+        e.preventDefault();
+        executeParasiteTech('bloodwage');
+      } else if (e.code === 'Digit3') {
+        e.preventDefault();
+        executeParasiteTech('crosspull');
+      } else if (e.code === 'Digit4') {
+        e.preventDefault();
+        executeParasiteTech('call-bound');
+      } else if (e.code === 'KeyF' || e.code === 'KeyV') {
+        e.preventDefault();
+        executeParasiteTech('red-second');
+      } else if (e.code === 'KeyG') {
+        e.preventDefault();
+        player.triggerRespectBow(combatRig);
+        pixelFxManager.spawnFx(
+          'holy/pacify-halo',
+          player.position.x,
+          player.position.y + 0.08,
+          player.position.z,
+          { facingAngle: player.facingAngle }
+        );
+        boundEchoes = boundEchoes.map((ec) =>
+          ec.id === '02' || ec.id === '06'
+            ? { ...ec, loyalty: Math.min(100, ec.loyalty + 4) }
+            : ec
+        );
+        emitTelemetry(latestNearbyPrompt);
       }
     };
 
@@ -563,7 +884,16 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
                 player.position.z + (dz / Math.hypot(dx, dz)) * 0.35
               );
             }
-            player.triggerAttack(worldRig, combatRig);
+            const explicitArchetype = e.shiftKey
+              ? 'heavy'
+              : e.altKey
+                ? 'overhead'
+                : pressedKeys.has('KeyW') || pressedKeys.has('ArrowUp')
+                  ? 'thrust'
+                  : undefined;
+            player.triggerAttack(worldRig, combatRig, explicitArchetype);
+            spawnStrikePixelFx();
+            emitTelemetry(latestNearbyPrompt);
           }
         }
       }
@@ -579,6 +909,13 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
     const renderAtTime = (timeSeconds: number, dt = 0) => {
       const cfg = configRef.current;
       soundEngine.enabled = cfg.soundEnabled;
+
+      const desiredLowH = Math.min(dims.viewH, Math.max(240, cfg.internalHeight || 540));
+      if (desiredLowH !== dims.lowH) {
+        dims = computePixelDimensions();
+        lowResTarget.setSize(dims.lowW, dims.lowH);
+        postMaterial.uniforms.uResolution.value.set(dims.lowW, dims.lowH);
+      }
 
       const wrappedT = ((timeSeconds % LOOP_DURATION) + LOOP_DURATION) % LOOP_DURATION;
       const phaseRad = (wrappedT / LOOP_DURATION) * Math.PI * 2.0;
@@ -606,21 +943,21 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
       rimLight.intensity = dayNight.rimIntensity;
       player.lanternLight.intensity = lanternBase * dayNight.lanternIntensityMultiplier;
 
-      // Subtle atmospheric rim-light & lantern response when inside an AmbientTriggerZone
+      // Subtle atmospheric rim-light response when inside an AmbientTriggerZone
       if (combatRig.activeZoneTelemetry) {
         const zWeight = combatRig.activeZoneTelemetry.blendWeight;
         const zoneTint =
           combatRig.activeZoneTelemetry.effect === 'fen-mist-bank'
-            ? '#38BDF8'
+            ? '#9E9585'
             : combatRig.activeZoneTelemetry.effect === 'ossuary-ash-surge'
-              ? '#FB923C'
+              ? '#C89B54'
               : combatRig.activeZoneTelemetry.effect === 'apothecary-incense'
-                ? '#34D399'
+                ? '#9BA896'
                 : combatRig.activeZoneTelemetry.effect === 'barrow-wind-gust'
-                  ? '#A8A29E'
-                  : '#818CF8';
-        rimLight.color.lerp(new THREE.Color(zoneTint), zWeight * 0.65);
-        rimLight.intensity += zWeight * 0.35;
+                  ? '#A89F91'
+                  : '#B5A689';
+        rimLight.color.lerp(new THREE.Color(zoneTint), zWeight * 0.25);
+        rimLight.intensity += zWeight * 0.12;
       }
 
       (scene.background as THREE.Color).set(bgColorHex);
@@ -801,11 +1138,46 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
           ],
         };
       },
-      triggerAttack: () => {
-        player.triggerAttack(worldRig, combatRig);
+      triggerAttack: (archetype) => {
+        player.triggerAttack(worldRig, combatRig, archetype);
+        spawnStrikePixelFx();
+        emitTelemetry(latestNearbyPrompt);
+      },
+      triggerStrikeArchetype: (archetype) => {
+        player.triggerAttack(worldRig, combatRig, archetype);
+        spawnStrikePixelFx();
+        emitTelemetry(latestNearbyPrompt);
+      },
+      triggerDeflect: () => {
+        player.triggerDeflect(worldRig, combatRig);
+        pixelFxManager.spawnFx(
+          'combat/sekiro-deflect',
+          player.position.x + Math.sin(player.facingAngle) * 0.72,
+          player.position.y + 0.92,
+          player.position.z + Math.cos(player.facingAngle) * 0.72
+        );
+        emitTelemetry(latestNearbyPrompt);
+      },
+      triggerPixelFx: (fxId: PixelFxId) => {
+        const isGround =
+          fxId === 'combat/ichimonji-fissure' ||
+          fxId === 'shadow/gapstep-sigil' ||
+          fxId === 'shadow/crosspull-grasp' ||
+          fxId === 'holy/pacify-halo';
+        const fwd = fxId.startsWith('combat/') ? 0.75 : 0.0;
+        pixelFxManager.spawnFx(
+          fxId,
+          player.position.x + Math.sin(player.facingAngle) * fwd,
+          player.position.y + (isGround ? 0.08 : 0.85),
+          player.position.z + Math.cos(player.facingAngle) * fwd,
+          { facingAngle: player.facingAngle }
+        );
+        player.setToast(`PIXELFX [${fxId}] — Spawned 12-Frame Procedural Pixel Flipbook`);
+        emitTelemetry(latestNearbyPrompt);
       },
       triggerDodge: () => {
         player.triggerDodge();
+        emitTelemetry(latestNearbyPrompt);
       },
       triggerInteract: () => {
         player.triggerInteract(worldRig, combatRig);
@@ -816,6 +1188,7 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
       },
       grantSoulEmbers: (amount: number) => {
         player.addSoulEmbers(amount);
+        wrenScripFund = Math.min(wrenScripGoal, wrenScripFund + amount * 1250);
         emitTelemetry(latestNearbyPrompt);
       },
       closeNpcDialog: () => {
@@ -832,6 +1205,7 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
       },
       reelFishing: () => {
         player.reelFishing(combatRig);
+        wrenScripFund = Math.min(wrenScripGoal, wrenScripFund + 6000);
         emitTelemetry(latestNearbyPrompt);
       },
       respawnPlateProps: () => {
@@ -846,6 +1220,226 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
         cameraFollowTarget.set(x, player.position.y + 0.45, z);
         emitTelemetry(null);
         renderAtTime(currentTimeRef.current, 0);
+      },
+      // NULLSPIRE: LEVEL ZERO API Methods
+      triggerParasiteTech: (techId: ParasiteTechId) => {
+        executeParasiteTech(techId);
+      },
+      triggerRespectBow: () => {
+        player.triggerRespectBow(combatRig);
+        boundEchoes = boundEchoes.map((ec) =>
+          ec.id === '02' || ec.id === '06'
+            ? { ...ec, loyalty: Math.min(100, ec.loyalty + 4) }
+            : ec
+        );
+        emitTelemetry(latestNearbyPrompt);
+      },
+      attemptBindOffer: () => {
+        if (!pendingBindOffer) return;
+        const offer = pendingBindOffer;
+        const roll = Math.random() * 100;
+        const success = roll <= offer.chancePct;
+        if (success) {
+          boundEchoes = boundEchoes.map((e) =>
+            e.id === offer.echoId
+              ? {
+                  ...e,
+                  isBound: true,
+                  rank: Math.min(5, e.rank + 1),
+                  loyalty: Math.min(100, e.loyalty + 8),
+                  fsmState: 'FOLLOW',
+                }
+              : e
+          );
+          adjustSyncRot(4);
+          soundEngine.playEmberCollect();
+          player.setToast(
+            `BIND (73%) SUCCEEDED! Bound Echo [${offer.echoId} ${offer.echoName} ${offer.echoEpithet}] to your coat (+4% Sync/Rot)`
+          );
+        } else {
+          // 27% Failure: Remnant shatters in a frenzy burst, +2% Rot, drops extra scrip
+          adjustSyncRot(2);
+          player.addSoulEmbers(6);
+          wrenScripFund = Math.min(wrenScripGoal, wrenScripFund + 7500);
+          soundEngine.playImpactShatter();
+          player.setToast(
+            `BIND (73%) SHATTERED (Rolled ${Math.round(roll)}%) — Remnant went berserk & burst into +6 Scrip Pockets!`
+          );
+        }
+        pendingBindOffer = null;
+        syncSummonedEchoVisuals();
+        emitTelemetry(latestNearbyPrompt);
+      },
+      dismissBindOffer: () => {
+        if (!pendingBindOffer) return;
+        player.addSoulEmbers(3);
+        player.setToast(`Released ${pendingBindOffer.enemyName}'s shadow (+3 Unbanked Scrip)`);
+        pendingBindOffer = null;
+        emitTelemetry(latestNearbyPrompt);
+      },
+      resolveWhisperDeal: (accept: boolean) => {
+        if (!activeWhisperDeal) return;
+        const deal = activeWhisperDeal;
+        whisperDeals = whisperDeals.map((d) =>
+          d.id === deal.id ? { ...d, accepted: accept, refused: !accept } : d
+        );
+        if (accept) {
+          adjustSyncRot(deal.rotDelta);
+          wrenScripFund = Math.max(0, Math.min(wrenScripGoal, wrenScripFund + deal.scripDelta));
+          jossLevel += 1;
+          if (deal.isLie) {
+            tableClock = Math.min(8, tableClock + 1);
+            player.setToast(
+              `ACCEPTED VESTIGE BARGAIN "${deal.title}" — Truhound's ear drooped! Gilded Table Clock advanced to ${tableClock}/8!`
+            );
+          } else {
+            returnedClock = Math.min(6, returnedClock + 1);
+            player.setToast(
+              `ACCEPTED VESTIGE BARGAIN "${deal.title}" (+${deal.rotDelta}% Sync/Rot, Level ${jossLevel})`
+            );
+          }
+        } else {
+          // Refusing a Whisper Deal builds Echo loyalty & keeps Rot clean
+          boundEchoes = boundEchoes.map((e) =>
+            e.isBound ? { ...e, loyalty: Math.min(100, e.loyalty + 5) } : e
+          );
+          player.setToast(
+            `REFUSED VESTIGE WHISPER "${deal.title}" — Bound Echoes respect your restraint (+5 Loyalty)`
+          );
+        }
+        activeWhisperDeal = null;
+        truhoundEarState = 'idle';
+        emitTelemetry(latestNearbyPrompt);
+      },
+      triggerWhisperById: (dealId?: string) => {
+        const chosen = dealId
+          ? whisperDeals.find((d) => d.id === dealId)
+          : whisperDeals.find((d) => !d.accepted && !d.refused) || whisperDeals[0];
+        if (chosen) {
+          activeWhisperDeal = { ...chosen };
+          truhoundEarState = chosen.isLie ? 'drooped-lie' : 'perked-truth';
+          emitTelemetry(latestNearbyPrompt);
+        }
+      },
+      resolveMemoryTithe: (acceptTithe: boolean) => {
+        if (!memoryTithePending) return;
+        memoryTithePending = false;
+        if (acceptTithe) {
+          // Corrupt one intact memory, forfeit unbanked scrip, rank down 1 Echo, full heal on the spot!
+          const intactIdx = memories.findIndex((m) => !m.isTithed);
+          if (intactIdx >= 0) {
+            memories = memories.map((m, idx) =>
+              idx === intactIdx ? { ...m, isTithed: true } : m
+            );
+          }
+          player.setSoulEmbers(0);
+          player.setHp(player.maxHp);
+          adjustSyncRot(8);
+          boundEchoes = boundEchoes.map((e, idx) =>
+            idx === 0 ? { ...e, rank: Math.max(1, e.rank - 1) } : e
+          );
+          soundEngine.playBellToll();
+          player.setToast(
+            'MEMORY TITHE PAID TO VESTIGE — Resurrected on the spot! 1 Memory corrupted & unbanked scrip forfeited.'
+          );
+        } else {
+          // Refuse Tithe: wake up at Doc Sable's Clinic in The Hold
+          player.setHp(player.maxHp);
+          player.teleportTo(7.4, -14.5, worldRig.getGroundHeight);
+          cameraFollowTarget.set(7.4, player.position.y + 0.45, -14.5);
+          player.setToast(
+            "Refused VESTIGE's Tithe — Hauled back to Doc Sable's Clinic in Cinderfall (Memories Intact)."
+          );
+        }
+        emitTelemetry(latestNearbyPrompt);
+      },
+      washRotAtClinic: () => {
+        const cost = 4;
+        if (player.soulEmbers < cost) {
+          player.setToast(`Doc Sable requires ${cost} Unbanked Scrip Pockets to wash 15% Rot`);
+          emitTelemetry(latestNearbyPrompt);
+          return;
+        }
+        player.setSoulEmbers(player.soulEmbers - cost);
+        adjustSyncRot(-15);
+        player.setHp(player.maxHp);
+        soundEngine.playEmberCollect();
+        player.setToast(
+          `Doc Sable flushed your lymph-lines (-15% Sync/Rot -> ${syncRotPct}%, Full HP Restored)`
+        );
+        emitTelemetry(latestNearbyPrompt);
+      },
+      depositWrenScrip: (emberCount: number) => {
+        const count = Math.min(player.soulEmbers, Math.max(1, emberCount));
+        if (count <= 0) {
+          player.setToast('No Unbanked Scrip Pockets in coat to deposit for Wren');
+          emitTelemetry(latestNearbyPrompt);
+          return;
+        }
+        player.setSoulEmbers(player.soulEmbers - count);
+        const scripValue = count * 5000;
+        wrenScripFund = Math.min(wrenScripGoal, wrenScripFund + scripValue);
+        soundEngine.playEmberCollect();
+        player.setToast(
+          `Banked ${count} Scrip Pockets (+${scripValue.toLocaleString()} Scrip) into Wren's Ward-C Breath-Graft Fund!`
+        );
+        emitTelemetry(latestNearbyPrompt);
+      },
+      toggleEchoSummon: (echoId: string) => {
+        const target = boundEchoes.find((e) => e.id === echoId);
+        if (!target) return;
+        if (!target.isBound) {
+          // Allow binding from Codex if player spends 5 Unbanked Scrip Pockets
+          if (player.soulEmbers < 5) {
+            player.setToast(`Echo ${target.name} is Unbound — Defeat Floor foes for 73% BIND or spend 5 Scrip Pockets`);
+            emitTelemetry(latestNearbyPrompt);
+            return;
+          }
+          player.setSoulEmbers(player.soulEmbers - 5);
+          boundEchoes = boundEchoes.map((e) =>
+            e.id === echoId ? { ...e, isBound: true, isSummoned: true, fsmState: 'FOLLOW' } : e
+          );
+          adjustSyncRot(3);
+          syncSummonedEchoVisuals();
+          player.setToast(`Bound & Summoned [${target.id} ${target.name} ${target.epithet}]!`);
+          emitTelemetry(latestNearbyPrompt);
+          return;
+        }
+        boundEchoes = boundEchoes.map((e) =>
+          e.id === echoId
+            ? {
+                ...e,
+                isSummoned: !e.isSummoned,
+                fsmState: !e.isSummoned ? 'FOLLOW' : 'IDLE',
+              }
+            : e
+        );
+        syncSummonedEchoVisuals();
+        emitTelemetry(latestNearbyPrompt);
+      },
+      cycleEchoFsmOrder: (echoId: string) => {
+        const states: EchoFsmState[] = ['FOLLOW', 'FIGHT', 'HOLD-DOOR', 'MOURN', 'IDLE'];
+        boundEchoes = boundEchoes.map((e) => {
+          if (e.id !== echoId) return e;
+          const idx = states.indexOf(e.fsmState);
+          const next = states[(idx + 1) % states.length];
+          return { ...e, fsmState: next };
+        });
+        syncSummonedEchoVisuals();
+        emitTelemetry(latestNearbyPrompt);
+      },
+      toggleWardenAccord: (numeral: string) => {
+        wardenAccords = wardenAccords.map((w) => {
+          if (w.numeral !== numeral) return w;
+          const nextSworn = !w.sworn;
+          player.setToast(
+            nextSworn
+              ? `Swore Accord ${w.numeral} (${w.name}) — ${w.boon}`
+              : `Broke Accord ${w.numeral} (${w.name}) — ${w.refusalBonus}`
+          );
+          return { ...w, sworn: nextSworn };
+        });
+        emitTelemetry(latestNearbyPrompt);
       },
     };
 
@@ -872,6 +1466,16 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
     const stepPhysics = (fixedDt: number) => {
       prevPlayerPos.copy(player.position);
 
+      if (redSecondRemaining > 0) {
+        redSecondRemaining = Math.max(0, redSecondRemaining - fixedDt);
+      }
+      if (bloodwageRemaining > 0) {
+        bloodwageRemaining = Math.max(0, bloodwageRemaining - fixedDt);
+        if (bloodwageRemaining <= 0) {
+          player.setBloodwageActive(false);
+        }
+      }
+
       const cfg = configRef.current;
       const azimuth = Math.PI / 4 + (cfg.cameraYawIndex % 4) * (Math.PI / 2);
 
@@ -887,10 +1491,11 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
       latestNearbyPrompt = nearbyPrompt;
       currPlayerPos.copy(player.position);
 
-      // Update Roaming Enemies, Soul Ember Orbs, Regional Weather & Invisible Ambient Trigger Zones
+      // Update Roaming Enemies (slowed to 30% speed during The Red Second!), Soul Ember Orbs, Regional Weather & Trigger Zones
+      const enemyDt = redSecondRemaining > 0 ? fixedDt * 0.3 : fixedDt;
       const magnetRadius = 3.2 + (player.upgrades.lanternLevel - 1) * 1.8;
       combatRig.update(
-        fixedDt,
+        enemyDt,
         currentTimeRef.current,
         player.position,
         player.isInvulnerable,
@@ -901,7 +1506,10 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
         worldRig.triggerZones,
         worldRig.getGroundHeight,
         player.takeDamage,
-        player.addSoulEmbers
+        (amt) => {
+          player.addSoulEmbers(amt);
+          wrenScripFund = Math.min(wrenScripGoal, wrenScripFund + amt * 1250);
+        }
       );
 
       // Trigger Screen-Space Camera Shake when a new Hitstop physics event occurs
@@ -971,6 +1579,7 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
       player.root.position.set(interpPlayerPos.x, 0, interpPlayerPos.z);
 
       const renderDt = Math.min(elapsedSinceRenderMs / 1000, MAX_FRAME_DELTA_SEC);
+      pixelFxManager.update(renderDt, orthoCamera.quaternion);
       const savedPosX = player.position.x;
       const savedPosY = player.position.y;
       const savedPosZ = player.position.z;
@@ -1017,6 +1626,7 @@ export const VignetteCanvas: React.FC<VignetteCanvasProps> = ({
       renderer.domElement.removeEventListener('contextmenu', handleContextMenu);
       player.dispose();
       combatRig.dispose();
+      pixelFxManager.dispose();
       worldRig.dispose();
       lowResTarget.dispose();
       depthTexture.dispose();

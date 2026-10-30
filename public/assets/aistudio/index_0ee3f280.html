@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NULLSPIRE: LEVEL ZERO — Cinderfall World Bible</title>
+<meta name="description" content="World bible for NULLSPIRE: LEVEL ZERO — a Solo-Leveling x Tower-of-God RPG set in the fictional city of Cinderfall. 77 floors, 7 souls, 3 factions, 1 parasite.">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root, [data-theme="dark"]{
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+  --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+  --text-hero: clamp(3rem, 0.5rem + 7vw, 7rem);
+  --space-1:.25rem; --space-2:.5rem; --space-3:.75rem; --space-4:1rem;
+  --space-5:1.25rem; --space-6:1.5rem; --space-8:2rem; --space-10:2.5rem;
+  --space-12:3rem; --space-16:4rem; --space-24:6rem;
+  --font-display:'Clash Display','Arial Black',sans-serif;
+  --font-body:'Satoshi','Segoe UI',sans-serif;
+  --font-mono:'JetBrains Mono','Courier New',monospace;
+  --color-bg:#121013;
+  --color-surface:#1c191d;
+  --color-surface-2:#242027;
+  --color-surface-offset:#171418;
+  --color-border:#3a3235;
+  --color-ink:#3a3235;
+  --color-text:#ece4f0;
+  --color-text-muted:#a89ab2;
+  --color-text-faint:#6e6278;
+  --color-blood:#e5482f;
+  --color-blood-deep:#8f1d12;
+  --color-gold:#e8a020;
+  --color-chalk:#f4efe4;
+  --color-moss:#6daa45;
+  --color-river:#5591c7;
+  --radius-sm:.375rem; --radius-md:.75rem; --radius-lg:1.25rem;
+  --shadow-hard:7px 7px 0 #000;
+  --shadow-hard-sm:4px 4px 0 #000;
+  --transition-interactive:180ms cubic-bezier(.16,1,.3,1);
+}
+[data-theme="light"]{
+  --color-bg:#f1ebf4;
+  --color-surface:#faf6fd;
+  --color-surface-2:#fffdf7;
+  --color-surface-offset:#e7dfec;
+  --color-border:#1f1b2d;
+  --color-ink:#1f1b2d;
+  --color-text:#221c16;
+  --color-text-muted:#6b5f6e;
+  --color-text-faint:#a297a3;
+  --color-blood:#c22e1c;
+  --color-blood-deep:#8f1d12;
+  --color-gold:#b07a00;
+  --color-chalk:#221c16;
+  --shadow-hard:7px 7px 0 #1f1b2d;
+  --shadow-hard-sm:4px 4px 0 #1f1b2d;
+}
+/* ============ BASE ============ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:none;text-size-adjust:none;-webkit-font-smoothing:antialiased;scroll-behavior:smooth;scroll-padding-top:var(--space-16)}
+body{min-height:100dvh;line-height:1.6;font-family:var(--font-body);font-size:var(--text-base);color:var(--color-text);background-color:var(--color-bg);
+  background-image:radial-gradient(color-mix(in oklab, var(--color-blood) 14%, transparent) 1px, transparent 1px);
+  background-size:26px 26px;}
+img,svg{display:block;max-width:100%}
+h1,h2,h3,h4{text-wrap:balance;line-height:1.12}
+p,li,figcaption{text-wrap:pretty}
+::selection{background:var(--color-blood);color:#fff}
+:focus-visible{outline:2px solid var(--color-gold);outline-offset:3px;border-radius:var(--radius-sm)}
+a,button{transition:color var(--transition-interactive),background var(--transition-interactive),border-color var(--transition-interactive),box-shadow var(--transition-interactive),transform var(--transition-interactive)}
+button{cursor:pointer;background:none;border:none;color:inherit;font:inherit}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+/* ============ CHROME ============ */
+.top-strip{background:#000;color:var(--color-text);text-align:center;font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:.14em;padding:var(--space-2) var(--space-4);font-weight:700}
+.top-strip b{color:var(--color-blood)}
+[data-theme="light"] .top-strip{background:#1f1b2d;color:#f1ebf4}
+.banner{position:sticky;top:0;z-index:50;background:color-mix(in oklab, var(--color-bg) 88%, transparent);backdrop-filter:blur(12px);border-bottom:3px solid var(--color-ink)}
+.banner-inner{max-width:1200px;margin:0 auto;padding:var(--space-4) var(--space-5);display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:var(--space-3);margin-right:auto}
+.brand-name{font-family:var(--font-display);font-weight:700;font-size:var(--text-lg);letter-spacing:.01em}
+.brand-name span{color:var(--color-blood)}
+nav.main{display:flex;gap:var(--space-1);flex-wrap:wrap}
+nav.main a{font-size:var(--text-sm);font-weight:700;text-decoration:none;color:var(--color-text-muted);padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm)}
+nav.main a:hover{color:var(--color-text);background:var(--color-surface-2)}
+.theme-btn{border:2px solid var(--color-ink);border-radius:var(--radius-sm);padding:var(--space-2) var(--space-3);font-family:var(--font-mono);font-size:var(--text-xs);font-weight:700;box-shadow:3px 3px 0 #000;background:var(--color-surface-2);color:var(--color-text)}
+[data-theme="light"] .theme-btn{box-shadow:3px 3px 0 #1f1b2d}
+.theme-btn:hover{transform:translate(-1px,-1px)}
+/* ============ LAYOUT ============ */
+.wrap{max-width:1200px;margin:0 auto;padding:0 var(--space-5) var(--space-24)}
+section{padding-block:clamp(var(--space-12),7vw,var(--space-24))}
+.kicker{font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:.18em;color:var(--color-blood);font-weight:700;text-transform:uppercase;margin-bottom:var(--space-3)}
+h2.section-title{font-family:var(--font-display);font-weight:600;font-size:var(--text-xl);margin-bottom:var(--space-2)}
+.section-sub{color:var(--color-text-muted);max-width:68ch;margin-bottom:var(--space-8)}
+/* ============ HERO ============ */
+.hero{text-align:left;padding-block:clamp(var(--space-12),8vw,var(--space-24));display:grid;gap:var(--space-6)}
+.hero h1{font-family:var(--font-display);font-weight:700;font-size:var(--text-hero);line-height:.98;letter-spacing:-.01em}
+.hero h1 .zero{color:var(--color-blood);text-shadow:4px 4px 0 #000}
+[data-theme="light"] .hero h1 .zero{text-shadow:4px 4px 0 #1f1b2d}
+.hero-tag{font-size:var(--text-lg);color:var(--color-text-muted);max-width:60ch}
+.hero-tag b{color:var(--color-text)}
+.stat-row{display:flex;gap:var(--space-4);flex-wrap:wrap;margin-top:var(--space-4)}
+.stat{border:3px solid var(--color-ink);background:var(--color-surface);border-radius:var(--radius-md);box-shadow:var(--shadow-hard-sm);padding:var(--space-4) var(--space-5);min-width:130px}
+.stat .n{font-family:var(--font-display);font-size:var(--text-xl);font-weight:700;color:var(--color-gold)}
+.stat .l{font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:.1em;color:var(--color-text-muted);text-transform:uppercase}
+/* ============ VESTIGE TERMINAL ============ */
+.terminal{border:3px solid var(--color-ink);border-radius:var(--radius-lg);background:#0c0a0b;box-shadow:var(--shadow-hard);overflow:hidden;color:#f4efe4}
+[data-theme="light"] .terminal{background:#141114}
+.term-head{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-bottom:2px solid #2c2628;font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:.12em;color:#8f8578}
+.term-head .lights{display:flex;gap:6px}
+.term-head .lights i{width:10px;height:10px;border-radius:50%;background:#3a3235}
+.term-head .lights i:first-child{background:var(--color-blood)}
+.term-body{padding:var(--space-6);font-family:var(--font-mono);font-size:var(--text-base);display:grid;gap:var(--space-4)}
+.term-line{min-height:3.2em}
+.term-line .sys{color:var(--color-blood);font-weight:700}
+.term-line .said{color:#f4efe4}
+.term-sync{display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap}
+.term-sync label{font-size:var(--text-xs);letter-spacing:.12em;color:#8f8578}
+input[type="range"]{accent-color:var(--color-blood);width:min(320px,100%)}
+.sync-meter{flex:1;min-width:160px;height:14px;border:2px solid #3a3235;border-radius:999px;overflow:hidden;background:#1a1512}
+.sync-fill{height:100%;width:9%;background:linear-gradient(90deg,var(--color-gold),var(--color-blood));transition:width var(--transition-interactive)}
+.sync-note{font-size:var(--text-sm);color:#8f8578}
+.term-btn{justify-self:start;border:2px solid var(--color-blood);color:#f4efe4;font-family:var(--font-mono);font-weight:700;font-size:var(--text-sm);padding:var(--space-3) var(--space-5);border-radius:var(--radius-sm)}
+.term-btn:hover{background:var(--color-blood)}
+/* ============ CARDS ============ */
+.grid{display:grid;gap:var(--space-6);grid-template-columns:repeat(3,1fr)}
+.grid.two{grid-template-columns:repeat(2,1fr)}
+@media (max-width:1020px){.grid{grid-template-columns:1fr 1fr}}
+@media (max-width:700px){.grid,.grid.two{grid-template-columns:1fr}}
+.card{background:var(--color-surface);border:3px solid var(--color-ink);border-radius:var(--radius-lg);box-shadow:var(--shadow-hard);overflow:hidden;display:flex;flex-direction:column}
+.card-head{padding:var(--space-5);border-bottom:3px solid var(--color-ink)}
+.card-head.court{background:color-mix(in oklab, var(--color-gold) 22%, var(--color-surface))}
+.card-head.boys{background:color-mix(in oklab, var(--color-chalk) 10%, var(--color-surface))}
+.card-head.union{background:color-mix(in oklab, var(--color-river) 20%, var(--color-surface))}
+.card-head.beast{background:color-mix(in oklab, var(--color-blood) 20%, var(--color-surface))}
+.card-head.place{background:color-mix(in oklab, var(--color-moss) 18%, var(--color-surface))}
+.card-head.quest{background:color-mix(in oklab, var(--color-river) 14%, var(--color-surface))}
+.num{font-family:var(--font-mono);font-size:var(--text-xs);font-weight:700;background:var(--color-surface-2);border:2px solid var(--color-ink);padding:var(--space-1) var(--space-2);border-radius:6px;display:inline-block;margin-bottom:var(--space-3);color:var(--color-text)}
+.card h3{font-family:var(--font-display);font-size:var(--text-lg);font-weight:600;margin-bottom:var(--space-1)}
+.card .role{font-size:var(--text-sm);font-weight:700;color:var(--color-text-muted)}
+.card-body{padding:var(--space-5);display:grid;gap:var(--space-4);font-size:var(--text-base)}
+.field{font-size:var(--text-base)}
+.field b{display:block;font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:.12em;text-transform:uppercase;color:var(--color-blood);margin-bottom:var(--space-1)}
+.quote{border-left:3px solid var(--color-blood);padding-left:var(--space-3);font-style:italic;color:var(--color-text-muted)}
+.secret{background:var(--color-surface-offset);border:2px dashed var(--color-border);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);font-size:var(--text-sm)}
+.secret b{color:var(--color-gold);font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:.12em;display:block;margin-bottom:var(--space-1)}
+.tags{display:flex;flex-wrap:wrap;gap:var(--space-2)}
+.tag{border:2px solid var(--color-ink);padding:var(--space-1) var(--space-3);border-radius:999px;font-size:var(--text-sm);font-weight:700;background:var(--color-surface-2)}
+/* ============ CLOCKS ============ */
+.clock{border:3px solid var(--color-ink);border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-hard);padding:var(--space-6);display:grid;gap:var(--space-4)}
+.clock-top{display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-3);flex-wrap:wrap}
+.clock-top h3{font-family:var(--font-display);font-size:var(--text-lg)}
+.clock-count{font-family:var(--font-mono);font-weight:700;color:var(--color-gold)}
+.pips{display:flex;gap:var(--space-2);flex-wrap:wrap}
+.pip{width:30px;height:30px;border:3px solid var(--color-ink);border-radius:8px;background:var(--color-surface-2)}
+.pip.on{background:var(--color-blood);box-shadow:2px 2px 0 #000}
+.clock p{color:var(--color-text-muted);font-size:var(--text-base)}
+.clock-btn{justify-self:start;border:2px solid var(--color-ink);background:var(--color-surface-2);font-weight:700;font-size:var(--text-sm);padding:var(--space-2) var(--space-4);border-radius:var(--radius-sm);box-shadow:3px 3px 0 #000}
+.clock-btn:hover{transform:translate(-1px,-1px)}
+.clock-note{font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-faint)}
+/* ============ TABLES / RULES ============ */
+.panel{border:3px solid var(--color-ink);border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-hard);padding:var(--space-6);display:grid;gap:var(--space-5)}
+.ladder{display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:stretch}
+.rung{flex:1;min-width:90px;text-align:center;border:3px solid var(--color-ink);border-radius:var(--radius-md);padding:var(--space-4) var(--space-2);background:var(--color-surface-2)}
+.rung.you{border-color:var(--color-blood);background:color-mix(in oklab, var(--color-blood) 16%, var(--color-surface-2))}
+.rung .r{font-family:var(--font-display);font-size:var(--text-lg);font-weight:700}
+.rung .d{font-size:var(--text-sm);color:var(--color-text-muted)}
+table.rules{width:100%;border-collapse:collapse;font-size:var(--text-base)}
+table.rules th{font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:.1em;text-transform:uppercase;text-align:left;color:var(--color-text-muted);padding:var(--space-2) var(--space-3);border-bottom:2px solid var(--color-ink)}
+table.rules td{padding:var(--space-3);border-bottom:1px solid var(--color-border);vertical-align:top}
+table.rules tr:last-child td{border-bottom:none}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)}
+@media (max-width:700px){.statgrid{grid-template-columns:1fr 1fr}}
+.statbox{border:2px solid var(--color-ink);border-radius:var(--radius-md);padding:var(--space-4);background:var(--color-surface-2)}
+.statbox b{font-family:var(--font-display);font-size:var(--text-base);display:block}
+.statbox span{font-size:var(--text-sm);color:var(--color-text-muted)}
+/* ============ QUEST TASKS ============ */
+.tasks{list-style:none;display:grid;gap:var(--space-2)}
+.task{background:var(--color-surface-2);border:2px solid var(--color-ink);border-radius:10px;padding:var(--space-3) var(--space-4);font-weight:500;font-size:var(--text-base);display:flex;gap:var(--space-3);align-items:flex-start;cursor:pointer;user-select:none}
+.task::before{content:'▢';font-family:var(--font-mono);flex:none}
+.task.done{background:color-mix(in oklab, var(--color-moss) 22%, var(--color-surface-2))}
+.task.done::before{content:'✓';color:var(--color-moss)}
+.task small{display:block;color:var(--color-text-muted);font-weight:400}
+/* ============ FOOTER ============ */
+footer.site{border-top:3px solid var(--color-ink);padding:var(--space-8) var(--space-5);text-align:center;color:var(--color-text-muted);font-size:var(--text-sm)}
+footer.site b{color:var(--color-text)}
+</style>
+</head>
+<body>
+<div class="top-strip">NULLSPIRE: LEVEL ZERO <b>•</b> WORLD BIBLE <b>•</b> CINDERFALL — A FICTIONAL CITY</div>
+
+<header class="banner">
+  <div class="banner-inner">
+    <div class="brand">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-label="Nullspire mark" role="img">
+        <rect x="2" y="2" width="36" height="36" rx="9" fill="#e5482f" stroke="#000" stroke-width="3"/>
+        <path d="M13 31 L20 8 L24 20 L27 12 L29 31 Z" fill="#141114" stroke="#f4efe4" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M20 8 L22 16" stroke="#e8a020" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div class="brand-name">NULLSPIRE<span>: LEVEL ZERO</span></div>
+    </div>
+    <nav class="main" aria-label="World sections">
+      <a href="#city">City</a><a href="#people">People</a><a href="#factions">Factions</a>
+      <a href="#power">Power</a><a href="#beasts">Beasts</a><a href="#quests">Quests</a><a href="#rules">Rules</a><a href="concepts.html">Concepts</a><a href="docs.html">Docs</a>
+    </nav>
+    <button class="theme-btn" data-theme-toggle aria-label="Switch to light mode">◐ THEME</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- HERO -->
+  <section class="hero" aria-label="Introduction">
+    <p class="kicker">Solo-Leveling × Tower of God • RPG / Roguelike • Weak-to-OP • Sentient parasite</p>
+    <h1>THE MOUNTAIN<br>SPLIT.<br><span class="zero">YOU CLIMBED.</span></h1>
+    <p class="hero-tag">Ten years ago the black mountain outside the city lit up from inside. Inside it: <b>77 floors</b>. You are <b>Joss Vane</b>, 19, an E-rank porter nicknamed <b>Coffin</b> — every team he carries for loses someone, except him. Then a voice moves into his skull, offers him levels, and starts charging interest.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="n">77</div><div class="l">Floors</div></div>
+      <div class="stat"><div class="n">7</div><div class="l">Key souls</div></div>
+      <div class="stat"><div class="n">3</div><div class="l">Factions</div></div>
+      <div class="stat"><div class="n">2</div><div class="l">Racing clocks</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">Parasite</div></div>
+    </div>
+  </section>
+
+  <!-- VESTIGE -->
+  <section aria-label="The System">
+    <p class="kicker">The System</p>
+    <h2 class="section-title">VESTIGE talks. Negotiates. Gets bored. Lies.</h2>
+    <p class="section-sub">Not a cold blue window — a parasite with opinions. It claims to be a laugh the Crossroads left behind. No Warden confirms it. No Warden denies it. Drag the Sync slider: more power, more control, blacker veins.</p>
+    <div class="terminal" role="region" aria-label="Vestige dialogue terminal">
+      <div class="term-head"><span class="lights"><i></i><i></i><i></i></span> VESTIGE // <span id="syncLabel">SYNC 9%</span></div>
+      <div class="term-body">
+        <p class="term-line"><span class="sys">[ VESTIGE ]</span> <span class="said" id="vestigeLine">“Up, Coffin. The others didn't make it. I'm starving. Deal?”</span></p>
+        <div class="term-sync">
+          <label for="sync">SYNC</label>
+          <input type="range" id="sync" min="0" max="100" value="9" aria-label="Vestige sync level">
+          <div class="sync-meter" aria-hidden="true"><div class="sync-fill" id="syncFill"></div></div>
+        </div>
+        <p class="sync-note" id="syncNote">9% — passenger. It watches. It waits. It is polite, which is the most frightening setting.</p>
+        <button class="term-btn" id="nextLine">▶ NEW LINE FROM THE SKULL</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CITY -->
+  <section id="city" aria-label="The city">
+    <p class="kicker">The City</p>
+    <h2 class="section-title">Cinderfall — a capital that moved twice and never finished moving</h2>
+    <p class="section-sub">Fictional sprawl. Terminal-park chaos, a gilt trade maze, stilt slums on black water — built to feel like nowhere on any map. Smell of diesel and roast corn. Sound of horns and generators. And past the expressway, floodlights that never go off.</p>
+    <div class="grid">
+      <article class="card"><div class="card-head place"><span class="num">DISTRICT 01</span><h3>The Terminus</h3><p class="role">Hub • The Hold • Combine territory</p></div>
+        <div class="card-body">
+          <p class="field"><b>First impression</b>A bus station the size of a town that became a town. Tarps for roofs, touts shouting destinations, shade as currency.</p>
+          <p class="field"><b>Key spots</b>The Hold (back room, bunks, loot scale), Sable's container clinic, a crossing shrine where somebody leaves lamp oil every night and nobody admits to it.</p>
+          <div class="secret"><b>Hidden</b>Chalk marks keep appearing on the third bay wall. Someone is counting how many Terminus carriers die per month.</div>
+        </div></article>
+      <article class="card"><div class="card-head place"><span class="num">DISTRICT 02</span><h3>The Gilt Bazaar</h3><p class="role">Trade • Dame Sera • Appraisal row</p></div>
+        <div class="card-body">
+          <p class="field"><b>First impression</b>Three floors of everything plus a fourth nobody admits exists. A wedding, a weapon, a witness, and lunch within forty steps.</p>
+          <p class="field"><b>The law</b>No blades drawn inside. Enforced by something worse than guards — Sera's fiat field, rented from a Warden. It flickers during storms.</p>
+          <div class="secret"><b>Hidden</b>The real Floor 4 looks uncomfortably like this market. The Association noticed first and charges admission to discuss it.</div>
+        </div></article>
+      <article class="card"><div class="card-head place"><span class="num">GATE</span><h3>The Spire Gate</h3><p class="role">Staging • Office perimeter • Muster ground</p></div>
+        <div class="card-body">
+          <p class="field"><b>First impression</b>Floodlights, razor wire, a queue that starts before dawn. Veterans stare at the return board — and the column nobody reads out loud.</p>
+          <p class="field"><b>The door</b>Floor 0 was welded shut three years ago. Last month something chewed through from the inside. The teeth match nothing registered.</p>
+          <div class="secret"><b>Hidden</b>The Office reclassified Joss's tutorial run as a double <em>before</em> the team went in. Somebody knew.</div>
+        </div></article>
+    </div>
+  </section>
+
+  <!-- PEOPLE -->
+  <section id="people" aria-label="Characters">
+    <p class="kicker">People</p>
+    <h2 class="section-title">Seven souls the story stands on</h2>
+    <p class="section-sub">Every one of them wants something specific, fears something specific, and is hiding one thing.</p>
+    <div class="grid">
+      <article class="card"><div class="card-head"><span class="num">PROTAGONIST</span><h3>Joss Vane</h3><p class="role">19 • E-rank porter • "Coffin"</p></div>
+        <div class="card-body">
+          <p class="field"><b>Wants</b>Two million scrip for his sister's hospital bill. Everything else is weather.</p>
+          <p class="field"><b>Fears</b>That the voice is right — he survives because others die first.</p>
+          <p class="quote">Thin, scar-split lip, a cutlass two sizes too big. Brings every body out, dead or alive. That's why they call him Coffin.</p>
+          <div class="secret"><b>Hidden</b>The Bureau still reads E-rank, 11, flat. His real curve has no precedent — the other six files stopped being readable at exactly this point.</div>
+          <div class="tags"><span class="tag">Door-Breaker Seven</span><span class="tag">One-man cell</span></div>
+        </div></article>
+      <article class="card"><div class="card-head beast"><span class="num">PARASITE</span><h3>VESTIGE</h3><p class="role">System • "The Laugh" • Spite</p></div>
+        <div class="card-body">
+          <p class="field"><b>Wants</b>Hunger first. Underneath: to not be the smallest of seven.</p>
+          <p class="field"><b>Fears</b>The other six Fallen. Changes the subject every time.</p>
+          <p class="quote">A bored showman. Rewards near-death, yawns at easy wins, narrates fights like a tout calling passengers.</p>
+          <div class="secret"><b>Hidden</b>The Memory Tithe isn't metabolism — it's editing. It eats the memories that would make Joss stop climbing.</div>
+          <div class="tags"><span class="tag">Levels</span><span class="tag">Whispers</span><span class="tag">The Shop</span></div>
+        </div></article>
+      <article class="card"><div class="card-head"><span class="num">ANCHOR</span><h3>Wren Vane</h3><p class="role">16 • Fluxburnt • Ward C</p></div>
+        <div class="card-body">
+          <p class="field"><b>Wants</b>Out of Ward C. To see the Spire with her own eyes.</p>
+          <p class="field"><b>Fears</b>That Joss dies paying for her and she has to live in the room his money bought.</p>
+          <p class="quote">Draws the Spire in charcoal, big confident strokes. Believes her brother is strong "underneath" and says so to intake officers.</p>
+          <div class="secret"><b>Hidden</b>Her newest drawing shows Floor 2's game room in detail — bell, sigils, door count. She has never been inside the Spire.</div>
+          <div class="tags"><span class="tag">Ticking clock</span><span class="tag">2M bill</span></div>
+        </div></article>
+      <article class="card"><div class="card-head"><span class="num">MENTOR</span><h3>Old Beck</h3><p class="role">Ex-B Vanguard • Manifest keeper • One leg</p></div>
+        <div class="card-body">
+          <p class="field"><b>Wants</b>No more terminal kids dying the way his squad died on Floor 9.</p>
+          <p class="field"><b>Fears</b>He already knows what VESTIGE is — and telling Joss finishes him faster than silence.</p>
+          <p class="quote">Logs everything, pays on time. Answers questions with jobs: "Carry this bag to the Gate and come back."</p>
+          <div class="secret"><b>Hidden</b>The lamp oil at the shrine is an Accord offering for nobodies who can't afford Table writs. It works. That's the most dangerous thing he knows.</div>
+        </div></article>
+      <article class="card"><div class="card-head"><span class="num">DOCTOR</span><h3>Doc Sable</h3><p class="role">Road surgeon • Sync tech • Container clinic</p></div>
+        <div class="card-body">
+          <p class="field"><b>Wants</b>Terminal kids alive through unsurvivable things — and a generator that keeps running.</p>
+          <p class="field"><b>Fears</b>A patient she can't fix because what's killing him is riding him, not in him.</p>
+          <p class="quote">"That thing in your head? It's a crossroads kid. It doesn't fit in people. Now hold still — this will hurt."</p>
+          <div class="secret"><b>Hidden</b>Padlocked fridge: six vials of smuggled upper-floor tissue. Cure research. Wren's name is on the oldest label.</div>
+        </div></article>
+      <article class="card"><div class="card-head court"><span class="num">RIVAL</span><h3>Rook</h3><p class="role">19 • Heir Seven • Hushblades</p></div>
+        <div class="card-body">
+          <p class="field"><b>Wants</b>To prove the Crown chose right — a weak orphan deserved the seventh seat.</p>
+          <p class="field"><b>Fears</b>There's nothing under the power worth choosing. The Crown ate her past.</p>
+          <p class="quote">Beat Joss in 40 seconds. Lost an unauthorized rematch she can't explain. Hasn't filed the report. Her handler noticed.</p>
+          <div class="secret"><b>Hidden</b>She remembers one thing the Crown should have eaten: a lullaby. The Sigil Game bell is tuned to its interval.</div>
+          <div class="tags"><span class="tag">Null Crown 7</span><span class="tag">Floor 19</span></div>
+        </div></article>
+      <article class="card"><div class="card-head"><span class="num">HUNTER</span><h3>Auditor Voss</h3><p class="role">Office inquisitor • "The Manifest" • Ex-A</p></div>
+        <div class="card-body">
+          <p class="field"><b>Wants</b>A containment method that isn't a slab. None exists yet.</p>
+          <p class="field"><b>Fears</b>Ordering the dissection makes him the villain of every Terminus story — and that he's right to order it. Six for six.</p>
+          <p class="quote">Soft, precise, kind to porters by name at screening — while keeping the order book that will dissect one of them.</p>
+          <div class="secret"><b>Hidden</b>Started a seventh file with Joss's real readings. Hasn't filed it. An unfiled file is a confession.</div>
+        </div></article>
+    </div>
+  </section>
+
+  <!-- FACTIONS -->
+  <section id="factions" aria-label="Factions">
+    <p class="kicker">Factions</p>
+    <h2 class="section-title">Three powers. Two clocks. One boy.</h2>
+    <p class="section-sub">The Table hunts Joss. The Returned harvest him. The Combine is the ground both stand on. Both clocks advance when Joss grows — power draws attention, attention accelerates both. Click to tick (session sketch only).</p>
+    <div class="grid">
+      <article class="card"><div class="card-head court"><span class="num">ORDER</span><h3>The Gilded Table</h3><p class="role">Writs • Heirs • Kill-orders</p></div>
+        <div class="card-body">
+          <p>First climber to Floor 77 stopped, declared the climb finished, made worship climb upward instead. Issues ascent writs, seats thirteen Crown Heirs, calls Door-Breakers hazards.</p>
+          <div class="secret"><b>Hidden</b>The Sovereign was the first Door-Breaker. The kill-order is autobiography with the serial numbers filed off.</div>
+        </div></article>
+      <article class="card"><div class="card-head boys"><span class="num">REBELLION</span><h3>The Returned</h3><p class="role">Chalk • Smuggling • Sabotage</p></div>
+        <div class="card-body">
+          <p>Named for returnlings. The Spire is a prison, the Sovereign its jailer, a Door-Breaker the key. Recruit porters, smuggle cure tissue, bomb Table works, bury the Office's "equipment losses" with honors.</p>
+          <div class="secret"><b>Hidden</b>The cure tissue works — partially — and the oldest cell rations it. A cured Terminus owes nothing. A dying Terminus owes everything.</div>
+        </div></article>
+      <article class="card"><div class="card-head union"><span class="num">GROUND</span><h3>The Bearers Combine</h3><p class="role">Carriers • Manifests • The Hold</p></div>
+        <div class="card-body">
+          <p>Eight thousand backs. Ten percent, receipts, bodies brought home. Keeps two books — one for audits, one with real names. The weakest faction on paper; the only one that can halt the Spire by sitting down.</p>
+          <div class="secret"><b>Hidden</b>The real book lists six carriers who came back wrong — flat readings, dark veins. Beck is waiting for the seventh. Joss's name is penciled in.</div>
+        </div></article>
+    </div>
+    <div class="grid two" style="margin-top:var(--space-6)">
+      <div class="clock" data-clock>
+        <div class="clock-top"><h3>Find the Door-Breaker</h3><span class="clock-count"><span data-count>2</span>/8 — TABLE</span></div>
+        <div class="pips" aria-hidden="true"></div>
+        <p>Sealed inquiry → Subject Seven file → Heir reports contact → capture-vs-kill split → rigged Sigil Game → Hold audit → hesitation on record → <b>kill-order served in person.</b></p>
+        <button class="clock-btn" data-tick>Tick ▲</button>
+        <span class="clock-note">Fills → Joss runs Up early, under-leveled, Crown squad behind.</span>
+      </div>
+      <div class="clock" data-clock>
+        <div class="clock-top"><h3>Recruit the Door-Breaker</h3><span class="clock-count"><span data-count>2</span>/6 — RETURNED</span></div>
+        <div class="pips" aria-hidden="true"></div>
+        <p>Headcount → leverage in Sable's fridge → first contact with the six-files truth → defection offer at the Sigil Game → Ward C reach proven → <b>chalk at a Table event.</b></p>
+        <button class="clock-btn" data-tick>Tick ▲</button>
+        <span class="clock-note">Fills → defection proves the Table's story, or a dosed volunteer walks into Joss's kill-order.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- POWER -->
+  <section id="power" aria-label="Power system">
+    <p class="kicker">Power</p>
+    <h2 class="section-title">The Flux — Accord or Rot</h2>
+    <p class="section-sub">The Spire has flux the way the grid has light: thin down low, thick enough Up to drown in. To use it freely you need an Accord with that floor's Warden. Joss has none — VESTIGE eats it for him, and his veins pay the difference.</p>
+    <div class="panel">
+      <table class="rules">
+        <tr><th>School</th><th>Focus</th><th>Cost</th></tr>
+        <tr><td><b>Vanguard shaping</b></td><td>Body reinforcement, carry-weight tricks</td><td>Stamina</td></tr>
+        <tr><td><b>Lance-casting</b></td><td>Single heavy strikes at range</td><td>Long reload</td></tr>
+        <tr><td><b>Lantern-reading</b></td><td>Light, detection, trap-sense</td><td>Focus</td></tr>
+        <tr><td><b>Hand-weaving</b></td><td>Walls, slows, density fields</td><td>Warden Accord</td></tr>
+        <tr><td><b>Chaplain's vigil</b></td><td>Sanity, purge, Rot-washing — the only path back down the Sync meter</td><td>Faith, any kind (the flux checks sincerity)</td></tr>
+      </table>
+    </div>
+    <div class="grid" style="margin-top:var(--space-6)">
+      <article class="card"><div class="card-head beast"><span class="num">SIGNATURE</span><h3>BIND — Carry This Echo?</h3><p class="role">73% base • Our shadow-extract</p></div>
+        <div class="card-body"><p>Worthy kill, offer made. Success: the echo joins the Bound — keeps personality plus one memory, levels on soul-sand, can refuse orders at low loyalty. Failure: the soul screams and buffs the room. Never free, never safe.</p><div class="tags"><span class="tag">Bram</span><span class="tag">Mercy</span><span class="tag">Hush</span></div></div></article>
+      <article class="card"><div class="card-head"><span class="num">KIT</span><h3>Parasite Techniques</h3><p class="role">Priced in HP + Rot</p></div>
+        <div class="card-body"><div class="tags"><span class="tag">Gapstep</span><span class="tag">Bloodwage</span><span class="tag">Crosspull</span><span class="tag">Call the Bound</span><span class="tag">Red Second</span></div><p>Every cast has a visible price. No free scaling — that's the genre contract with the player.</p></div></article>
+      <article class="card"><div class="card-head union"><span class="num">DOCTRINE</span><h3>Five-Person Cell</h3><p class="role">Spire law • Joss breaks it</p></div>
+        <div class="card-body"><p>Vanguard / Lancer / Lantern / Weaver / Chaplain. Legal cells run 4+1. Joss plus his Bound is an illegal one-man cell — the rules break, which is the point, and why everyone is afraid of him.</p></div></article>
+    </div>
+  </section>
+
+  <!-- BEASTS -->
+  <section id="beasts" aria-label="Bestiary">
+    <p class="kicker">Bestiary</p>
+    <h2 class="section-title">Things that hunt the climb</h2>
+    <p class="section-sub">Street-faith monsters with readable rules. Each one teaches a mechanic: respect, preparation, attention.</p>
+    <div class="grid">
+      <article class="card"><div class="card-head beast"><span class="num">LAWFUL • CLOTH</span><h3>The Pall</h3><p class="role">Layers of cloth = HP layers</p></div>
+        <div class="card-body"><p>A tower of layered cloth moving like weather. Never strikes first — ignored, it blocks; insulted, it slams; attacked, the cloth opens and the argument comes out. The greeting obeisance stuns it. Speedrunners hate it. Lore-keepers farm it.</p></div></article>
+      <article class="card"><div class="card-head beast"><span class="num">BOSS • 3 LIVES</span><h3>Returnling</h3><p class="role">Dies laughing, returns stronger</p></div>
+        <div class="card-body"><p>First life lost and crying. Second laughing and faster. Third quiet, adult-eyed, negotiating. Only a genuine chaplain's rite stops the return — the flux checks sincerity, mercenaries can't fake it. It has been visiting Ward C longer than Joss has been climbing.</p></div></article>
+      <article class="card"><div class="card-head beast"><span class="num">UTILITY • TRUTH</span><h3>Truhound</h3><p class="role">Smells falsehood</p></div>
+        <div class="card-body"><p>Shrine-kept ridgebacks, ears up for truth, folded for lies. One sleeps in the Hold's doorway. It barks at Joss's head whenever VESTIGE speaks. Never explain it in dialogue — let the player notice before Joss does.</p></div></article>
+    </div>
+  </section>
+
+  <!-- QUESTS -->
+  <section id="quests" aria-label="Quests">
+    <p class="kicker">Quests</p>
+    <h2 class="section-title">Act 1 runs on two floors</h2>
+    <p class="section-sub">Tutorial loss that teaches carrying, then a gala game that teaches betrayal. Check objectives off — this page keeps score.</p>
+    <div class="grid two">
+      <article class="card"><div class="card-head quest"><span class="num">MAIN • TUTORIAL</span><h3>Floor Zero — The Unfinished Block</h3><p class="role">Double splinter • Scripted loss</p></div>
+        <div class="card-body">
+          <p>A routine Grey clear in an abandoned ministry high-rise. The second splinter opens behind the team. The lead orders Joss to drop the wounded scout and save the cores. Six seconds.</p>
+          <ul class="tasks">
+            <li class="task">Survive the bloom — bring out the bodies <small>Carry first, fight second. That's the Hold way.</small></li>
+            <li class="task">Choose: the scout or the cores <small>Save Lark: blacklist + first BIND. Save cores: money + the voice stays quiet.</small></li>
+            <li class="task">Hear the voice — accept the deal <small>An eye is on the table. It always was.</small></li>
+            <li class="task">Walk past a scan that still reads E-rank, 11, flat</li>
+          </ul>
+        </div></article>
+      <article class="card"><div class="card-head quest"><span class="num">MAIN • FLOOR 2 TEST</span><h3>The Sigil Game</h3><p class="role">Betrayal scheduled • Rook enforces</p></div>
+        <div class="card-body">
+          <p>Five teams, one endless gala hall. Hold a sigil when the bell rings. The third bell's rule is never announced — it's discovered, usually by the loser: sigils worn by the bound dead count double. Joss is the only player with dead on his side.</p>
+          <ul class="tasks">
+            <li class="task">Hold a sigil at the final bell <small>Alliances form in minutes and rot faster.</small></li>
+            <li class="task">Win without spending an echo <small>Stay flat. Let someone else bleed for it.</small></li>
+            <li class="task">Spot the rig <small>The Game is a sieve. Spotting it proves what they're hunting.</small></li>
+            <li class="task">Survive Rook's rematch — and her unfiled report</li>
+          </ul>
+        </div></article>
+    </div>
+  </section>
+
+  <!-- RULES -->
+  <section id="rules" aria-label="Table rules">
+    <p class="kicker">Table Rules</p>
+    <h2 class="section-title">Numbers climb. Story costs.</h2>
+    <p class="section-sub">Homebrew spine for the roguelike loop. Ranks are locked for everyone except Joss. Death takes loot, one memory, and one echo rank — levels kept.</p>
+    <div class="panel">
+      <div class="ladder" aria-label="Hunter ranks">
+        <div class="rung"><div class="r">E</div><div class="d">gig hands</div></div>
+        <div class="rung"><div class="r">D</div><div class="d">mistake survivors</div></div>
+        <div class="rung"><div class="r">C</div><div class="d">working climbers</div></div>
+        <div class="rung"><div class="r">B</div><div class="d">cell leaders</div></div>
+        <div class="rung"><div class="r">A</div><div class="d">floor names</div></div>
+        <div class="rung"><div class="r">S</div><div class="d">living weapons</div></div>
+        <div class="rung you"><div class="r">Ø</div><div class="d">you. unmeasured.</div></div>
+      </div>
+      <div class="statgrid">
+        <div class="statbox"><b>STR</b><span>damage, carry weight — carrying is sacred</span></div>
+        <div class="statbox"><b>VIT</b><span>HP, bleed resistance</span></div>
+        <div class="statbox"><b>AGI</b><span>dodge, speed, movement</span></div>
+        <div class="statbox"><b>INT</b><span>technique damage, sync efficiency</span></div>
+        <div class="statbox"><b>WILL</b><span>fear + Whisper-deal resistance — the bargaining stat</span></div>
+        <div class="statbox"><b>SENSE</b><span>traps, weak points, hidden rooms</span></div>
+      </div>
+      <table class="rules">
+        <tr><th>System</th><th>Rule</th></tr>
+        <tr><td><b>Level-up</b></td><td>+3 free points. VESTIGE comments on the build. Its advice is good and should not be trusted.</td></tr>
+        <tr><td><b>Sync / Rot</b></td><td>0–100%. High: power + control + black veins + fear checks. Low: human-passing. Chaplain mechanics are the only way down. Endings branch at 40 / 70 / 90.</td></tr>
+        <tr><td><b>Death</b></td><td>Revive via parasite. Lose run loot + one memory (edited, not random) + one echo rank-down. Keep levels and XP.</td></tr>
+        <tr><td><b>Daily Pact</b></td><td>Train or drift: fail the day's work, spend four hours with the ashworms in the dry pocket.</td></tr>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <b>NULLSPIRE: LEVEL ZERO</b> — Cinderfall world bible • Vault source: <b>worlds/cinderfall/</b> • Dev docs: <b><a href="docs.html" style="color:inherit">docs.html</a></b> • Tracker: <b><a href="progress.html" style="color:inherit">progress.html</a></b><br>
+  Next: Floor 0–2 beat sheets • 20-echo roster • Warden accords
+</footer>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var btn=document.querySelector('[data-theme-toggle]');
+  var mq=window.matchMedia('(prefers-color-scheme: dark)');
+  var mode=mq.matches?'dark':'light';
+  function apply(m){mode=m;root.setAttribute('data-theme',m);
+    btn.setAttribute('aria-label','Switch to '+(m==='dark'?'light':'dark')+' mode');}
+  apply(mode);
+  btn.addEventListener('click',function(){apply(mode==='dark'?'light':'dark');});
+})();
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.task').forEach(function(t){
+    t.addEventListener('click',function(){t.classList.toggle('done');});
+  });
+  var lines=[
+    '“Up, Coffin. The others didn\u2019t make it. I\u2019m starving. Deal?”',
+    '“Look at you. Small steps, Coffin — thrones start as stairs. I\u2019m paying your dues.”',
+    '“YES. That fear? Feed me. Up. Take one of them and I\u2019ll give you thirty seconds of godhood.”',
+    '“Trade? Five years of sweetness — everything tastes like ash after — for sixty seconds at half-again strength. Deal, or keep bleeding?”',
+    '“[ ...... the Crossroads doesn\u2019t lie. It...... revises. ]”',
+    '“You\u2019re shaking. Good. Shaking means you\u2019re still spending. Move.”'
+  ];
+  var li=0, lineEl=document.getElementById('vestigeLine');
+  document.getElementById('nextLine').addEventListener('click',function(){
+    li=(li+1)%lines.length; lineEl.textContent=lines[li];
+  });
+  var sync=document.getElementById('sync'), fill=document.getElementById('syncFill'),
+      label=document.getElementById('syncLabel'), note=document.getElementById('syncNote');
+  var notes=[[25,'passenger. It watches. It waits. It is polite, which is the most frightening setting.'],
+    [55,'partner. It laughs at your jokes now. The veins reach the wrist. Hounds notice.'],
+    [80,'keeper. It finishes your sentences. The elbow is black. Mothers move children away.'],
+    [101,'unspeakable. Do not drag it here. Roll it back. Now.']];
+  function paint(){
+    var v=+sync.value; fill.style.width=v+'%'; label.textContent='SYNC '+v+'%';
+    for(var i=0;i<notes.length;i++){ if(v<notes[i][0]){ note.textContent=v+'% — '+notes[i][1]; break; } }
+  }
+  sync.addEventListener('input',paint); paint();
+  document.querySelectorAll('[data-clock]').forEach(function(clock){
+    var max=clock.querySelector('[data-count]').textContent==='8'?'8':'6';
+    var filled=+clock.querySelector('[data-count]').textContent;
+    var pips=clock.querySelector('.pips');
+    function draw(){
+      pips.innerHTML='';
+      for(var i=0;i<+max;i++){var p=document.createElement('span');p.className='pip'+(i<filled?' on':'');pips.appendChild(p);}
+      clock.querySelector('[data-count]').textContent=filled;
+    }
+    draw();
+    clock.querySelector('[data-tick]').addEventListener('click',function(){
+      if(filled<+max){filled++;draw();}
+      if(filled>=+max){clock.querySelector('.clock-note').textContent='CLOCK FULL — the world changes state. No take-backs.';}
+    });
+  });
+});
+</script>
+</body>
+</html>

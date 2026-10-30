@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NULLSPIRE: LEVEL ZERO — Progress Tracker</title>
+<meta name="description" content="Living progress tracker for NULLSPIRE: LEVEL ZERO — completed work, file manifest, known issues, next steps, decisions, session notes.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#141114;color:#ece4f0;line-height:1.65;max-width:1080px;margin:0 auto;padding:24px 22px 80px;-webkit-font-smoothing:antialiased}
+h1{font-size:clamp(26px,3.6vw,40px);margin:12px 0 6px}
+h1 .zero{color:#e5482f}
+h2{font-size:clamp(20px,2.4vw,27px);margin:48px 0 14px;padding-top:8px;border-top:3px solid #3a3235}
+h3{font-size:18px;margin:24px 0 8px;color:#e8a020}
+p,li{max-width:78ch}
+p{margin:0 0 10px}
+ul,ol{margin:0 0 12px 24px}
+li{margin-bottom:5px}
+a{color:#e8a020}
+code{font-family:'Courier New',monospace;font-size:.88em;color:#f4efe4}
+table{width:100%;border-collapse:collapse;margin:12px 0 18px;font-size:15px}
+th,td{text-align:left;padding:9px 12px;border:1px solid #3a3235;vertical-align:top}
+th{background:#1e1a1c;font-family:'Courier New',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#a89ab2}
+.meta{background:#1e1a1c;border:2px solid #3a3235;border-radius:10px;padding:14px 18px;margin:18px 0;font-size:15px}
+.bar-wrap{background:#1e1a1c;border:2px solid #3a3235;border-radius:999px;height:26px;overflow:hidden;margin:12px 0}
+.bar-fill{height:100%;width:12%;background:linear-gradient(90deg,#e8a020,#e5482f)}
+.done{color:#6daa45;font-weight:700}
+.open{color:#e8a020;font-weight:700}
+footer.doc{margin-top:56px;border-top:3px solid #3a3235;padding-top:16px;color:#a89ab2;font-size:14px}
+@media (max-width:640px){body{padding:16px 14px 60px}table{font-size:13.5px}}
+</style>
+</head>
+<body>
+<h1>NULLSPIRE: LEVEL ZERO <span class="zero">— Progress</span></h1>
+
+<div class="meta">
+<strong>Design bible:</strong> <a href="docs.html">docs.html (single source of truth)</a> |
+<strong>World site:</strong> <a href="index.html">pitch face</a> |
+<strong>Lore vault:</strong> <code>worlds/cinderfall/</code> |
+<strong>Last Updated:</strong> September 27, 2026
+</div>
+
+<h2>Overall Progress</h2>
+<div class="bar-wrap" role="img" aria-label="Phase 0 documentation about 90 percent complete"><div class="bar-fill"></div></div>
+<p><strong>Phase 0 Documentation ~90%.</strong> World, systems, beats, and docs suite exist. Remaining in Phase 0: echo roster (20), Warden accords. No game code yet — by decision, not delay.</p>
+
+<h2>Completed Work (Session: Sep 27, 2026)</h2>
+
+<h3>1. World bible (vault, Hybrid mode)</h3>
+<ul>
+<li>Cinderfall + Terminus, Gilt Bazaar, Spire Gate</li>
+<li>7 characters (Joss, VESTIGE, Wren, Beck, Sable, Rook, Voss)</li>
+<li>3 factions + 2 racing clocks (Table 2/8, Returned 2/6)</li>
+<li>Flux system, 2 quests, 3 creatures, First Breach Day, table rules</li>
+<li>Validator: 0 issues, 0 broken links</li>
+</ul>
+
+<h3>2. World site (pitch face)</h3>
+<ul>
+<li>7 sections, VESTIGE terminal, tickable clocks, checkable quests, light/dark toggle</li>
+<li>Serves 200, HTML parses clean</li>
+</ul>
+
+<h3>3. Beat sheets (manuscript, 19 files)</h3>
+<ul>
+<li>Ch.0 Floor Zero (5 scenes) · Ch.1 Muster (5) · Ch.2 Sigil Game (6)</li>
+<li>Clock math tracked: both factions 2 → 4 across the act</li>
+</ul>
+
+<h3>4. Skills imported</h3>
+<ul>
+<li>worldbuilding-obsidian (vault tooling) + 17 Scenario game-art skills (art on demand; nothing generated, nothing spent)</li>
+</ul>
+
+<h3>5. Documentation suite (this phase)</h3>
+<ul>
+<li>docs.html (15 sections) + progress.html (this file), modeled on Neon-Lights</li>
+</ul>
+
+<h3>6. Concept board (SVG, drawn in code)</h3>
+<ul>
+<li>concepts.html: 9 character concepts, 3 run plans, 3 building elevations — palette-locked, grain filter, model notes per card</li>
+<li>concepts.html v2: silhouettes replaced with shaded pixel-art portraits rasterized live from map data (engine-compatible format)</li>
+</ul>
+
+<h2>File Manifest</h2>
+<table>
+<tr><th>Path</th><th>What</th><th>Status</th></tr>
+<tr><td><code>worlds/cinderfall/</code> (28 notes)</td><td>Lore vault — canon source</td><td class="done">Complete (validator clean)</td></tr>
+<tr><td><code>nullspire-world/index.html</code></td><td>World site — pitch face</td><td class="done">Live locally</td></tr>
+<tr><td><code>nullspire-world/docs.html</code></td><td>Technical design doc — dev source of truth</td><td class="done">v0.1-docs</td></tr>
+<tr><td><code>nullspire-world/progress.html</code></td><td>This tracker</td><td class="done">Seeded</td></tr>
+<tr><td><code>worlds/cinderfall/11_Manuscript/</code> (19 files)</td><td>Beat sheets Ch.0–2</td><td class="done">Beats locked, prose open</td></tr>
+<tr><td><code>vestige-game-bible.md</code></td><td>Early drafts v0.1–v0.3</td><td class="done">Archived</td></tr>
+<tr><td><code>nullspire-world/concepts.html</code></td><td>Concept board — pixel portraits, run plans, elevations</td><td class="done">v2 (portraits live)</td></tr>
+<tr><td><code>nullspire/src/</code> (game code)</td><td>Piece 1: iso rig, Hold shell, walkable Joss — preview :3100</td><td class="done">Scaffold + foundation live</td></tr>
+</table>
+
+<h2>Known Issues / Remaining Work</h2>
+<h3><span class="open">High Priority</span></h3>
+<ul>
+<li>Echo roster (20) with loyalty questlines — blocks §7.3 implementation + Phase 1 content</li>
+<li>Warden accord terms (7 Wardens) — blocks §5.2 Up-floors + Phase 2</li>
+<li>First playable slice undefined at code level (Floor 0 combat feel, BIND moment)</li>
+</ul>
+<h3>Medium Priority</h3>
+<ul>
+<li>Reference laptop for perf floor (§13.2) not chosen</li>
+<li>Scenario art: zero assets generated; style lock untested (first targets: Spire hero, Joss + Rook portraits)</li>
+<li>Analytics beacon design (§12.3) open</li>
+</ul>
+<h3>Low Priority / Phase 2+</h3>
+<ul>
+<li>Physics needs (cannon-es TBD — runs may not need rigid bodies)</li>
+<li>Mobile touch pass, gamepad mapping</li>
+<li>NG+ design, seasonal events</li>
+</ul>
+
+<h2>Next Steps (Recommended Order)</h2>
+<ol>
+<li>Echo roster (20) — unblocks companions, loyalty, Phase 1 fights</li>
+<li>Warden accords — unblocks Up-floors + Phase 2 scope</li>
+<li>Scenario style-lock test batch (hero + 2 portraits, <code>dry_run</code> first)</li>
+<li>Scaffold <code>src/</code> per docs §3 + playable Floor 0 slice (§15.2)</li>
+<li>Draft one scene fully (nominee: Ch.0 S4 Six Seconds) to lock voice</li>
+</ol>
+
+<h2>Architecture Decisions Log</h2>
+<table>
+<tr><th>Date</th><th>Decision</th><th>Rationale</th></tr>
+<tr><td>Sep 27</td><td>Vault = lore canon; docs.html = dev truth; site = pitch face</td><td>Three audiences (writers, coders, newcomers) need three doors, one key each</td></tr>
+<tr><td>Sep 27</td><td>Stack mirrors Neon-Lights (Vite + Three.js + Vitest + ESLint)</td><td>Team-known tools; docs/code map 1:1 with a shipped project</td></tr>
+<tr><td>Sep 27</td><td>Systems as singletons, content as data packs</td><td>77 floors must be data, not code branches</td></tr>
+<tr><td>Sep 27</td><td>CR-only landing to main (session branches, no self-merge)</td><td>Review contract; matches platform mandate</td></tr>
+<tr><td>Sep 27</td><td>No game code in Phase 0</td><td>Design debt is cheaper than code debt; docs first</td></tr>
+<tr><td>Sep 27</td><td>All names invented; VESTIGE speaks original street cant</td><td>Sci-fi must read placeless; voice carries the street, not the nouns</td></tr>
+</table>
+
+<h2>Session Notes</h2>
+<h3>Sep 27, 2026 — Full documentation suite session</h3>
+<ul>
+<li>Studied Neon-Lights (docs.html 15 sections + progress.html + mirrored src/) and adapted the system wholesale.</li>
+<li>Wrote docs.html v0.1-docs and seeded this tracker. Open TODOs carried honestly in the docs footer.</li>
+<li>Validator still clean; no vault changes this session (docs-only).</li>
+</ul>
+
+<footer class="doc">
+<strong>Tracker version:</strong> seeded Sep 27, 2026 |
+<strong>Next update:</strong> when echo roster lands.
+Design bible: <a href="docs.html">docs.html</a> · World site: <a href="index.html">index</a>
+</footer>
+</body>
+</html>

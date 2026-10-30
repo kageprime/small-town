@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NULLSPIRE: LEVEL ZERO — Technical Design Documentation</title>
+<meta name="description" content="Single source of truth for NULLSPIRE: LEVEL ZERO development — vision, architecture, file structure, conventions, world, player, echoes, runs, art, audio, testing, deployment, roadmap.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#141114;color:#ece4f0;line-height:1.65;max-width:1080px;margin:0 auto;padding:24px 22px 80px;-webkit-font-smoothing:antialiased}
+h1{font-size:clamp(28px,4vw,44px);line-height:1.1;margin:12px 0 16px;letter-spacing:-.01em}
+h1 .zero{color:#e5482f}
+h2{font-size:clamp(22px,2.6vw,30px);margin:56px 0 16px;padding-top:8px;border-top:3px solid #3a3235}
+h3{font-size:19px;margin:28px 0 10px;color:#e8a020}
+h4{font-size:16px;margin:18px 0 8px}
+p,li{max-width:78ch}
+p{margin:0 0 12px}
+ul,ol{margin:0 0 14px 24px}
+li{margin-bottom:6px}
+a{color:#e8a020}
+table{width:100%;border-collapse:collapse;margin:14px 0 20px;font-size:15px}
+th,td{text-align:left;padding:10px 12px;border:1px solid #3a3235;vertical-align:top}
+th{background:#1e1a1c;font-family:'Courier New',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#a89ab2}
+td code,li code,p code,pre code{font-family:'Courier New',monospace;font-size:.88em}
+pre{background:#0c0a0b;border:2px solid #3a3235;border-radius:10px;padding:16px 18px;overflow-x:auto;margin:14px 0 20px;font-size:13.5px;line-height:1.55}
+code{color:#f4efe4}
+.version-badge{display:inline-block;font-size:13px;font-family:'Courier New',monospace;background:#e5482f;color:#fff;border-radius:6px;padding:3px 10px;vertical-align:middle;letter-spacing:.06em}
+.meta{background:#1e1a1c;border:2px solid #3a3235;border-radius:10px;padding:14px 18px;margin:18px 0;font-size:15px}
+.meta a{font-weight:700}
+.warning{background:#2a1210;border:2px solid #e5482f;border-radius:10px;padding:14px 18px;margin:18px 0}
+.success{background:#12240f;border:2px solid #6daa45;border-radius:10px;padding:14px 18px;margin:18px 0}
+.todo{background:#241d08;border:2px dashed #e8a020;border-radius:10px;padding:14px 18px;margin:18px 0}
+.toc{background:#1e1a1c;border:2px solid #3a3235;border-radius:10px;padding:18px 22px;margin:22px 0}
+.toc h3{margin:0 0 10px;color:#ece4f0}
+.toc ul{margin:0;list-style:none;padding:0;display:grid;gap:6px}
+.toc a{color:#a89ab2;text-decoration:none;font-weight:600}
+.toc a:hover{color:#e8a020}
+.section-number{display:inline-grid;place-items:center;width:34px;height:34px;background:#e5482f;color:#fff;border-radius:8px;font-size:17px;margin-right:10px}
+footer.doc{margin-top:64px;border-top:3px solid #3a3235;padding-top:18px;color:#a89ab2;font-size:14px}
+.priority-high{color:#ff6b9d;font-weight:700}
+.priority-medium{color:#e8a020;font-weight:700}
+.priority-low{color:#6daa45;font-weight:700}
+@media (max-width:640px){body{padding:16px 14px 60px}table{font-size:13.5px}}
+</style>
+</head>
+<body>
+<h1>NULLSPIRE: LEVEL ZERO <span class="version-badge">v0.1-docs</span></h1>
+
+<div class="meta">
+<strong>Project Type:</strong> Browser-based roguelike RPG (Solo-Leveling × Tower-of-God) |
+<strong>Engine:</strong> Three.js (WebGL), Vite |
+<strong>Style:</strong> Dark stylized + street-faith |
+<strong>Initial Scale:</strong> Act 1 — Floors 0–2 |
+<strong>Last Updated:</strong> September 27, 2026<br>
+<strong>Progress Tracker:</strong> <a href="progress.html">View Current Progress &rarr;</a> |
+<strong>World Bible (pitch face):</strong> <a href="index.html">World Site &rarr;</a> |
+<strong>Lore source of truth:</strong> <code>worlds/cinderfall/</code> vault (Obsidian)
+</div>
+
+<div class="warning">
+<strong>This document is the single source of truth for all development on this project.</strong>
+All code changes, asset creation, and design decisions must align with the specifications outlined here.
+Lore canon lives in the <code>worlds/cinderfall/</code> vault — this file specifies how that lore becomes a shippable game.
+Updates to this document require team discussion.
+</div>
+
+<div class="success">
+<strong>Implementation Status:</strong> Phase 0 Documentation ~90% Complete<br><br>
+<strong>Done:</strong> World vault (28 notes, validator clean), world site (7 sections, interactive), 19 beat-sheet files (Ch.0–2, 16 scenes), Scenario art skill set imported, tech stack + file structure + conventions specified here<br><br>
+<strong>Remaining:</strong> Echo roster (20), Warden accords, art direction assets, first playable slice (Floor 0 tutorial fight + BIND)<br><br>
+<a href="progress.html">View Full Progress Tracker &rarr;</a>
+</div>
+
+<div class="toc">
+<h3>Table of Contents</h3>
+<ul>
+<li><a href="#vision">1. Project Vision &amp; Core Concept</a></li>
+<li><a href="#architecture">2. Technical Architecture</a></li>
+<li><a href="#structure">3. Project File Structure</a></li>
+<li><a href="#conventions">4. Development Conventions &amp; Standards</a></li>
+<li><a href="#world">5. World Design: Cinderfall &amp; the Nullspire</a></li>
+<li><a href="#player">6. Player Character System</a></li>
+<li><a href="#echoes">7. NPC &amp; Echo System</a></li>
+<li><a href="#runs">8. Run Modules</a></li>
+<li><a href="#run-specs">9. Runs 1–3: Floor Zero, Muster, Sigil Game</a></li>
+<li><a href="#art">10. Art Style &amp; Asset Guidelines</a></li>
+<li><a href="#audio">11. Audio Design</a></li>
+<li><a href="#expansion">12. Expansion Roadmap</a></li>
+<li><a href="#testing">13. Testing &amp; QA Procedures</a></li>
+<li><a href="#deployment">14. Build &amp; Deployment</a></li>
+<li><a href="#roadmap">15. Development Roadmap</a></li>
+</ul>
+</div>
+
+<h2 id="vision"><span class="section-number">1</span> Project Vision &amp; Core Concept</h2>
+
+<h3>1.1 The Big Idea</h3>
+<p><strong>NULLSPIRE: LEVEL ZERO</strong> is a browser-based roguelike RPG. Ten years after a black mountain outside the fictional city of Cinderfall lit up from inside, 77 floors wait within it. You are <strong>Joss Vane</strong>, 19, an E-rank porter nicknamed Coffin — every team he carries for loses someone, except him. After his team dies in a double splinter, a sentient parasite called <strong>VESTIGE</strong> moves into his skull and offers him what no climber gets: <strong>levels</strong>. Infinite growth, negotiated prices, and an army of bound dead.</p>
+
+<h3>1.2 Core Pillars</h3>
+<ul>
+<li><strong>Numbers climb, story costs:</strong> roguelike loop — death takes loot + one memory + one echo rank, never levels. Power always, safety never.</li>
+<li><strong>Every power is priced:</strong> HP, Rot, loyalty, memories. No free scaling — the genre contract with the player.</li>
+<li><strong>Optimal vs quiet:</strong> the strongest play and the safest cover are mutually exclusive. The game forces the choice, prices both.</li>
+<li><strong>Two clocks race:</strong> the Gilded Table hunts Joss (2/8), the Returned harvest him (2/6). Growth advances both. Attention accelerates both.</li>
+<li><strong>Extensibility:</strong> floors are data (RunBase + floor packs); echoes are data (roster + loyalty); Wardens are data (accord terms). Act 1 is three runs; the machine runs seventy-seven.</li>
+</ul>
+
+<h3>1.3 Target Audience</h3>
+<ul>
+<li>Fans of Solo Leveling / Tower of God power-fantasy progression</li>
+<li>Roguelike players who want meta-progression with narrative teeth</li>
+<li>Browser-first players: no install, runs on mid-range hardware</li>
+<li>Age rating: T (violence, body horror veins, grief — no gore porn)</li>
+</ul>
+
+<h3>1.4 Platform Requirements</h3>
+<table>
+<tr><th>Requirement</th><th>Specification</th></tr>
+<tr><td>Minimum Browser</td><td>Chrome 90+, Firefox 88+, Safari 14+, Edge 90+</td></tr>
+<tr><td>WebGL Version</td><td>WebGL 2.0 (fallback: reduced-effects 2D canvas mode for Act 1 prototype)</td></tr>
+<tr><td>Target FPS</td><td>60fps desktop, 30fps minimum mobile</td></tr>
+<tr><td>Screen Support</td><td>Responsive: 1920×1080 down to 375×667 (mobile)</td></tr>
+<tr><td>Input Methods</td><td>Keyboard + Mouse (primary), Touch (secondary), Gamepad (future)</td></tr>
+</table>
+
+<h2 id="architecture"><span class="section-number">2</span> Technical Architecture</h2>
+
+<h3>2.1 Technology Stack</h3>
+<table>
+<tr><th>Layer</th><th>Choice</th><th>Why</th></tr>
+<tr><td>Build</td><td>Vite 5+</td><td>Same pipeline as Neon-Lights; instant dev, trivial static deploy</td></tr>
+<tr><td>3D</td><td>Three.js (WebGL)</td><td>Team-known; Spire interiors + Cinderfall hub in stylized low-poly</td></tr>
+<tr><td>Audio</td><td>Howler.js</td><td>Team-known; heartbeat/drum layering, positional gala audio</td></tr>
+<tr><td>Tests</td><td>Vitest</td><td>Systems are pure logic (clocks, BIND odds, economy) — highly testable</td></tr>
+<tr><td>Lint</td><td>ESLint</td><td>Same config family as Neon-Lights</td></tr>
+<tr><td>Art pipeline</td><td>Scenario MCP (imported skill set)</td><td>Sprites, tilesets, portraits, skyboxes; <code>dry_run</code> pricing before every batch</td></tr>
+<tr><td>Node</td><td>&ge;18.0.0</td><td>Matches Neon-Lights engines field</td></tr>
+</table>
+
+<h3>2.2 High-Level Architecture</h3>
+<ul>
+<li><strong>Boot → GameController:</strong> loads config, save (localStorage/IndexedDB), quality preset, then routes to Hub (Terminus Hold) or Run.</li>
+<li><strong>Two modes, one codebase:</strong> <em>Hub mode</em> (Den management: sell, heal echoes, dialogue, Daily Pact, choose run) and <em>Run mode</em> (procedural floor: 3 shuffled zones + 1 fixed story room + VESTIGE twist + boss/extraction).</li>
+<li><strong>Systems are singletons, content is data:</strong> <code>FluxEngine</code>, <code>VestigeSystem</code>, <code>ClockEngine</code>, <code>BindSystem</code> never hardcode floors — floors, echoes, accords load from data packs (mirrors vault structure).</li>
+<li><strong>EventBus pub/sub</strong> for decoupled communication (same pattern as Neon-Lights): clocks subscribe to growth events; UI subscribes to sync/rot; audio subscribes to combat states.</li>
+</ul>
+
+<h3>2.3 Module System</h3>
+<table>
+<tr><th>Module</th><th>Owns</th><th>Key classes (planned)</th></tr>
+<tr><td>core/</td><td>Orchestration, state, cross-cutting systems</td><td>GameController, RunManager, FluxEngine, VestigeSystem, ClockEngine, BindSystem, SaveManager, EventBus, InputManager, Renderer, AssetLoader</td></tr>
+<tr><td>world/</td><td>Places</td><td>CinderfallHub, TerminusHold, SpireFloor (procedural composer), GalaHall, SpireGate, Environment, Lighting</td></tr>
+<tr><td>entities/</td><td>Actors</td><td>Player (Joss), Echo + EchoManager, Beast (Pall/Returnling/Truhound), NPC, NPCManager, Interactable</td></tr>
+<tr><td>runs/</td><td>Playable floor packs (Neon-Lights venues+games merged)</td><td>RunBase, FloorZeroRun, MusterRun, SigilRun, HUD per run, run assets/</td></tr>
+<tr><td>ui/</td><td>Screens</td><td>UIManager, MainMenu, PauseMenu, RunHUD, VestigeTerminal, SyncMeter, ClockTracker, Dialog</td></tr>
+<tr><td>constants/</td><td>Tuning</td><td>Config, Ranks, Colors, Keys, Economy, Odds (BIND 73%, etc.)</td></tr>
+<tr><td>utils/</td><td>Helpers</td><td>MathUtils, Noise (procedural floors), Storage, Logger, Seed (run RNG)</td></tr>
+</table>
+
+<h2 id="structure"><span class="section-number">3</span> Project File Structure</h2>
+
+<h3>3.1 Directory Structure</h3>
+<pre><code>nullspire-level-zero/
+├── nullspire-world/
+│   ├── index.html      # World bible site (pitch face)
+│   ├── docs.html       # This file (technical source of truth)
+│   └── progress.html   # Living tracker
+├── worlds/cinderfall/  # Lore vault (Obsidian) — canon source
+├── src/
+│   ├── main.js                    # Entry point, initializes GameController
+│   ├── core/
+│   │   ├── GameController.js      # Central orchestrator, Hub/Run state machine
+│   │   ├── RunManager.js          # Run lifecycle: shuffle, twist, boss, extraction
+│   │   ├── FluxEngine.js          # Flux density, shaping costs, Accord checks
+│   │   ├── VestigeSystem.js       # Levels, Pacts, Whispers, shop, Sync/Rot
+│   │   ├── ClockEngine.js         # Faction clocks subscribe to growth events
+│   │   ├── BindSystem.js          # 73% offers, loyalty, refusal, scream-fail
+│   │   ├── SaveManager.js         # Meta-progression, memories eaten log
+│   │   ├── EventBus.js            # Pub/sub for decoupled communication
+│   │   ├── InputManager.js        # Keyboard, mouse, touch abstraction
+│   │   ├── Renderer.js            # WebGL renderer + post (vein vignette by Sync)
+│   │   └── AssetLoader.js         # GLTF, texture, audio loading
+│   ├── world/
+│   │   ├── CinderfallHub.js       # Terminus/Hold/Bazaar/Gate composition
+│   │   ├── SpireFloor.js          # Procedural floor composer (3 zones + story room)
+│   │   ├── GalaHall.js            # Floor 2 fixed room
+│   │   ├── Environment.js         # Dust, black water, storm flicker
+│   │   └── Lighting.js            # Floodlights, gala strings, VESTIGE red wash
+│   ├── entities/
+│   │   ├── Player.js              # Joss avatar + stats/Sync/Rot state
+│   │   ├── PlayerController.js    # Input → movement + techniques
+│   │   ├── Echo.js                # Bound echo base class
+│   │   ├── EchoManager.js         # Gang slots, loyalty, refusal, rank-down
+│   │   ├── Beast.js               # Pall / Returnling / Truhound base
+│   │   ├── NPC.js                 # Hub NPC base class
+│   │   ├── NPCManager.js          # Spawns, schedules, Hub dialogue states
+│   │   └── Interactable.js        # Shrines, loot, doors, bells
+│   ├── runs/
+│   │   ├── RunBase.js             # Abstract run: zones, twist, boss, extraction
+│   │   ├── floor-zero/            # Tutorial: bloom, choice, deal, first BIND
+│   │   ├── muster/                # 3-day survival, writ economy, quiet-play scoring
+│   │   ├── sigil-game/            # Bells, betrayal rounds, rematch, sieve
+│   │   └── [FutureRuns]/          # Directory per future floor pack
+│   ├── ui/
+│   │   ├── UIManager.js           # All screens
+│   │   ├── MainMenu.js            # Title, continue, codex
+│   │   ├── PauseMenu.js           # Pause overlay
+│   │   ├── RunHUD.js              # HP/Rot/sync/echo slots/soul-sand
+│   │   ├── VestigeTerminal.js     # Dialogue box, Whisper offers, shop
+│   │   ├── SyncMeter.js           # Vein vignette + thresholds 40/70/90
+│   │   ├── ClockTracker.js        # Table 2/8 vs Returned 2/6 display
+│   │   └── Dialog.js              # Hub conversations
+│   ├── utils/
+│   │   ├── MathUtils.js           # Vector math helpers
+│   │   ├── Noise.js               # Simplex noise for procedural floors
+│   │   ├── Seed.js                # Seeded RNG per run (replayable dailies)
+│   │   ├── Storage.js             # localStorage/IndexedDB wrapper
+│   │   └── Logger.js              # Debug logging utility
+│   └── constants/
+│       ├── Config.js              # Global tuning values
+│       ├── Ranks.js               # E–S ladder, Ø handling
+│       ├── Economy.js             # Scrip, soul-sand, writ prices
+│       ├── Odds.js                # BIND 73%, scream-fail, Whisper tables
+│       ├── Colors.js              # Ink/blood/gold/chalk palette
+│       └── Keys.js                # Input key mappings
+├── assets/
+│   ├── models/  (characters/ beasts/ architecture/ props/)
+│   ├── textures/ (spire/ terminus/ gala/ ui/)
+│   ├── audio/  (music/ sfx/ voice-stingers/)
+│   └── fonts/
+├── shaders/  (vertex/ fragment — vein vignette, flux shimmer, bell-ring)
+├── styles/
+│   └── main.css
+├── index.html                     # Game entry (distinct from world site)
+├── vite.config.js
+├── package.json
+└── .gitignore</code></pre>
+
+<h3>3.2 File Naming Conventions</h3>
+<table>
+<tr><th>Type</th><th>Convention</th><th>Example</th></tr>
+<tr><td>JavaScript Classes</td><td>PascalCase</td><td><code>VestigeSystem.js</code></td></tr>
+<tr><td>JavaScript Functions</td><td>camelCase</td><td><code>rollBind.js</code></td></tr>
+<tr><td>Constants</td><td>UPPER_SNAKE_CASE</td><td><code>BIND_BASE_ODDS</code></td></tr>
+<tr><td>CSS Classes</td><td>kebab-case</td><td><code>sync-meter</code></td></tr>
+<tr><td>3D Models</td><td>kebab-case</td><td><code>joss-porter.glb</code></td></tr>
+<tr><td>Textures</td><td>kebab-case + suffix</td><td><code>spire-wall-albedo.png</code></td></tr>
+<tr><td>Audio</td><td>kebab-case</td><td><code>vestige-chuckle.mp3</code></td></tr>
+<tr><td>Vault notes</td><td>Title Case, wikilinks</td><td><code>Joss Vane.md</code> → <code>[[Joss Vane]]</code></td></tr>
+</table>
+
+<h2 id="conventions"><span class="section-number">4</span> Development Conventions &amp; Standards</h2>
+
+<h3>4.1 Code Style</h3>
+<ul>
+<li>ESLint (Neon-Lights family config); semicolons, single quotes, 100-col soft limit.</li>
+<li>Classes own state; systems own orchestration; content lives in data packs, never in logic files.</li>
+<li>Every tunable number lives in <code>constants/</code> with a comment citing its design source (e.g. <code>// BIND 73% — Table Rules vault note</code>).</li>
+<li>No magic strings for lore names in code — import from a generated <code>LoreNames.js</code> if needed.</li>
+</ul>
+
+<h3>4.2 Class Structure</h3>
+<ul>
+<li>One class per file, file name = class name. Constructor takes a deps object <code>{ bus, config, rng }</code> — no globals, no singletons-by-import (GameController wires).</li>
+<li>Systems expose <code>update(dt)</code> + <code>serialize()/restore()</code> (save support from day one — roguelike meta-progression depends on it).</li>
+<li>Events over direct calls across modules: <code>bus.emit('growth:level', …)</code> feeds ClockEngine, UI, audio. Direct calls only within a module.</li>
+</ul>
+
+<h3>4.3 Memory Management</h3>
+<ul>
+<li>Dispose Three.js geometries/materials on run exit (RunManager owns teardown checklist).</li>
+<li>Object pools for projectiles, damage numbers, echo summons. No per-frame allocation in hot loops.</li>
+<li>AssetLoader ref-counts shared assets (Pall cloth, truhound) across runs.</li>
+</ul>
+
+<h3>4.4 Performance Rules</h3>
+<ul>
+<li>60fps desktop / 30fps mobile minimum; quality presets LOW/MEDIUM/HIGH + auto-detect (same approach as Neon-Lights).</li>
+<li>Run-time procedural generation budgeted: floor compose &lt; 300ms (show a masked transition, never a hitch).</li>
+<li>Draw-call budget per run zone: &lt; 150 (LOW), &lt; 300 (HIGH). Texture budget: &lt; 256MB.</li>
+</ul>
+
+<h3>4.5 Git Workflow</h3>
+<table>
+<tr><th>Branch</th><th>Purpose</th><th>Rules</th></tr>
+<tr><td><code>main</code></td><td>Shippable, reviewed</td><td>Only via change request (CR) — never push directly; sessions land work with <code>kortix cr open</code></td></tr>
+<tr><td><code>session-&lt;id&gt;</code></td><td>Agent session work</td><td>Ephemeral; commit small + working; push, open CR, never self-merge</td></tr>
+<tr><td><code>feature/*</code></td><td>Human/local features</td><td>Branch from main, land via CR with review</td></tr>
+<tr><td><code>bugfix/*</code></td><td>Bug fixes</td><td>Same as feature; link the QA checklist item</td></tr>
+</table>
+
+<h3>4.6 Commit Message Format</h3>
+<pre><code>&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt;
+
+&lt;body&gt;
+
+&lt;footer&gt;</code></pre>
+<p><strong>Types:</strong> <code>feat</code>, <code>fix</code>, <code>docs</code>, <code>style</code>, <code>refactor</code>, <code>perf</code>, <code>test</code>, <code>chore</code></p>
+<p><strong>Scopes:</strong> <code>world</code>, <code>player</code>, <code>echo</code>, <code>beast</code>, <code>vestige</code>, <code>run</code>, <code>floor-zero</code>, <code>muster</code>, <code>sigil</code>, <code>ui</code>, <code>assets</code>, <code>core</code>, <code>vault</code></p>
+<p><strong>Example:</strong> <code>feat(bind): add 73% offer flow with scream-fail buff</code></p>
+
+<h2 id="world"><span class="section-number">5</span> World Design: Cinderfall &amp; the Nullspire</h2>
+
+<h3>5.1 Overview</h3>
+<p>A capital that moved twice and never finished moving, twelve kilometers from a black mountain with 77 floors inside. Canon: <code>worlds/cinderfall/02_Locations/</code>. The Spire reads top-down as: <strong>Down</strong> (0–15, hustle: mazes, markets, unfinished shells), <strong>Middle</strong> (16–50, estates, guild plazas, forge towns), <strong>Up</strong> (51–77, white deserts, sky seas — flux thick as water).</p>
+
+<h3>5.2 Spire Structure</h3>
+<pre><code>Floor 77 — Locked Crown (Sovereign. No ascent past this.)
+  ...
+Floor 51–77 — UP: heavy flux, god-floors, Accords mandatory to breathe
+Floor 33 — Storm of Names (Pall approach march)
+Floor 21 — Flooded Gala (Water Warden) [future]
+Floor 19 — Rook's beat
+Floor 12 — Forge Town / Workshop [future]
+Floor 7 — Storm Market (Thunder Warden) [future]
+Floor 4 — Bazaar mirror [future]
+Floor 2 — Sigil Game (RUN 3, this act)
+Floor 1 — Muster maze-ward (RUN 2, this act)
+Floor 0 — Root / sealed weld (RUN 1 tutorial, this act)</code></pre>
+
+<h3>5.3 Key Locations</h3>
+<table>
+<tr><th>Location</th><th>Role</th><th>Game function</th></tr>
+<tr><td>The Terminus / Hold</td><td>Hub</td><td>Meta-progression: sell, heal echoes, dialogue, Pact, run select</td></tr>
+<tr><td>Sable's Container</td><td>Clinic</td><td>Sync upgrades, Rot washing (paid), wound care</td></tr>
+<tr><td>The Gilt Bazaar</td><td>Market</td><td>Appraisal, living salvage (4th floor), Fiat Field safe zone</td></tr>
+<tr><td>The Spire Gate</td><td>Staging</td><td>Muster intake, return board, writ checks</td></tr>
+<tr><td>Floor rooms</td><td>Runs</td><td>Procedural zones + fixed story rooms (see §9)</td></tr>
+</table>
+
+<h3>5.4 Environment Details</h3>
+<ul>
+<li>Terminus: diesel, roast corn, tarps, tout loudspeakers, generator hum in a known key.</li>
+<li>Spire interior: cold wind off stone, dust that hangs before blooms, black water seep in deep floors, gala strings on Floor 2.</li>
+<li>VESTIGE red wash + vein vignette scale with Sync (Renderer post-effect, §6.4).</li>
+<li>Crossing shrines (lamp oil, tyre, bottle) — interactables that grant micro-Accords.</li>
+</ul>
+
+<h3>5.5 Performance Budget</h3>
+<table>
+<tr><th>Budget</th><th>Target</th></tr>
+<tr><td>Hub scene draw calls</td><td>&lt; 200 (HIGH), &lt; 100 (LOW)</td></tr>
+<tr><td>Run zone draw calls</td><td>&lt; 300 (HIGH), &lt; 150 (LOW)</td></tr>
+<tr><td>Texture memory</td><td>&lt; 256MB</td></tr>
+<tr><td>Floor compose time</td><td>&lt; 300ms behind transition mask</td></tr>
+<tr><td>Echoes active</td><td>Max 3 early (perf + design agree)</td></tr>
+</table>
+
+<h2 id="player"><span class="section-number">6</span> Player Character System</h2>
+
+<h3>6.1 Character Design</h3>
+<p>Joss Vane, 19, E-rank porter. Thin, scar-split lip, oversized cutlass, boots he sleeps in. Reads E-rank/11/flat on every scan (VESTIGE eats the overflow). Canon: <code>01_Characters/Joss Vane.md</code>. Stats: STR/VIT/AGI/INT/WILL/SENSE; +3 points per level; VESTIGE comments on builds.</p>
+
+<h3>6.2 Controls</h3>
+<table>
+<tr><th>Mode</th><th>Move</th><th>Primary</th><th>Special</th><th>System</th></tr>
+<tr><td>Hub</td><td>WASD / left stick / tap</td><td>E / tap — talk, buy, rest</td><td>—</td><td>Esc pause, J journal/clocks</td></tr>
+<tr><td>Run</td><td>WASD / stick</td><td>Click / tap — cutlass chain</td><td>1–5 techniques (Gapstep, Bloodwage, Crosspull, Call the Bound, Red Second)</td><td>Q Whisper log, Tab echo orders, Esc pause</td></tr>
+</table>
+
+<h3>6.3 Camera System</h3>
+<ul>
+<li>Hub: soft-follow third person, shoulder height, terminal crowds part around the player.</li>
+<li>Run: pulled-back tactical third person; Red Second adds FOV punch + desaturation (3s).</li>
+<li>Mobile: dynamic zoom-out at low HP (readability over cinema).</li>
+</ul>
+
+<h3>6.4 Player State</h3>
+<ul>
+<li><strong>Sync/Rot 0–100:</strong> power + control + vein coverage + NPC fear checks. Chaplain mechanics only way down. Endings branch at 40/70/90. Renderer vein-vignette intensity = Sync.</li>
+<li><strong>Death:</strong> revive via parasite; lose run loot + 1 memory (edited, never random) + 1 echo rank-down. Keep levels/XP. SaveManager logs eaten memories (the player can read what was taken — cruelty with UI).</li>
+<li><strong>Daily Pact:</strong> midnight objectives; fail → 4h Penalty Drift preview (playable later; vision-shown in Act 1).</li>
+</ul>
+
+<h2 id="echoes"><span class="section-number">7</span> NPC &amp; Echo System</h2>
+
+<h3>7.1 Overview</h3>
+<p>Two populations: the living (Hub NPCs with schedules + dialogue states) and the Bound (combat echoes with loyalty FSM). Both run through NPCManager/EchoManager. Canon: <code>01_Characters/</code>, Table Rules.</p>
+
+<h3>7.2 Cast Design</h3>
+<table>
+<tr><th>NPC</th><th>Hub role</th><th>System hook</th></tr>
+<tr><td>Old Beck</td><td>Contracts, cover</td><td>Forged writs, two books (audit events)</td></tr>
+<tr><td>Doc Sable</td><td>Upgrades, wounds</td><td>Sync injections, Rot washing, fridge questline</td></tr>
+<tr><td>Wren Vane</td><td>Phone calls, drawings</td><td>Bill tracker, drawing-prophecy reveals</td></tr>
+<tr><td>Rook</td><td colspan="2">Rival — scripted duels (40s loss → rematch), unfiled-report arc flags</td></tr>
+<tr><td>Auditor Voss</td><td colspan="2">Antagonist — screening events, private-file meter (player-visible dread, never the contents)</td></tr>
+</table>
+
+<h3>7.3 Echo Behaviors (Bound FSM)</h3>
+<ul>
+<li>States: <code>IDLE / FOLLOW / HOLD-DOOR / FIGHT / REFUSE / MOURN</code> (MOURN plays when loyalty drops — the echo relives its death mid-run).</li>
+<li>Loyalty 0–100 per echo: rises on soul-sand feeding + kept promises; falls on suicidal orders + ignored refusal. Below 30: REFUSE available. At 0: the echo petitions release (a scene, not a stat).</li>
+<li>Bram (tutorial echo): tank, dry knee jokes, refuses to leave Joss's side even at low loyalty (founding-member exception — documented, not favoritism).</li>
+</ul>
+
+<h3>7.4 Truhound Tells</h3>
+<ul>
+<li>Ears up/folded = truth/lie, readable at distance. Barks (double-clipped) whenever VESTIGE speaks — including in the player's own dialogue box. Never explained in dialogue. Tutorialize by placement: one asleep in every lying scene.</li>
+</ul>
+
+<h3>7.5 NPC Interactions</h3>
+<ul>
+<li>Hub: talk/buy/rest/ask (ask unlocks codex + quest hooks; asking Beck about the files advances his secret meter).</li>
+<li>Runs: echoes take orders via Tab radial (Follow / Hold / Strike / Release-request). Orders against an echo's nature cost loyalty visibly.</li>
+</ul>
+
+<h3>7.6 VESTIGE Dialogue System</h3>
+<ul>
+<li>Voice: street cant, theatrical, intimate. Line pools per state: wake, level, near-death, deal, lie-glitch, bored, delighted, hungry. (Canon lines in <code>01_Characters/VESTIGE.md</code>.)</li>
+<li>Whisper economy: small prices first (dealer pricing), WILL-gated refusal, escalation per run. Every offer logged (Q) — the log is admissible evidence to the player that the System keeps score.</li>
+<li>Lie-glitch rendering: text stutter effect in VestigeTerminal + truhound bark. The game tells the truth about lying.</li>
+</ul>
+
+<h2 id="runs"><span class="section-number">8</span> Run Modules</h2>
+
+<h3>8.1 RunBase Class</h3>
+<ul>
+<li>Lifecycle: <code>compose(seed) → breach → zones[3 procedural + 1 story] → twist (VESTIGE) → boss → bind/banish → extract-or-push (Red Door) → settle (loot/tithe/clocks)</code>.</li>
+<li>Seeded RNG per run (replayable dailies + debug seeds). Red Door = double rewards + echo true-death risk.</li>
+<li>Run length target: 12–25 min. Compose budget §5.5.</li>
+</ul>
+
+<h3>8.2 Floor &amp; Test System</h3>
+<ul>
+<li>Floors are data packs: <code>runs/&lt;floor&gt;/floor.json</code> (zones, tables, story room ref, boss ref, test rules, writ reward).</li>
+<li>Tests are rule overlays (Muster: 200/100/3-days; Sigil: bells + doubling rule). Test logic lives in the pack, adjudicated by RunManager.</li>
+<li>Cleared floors stay cleared (persistent flags); attempts re-shuffle (roguelike).</li>
+</ul>
+
+<h3>8.3 Asset Sharing</h3>
+<ul>
+<li>RunBase owns shared run assets (Husks, corridors, loot tables); packs own specifics (gala strings, bells, sigils). AssetLoader ref-counts across packs.</li>
+<li>Scenario-generated art lands in <code>runs/&lt;floor&gt;/assets/</code> with prompt + seed + model recorded (reproducibility; see §10.6).</li>
+</ul>
+
+<h2 id="run-specs"><span class="section-number">9</span> Runs 1–3: Floor Zero, Muster, Sigil Game</h2>
+
+<h3>9.1 Run 1: Floor Zero — The Unfinished Block (Tutorial)</h3>
+<ul>
+<li><strong>Flow:</strong> manifest → routine Grey (6 floors, cutlass-only) → bloom → six-seconds choice → deal → first BIND → flat scan.</li>
+<li><strong>Teaches:</strong> carrying loop, choice theme, death sting (first revive eats father's face), deal hook.</li>
+<li><strong>Scripted loss, real choice:</strong> the team dies regardless; Lark-vs-cores is the player's.</li>
+<li><strong>Rewards:</strong> cutlass, level curve unlocked, Bram. <strong>Audio:</strong> generator hum → dead air → heartbeat + drum.</li>
+</ul>
+
+<h3>9.2 Run 2: The Muster (Survival)</h3>
+<ul>
+<li><strong>Flow:</strong> forged paper → 200Scatter → 3-day maze-ward → choke tolls → 100th-writ crush → Voss's pen stops.</li>
+<li><strong>Mechanics:</strong> writ economy, rearrangement navigation, power discipline scoring (optimal plays logged; using them advances Table clock faster — the game prices winning).</li>
+<li><strong>Rewards:</strong> ascent writ (Act 2 key), Subject Seven opens (Table 2/8). <strong>Visuals:</strong> copied-wrong ward, moving doors, crush lighting.</li>
+</ul>
+
+<h3>9.3 Run 3: The Sigil Game (Betrayal)</h3>
+<ul>
+<li><strong>Flow:</strong> gala doors → bell 1 (halve) → between-bells offer → bell 2 (shuffle, 40s loss) → bell 3 (dead count double, godhood-seconds, rematch) → paper.</li>
+<li><strong>Mechanics:</strong> alliance rot timers, forced-betrayal lots, rematch duel (scripted loss → earned win), sieve logging.</li>
+<li><strong>Rewards:</strong> Floor 3 writ, both clocks → 4, Rook's blank form. <strong>Audio:</strong> bell tuned to the lullaby interval (plant in S2, payoff never explained).</li>
+</ul>
+
+<h2 id="art"><span class="section-number">10</span> Art Style &amp; Asset Guidelines</h2>
+
+<h3>10.1 Core Aesthetic</h3>
+<p>Dark stylized low-poly + street-faith texture: ink-black surfaces, blood-red System tissue, crown-gold authority, chalk-white marks. Beauty in signage (gala strings, writ stamps, chalk tallies), horror in bodies (veins, cloth layers, chalk eyes). UI follows the world site: hard borders, offset shadows, terminal mono for VESTIGE.</p>
+
+<h3>10.2 Color Palette</h3>
+<table>
+<tr><th>Role</th><th>Hex</th><th>Use</th></tr>
+<tr><td>Ink</td><td><code>#141114</code></td><td>Backgrounds, Spire stone</td></tr>
+<tr><td>Blood</td><td><code>#e5482f</code></td><td>VESTIGE, Rot, warnings, primary CTAs</td></tr>
+<tr><td>Gold</td><td><code>#e8a020</code></td><td>Crowns, writs, clocks, rewards</td></tr>
+<tr><td>Chalk</td><td><code>#f4efe4</code></td><td>Type on dark, Returned marks, Wren's charcoal</td></tr>
+<tr><td>Moss</td><td><code>#6daa45</code></td><td>Success states, Hold/safety</td></tr>
+<tr><td>River</td><td><code>#5591c7</code></td><td>Combine, info, water/black-water</td></tr>
+</table>
+
+<h3>10.3 Modeling Guidelines</h3>
+<ul>
+<li>Characters read at distance by silhouette + one accent (Joss: oversized cutlass; Rook: Crown-braid; Beck: crutch-spear).</li>
+<li>Beasts: Pall = layered cloth sim cheat (stacked cones, sway by ancestor-argument); Returnling = small, chalk eyes emissive; Truhound = ridge + ear rig (up/folded poses mandatory).</li>
+<li>Architecture: Spire interiors brutalist + devotional (floodlight rigs, shrine clutter); gala hall warm vs the cold sieve-balcony above.</li>
+</ul>
+
+<h3>10.4 Polygon Budgets</h3>
+<table>
+<tr><th>Asset</th><th>Budget (tris)</th></tr>
+<tr><td>Joss / Rook (hero)</td><td>&le; 12k</td></tr>
+<tr><td>Echoes / beasts</td><td>&le; 8k (Pall layers instanced)</td></tr>
+<tr><td>Hub NPCs</td><td>&le; 5k</td></tr>
+<tr><td>Props / loot</td><td>&le; 1.5k</td></tr>
+<tr><td>Floor zone kit (modular)</td><td>&le; 60k assembled</td></tr>
+</table>
+
+<h3>10.5 Animation Guidelines</h3>
+<ul>
+<li>4-frame-feel combat readability over realism (telegraphs big, recoveries honest).</li>
+<li>Characters are iso pixel billboards (<code>PixelSprite</code>: hand-authored maps → canvas textures, NearestFilter, screen-flip; walk anim advances with distance). Geometry primitives are banned for characters.</li>
+<li>Echoes move wrong on purpose (Bram: shield-first glide; Hush: cut frames).</li>
+<li>Hushblades: sound cuts first — animate the absence (dust hangs, then parts).</li>
+<li>Red Second: 3s slowmo, FOV punch, desaturation, heartbeat+drum.</li>
+</ul>
+
+<h3>10.6 Scenario Generation Pipeline</h3>
+<ul>
+<li>Models re-discovered per batch (catalogs differ per team) — never hardcode model IDs.</li>
+<li>Style lock: one seed + prompt-expansion off + reference images of approved art; <code>scenario-consistency</code> pass before any batch acceptance.</li>
+<li>Every accepted asset records prompt + seed + model in its folder (see §8.3). <code>dry_run=true</code> prices everything first.</li>
+<li>First art targets: Nullspire at 02:14 (hero), Joss + Rook portraits, Terminus Hold interior.</li>
+</ul>
+
+<h2 id="audio"><span class="section-number">11</span> Audio Design</h2>
+
+<h3>11.1 Audio Categories</h3>
+<table>
+<tr><th>Category</th><th>Examples</th></tr>
+<tr><td>UI/System</td><td>VESTIGE stingers (chuckle, glitch), writ stamps, clock ticks (Table gold vs Returned chalk — different timbres)</td></tr>
+<tr><td>Combat</td><td>Cutlass chains, Gapstep whoosh, Bloodwage haze, Hushblade absence-then-cut</td></tr>
+<tr><td>Ambient</td><td>Terminus generators/touts, Spire wind, gala strings, Ward C machines</td></tr>
+<tr><td>Music</td><td>Heartbeat + talking-drum core (see 11.2)</td></tr>
+</table>
+
+<h3>11.2 Music Structure</h3>
+<ul>
+<li>Core loop: heartbeat (Joss) + talking drum (VESTIGE) — the drum answers the heart, slightly late, like it's learning.</li>
+<li>Hub: sparse strings + generator hum in the container's key. Gala: warm highlife-adjacent strings that cool by semitones as bells approach.</li>
+<li>Bosses: drum takes the lead; heart must catch up (player-HP-synced tempo — the music knows you're dying).</li>
+</ul>
+
+<h3>11.3 Spatial Audio</h3>
+<ul>
+<li>Howler positional: Mimic lures pan before they show; bell interval locates in 3D (players can navigate Floor 2 by ear).</li>
+<li>Truhound barks are diegetic UI — mixed above effects, never music-ducked.</li>
+</ul>
+
+<h2 id="expansion"><span class="section-number">12</span> Expansion Roadmap</h2>
+
+<h3>12.1 Phase 1: Act 1 Complete (this act)</h3>
+<ul>
+<li>Floors 0–2 shippable: tutorial → muster → sigil. Both clocks at 4. Wren's bill unpaid. Lancer owed. Volunteer running.</li>
+</ul>
+
+<h3>12.2 Phase 2: Content Expansion (Acts 2–3)</h3>
+<ul>
+<li>Echo roster to 20 with loyalty questlines; Warden accords (7 Wardens, terms + cheat-costs); Floors 3–7 packs; Rook ally arc; Voss's file vs Table kill-order collision.</li>
+<li>Endings branch at Sync 40/70/90 → Crown / Warden / Maw.</li>
+</ul>
+
+<h3>12.3 Phase 3: LiveOps &amp; Endgame</h3>
+<ul>
+<li>Daily Pact streaks + Penalty Drift playable; seeded daily challenge floors; seasonal gala events; NG+ (new host? new tithe rules — design open).</li>
+<li>Analytics: run length, death points, Whisper accept rate, clock velocity (balance the two-clock race with data).</li>
+</ul>
+
+<h2 id="testing"><span class="section-number">13</span> Testing &amp; QA Procedures</h2>
+
+<h3>13.1 Testing Pyramid</h3>
+<ul>
+<li><strong>Unit (Vitest, most):</strong> ClockEngine ticks, BindSystem odds/loyalty math, economy (writ prices, soul-sand curves), Whisper tables, seed determinism (same seed → same floor).</li>
+<li><strong>Integration:</strong> run lifecycle (compose→settle), save/restore mid-run, echo refusal cascades, clock-vs-growth event wiring.</li>
+<li><strong>Manual (least, checklist §13.4):</strong> feel, readability, fear.</li>
+</ul>
+
+<h3>13.2 Performance Testing</h3>
+<ul>
+<li>Budgets §5.5 enforced in CI-ish local runs: compose-time log, draw-call counter overlay (dev), texture-memory readout.</li>
+<li>LOW preset must hold 30fps on a 4-year-old laptop (reference device TBD, log in progress.html).</li>
+</ul>
+
+<h3>13.3 Browser Testing Matrix</h3>
+<table>
+<tr><th>Browser</th><th>Floor</th><th>Notes</th></tr>
+<tr><td>Chrome 90+</td><td>Primary dev target</td><td>WebGL2 assumed</td></tr>
+<tr><td>Firefox 88+</td><td>Full pass per run</td><td>Audio latency watch (Howler)</td></tr>
+<tr><td>Safari 14+</td><td>Full pass per run</td><td>Shader precision, IndexedDB quirks</td></tr>
+<tr><td>Edge 90+</td><td>Smoke pass</td><td>Chromium parity expected</td></tr>
+<tr><td>Mobile 375×667</td><td>Touch pass per run</td><td>Dynamic zoom, tap targets ≥44px</td></tr>
+</table>
+
+<h3>13.4 QA Checklist (Per Run)</h3>
+<ul>
+<li>Compose &lt; 300ms, no hitch past transition mask. Extract → settle → clocks tick correctly.</li>
+<li>Death path: loot lost, memory eaten (logged), echo rank-down applied, levels kept.</li>
+<li>BIND offered at correct odds; fail screams + buffs; refusal path reachable.</li>
+<li>Truhound barks on every VESTIGE lie (check against Whisper log).</li>
+<li>No soft-locks: every test (muster/sigil) completable AND skippable-failable with documented consequences.</li>
+<li>Mobile: HUD readable, terminal usable, no text below 12px.</li>
+</ul>
+
+<h2 id="deployment"><span class="section-number">14</span> Build &amp; Deployment</h2>
+
+<h3>14.1 Development Environment</h3>
+<ul>
+<li>Node ≥18, <code>npm run dev</code> (Vite) — game at localhost, world site served separately (static).</li>
+<li>ESLint + Vitest in pre-commit (local hooks; no empty commits, no skipping).</li>
+</ul>
+
+<h3>14.2 Production Build</h3>
+<ul>
+<li><code>npm run build</code> → static bundle. Budget: initial load &lt; 800KB (code) + streamed assets; LCP &lt; 1.5s on reference laptop.</li>
+<li>World site (<code>nullspire-world/</code>) deploys as pure static alongside or standalone.</li>
+</ul>
+
+<h3>14.3 Deployment Pipeline</h3>
+<ul>
+<li>Session branches → CR → main (review gate). Preview deploys per CR when available; else local <code>vite preview</code> + screenshots.</li>
+<li>Versioned doc stamps: every release updates the version badge + footer in docs.html and the status block in progress.html.</li>
+</ul>
+
+<h3>14.4 Hosting Requirements</h3>
+<ul>
+<li>Static host with HTTPS (WebGL + audio policies). No backend in Phase 1 (saves are local). Phase 3 analytics needs a beacon endpoint (TBD).</li>
+</ul>
+
+<h2 id="roadmap"><span class="section-number">15</span> Development Roadmap</h2>
+
+<h3>15.1 Phase 0: Documentation &amp; World (Weeks 1–2) — NOW</h3>
+<ul>
+<li>Vault complete, world site live, beat sheets Ch.0–2, this docs suite. <strong>Remaining:</strong> echo roster (20), Warden accords.</li>
+</ul>
+
+<h3>15.2 Phase 1: Playable Slice (Weeks 3–6)</h3>
+<ul>
+<li>Boot → Hub (Hold stub) → Floor 0 run: cutlass combat, bloom, choice, deal, first BIND, flat scan. VestigeTerminal + SyncMeter + one clock ticking. Playtest: does Six Seconds hurt?</li>
+</ul>
+
+<h3>15.3 Phase 2: Act 1 Complete (Weeks 7–12)</h3>
+<ul>
+<li>Muster + Sigil runs, echo loyalty, Whisper economy, both clocks live, Rook duels, Wren bill pressure. QA per §13.4. Balance with analytics hooks.</li>
+</ul>
+
+<h3>15.4 Phase 3: Expansion (Weeks 13+)</h3>
+<ul>
+<li>§12.2–12.3. Endings. LiveOps. The machine runs seventy-seven.</li>
+</ul>
+
+<div class="todo">
+<strong>Open doc TODOs (gaps carried honestly):</strong> echo roster spec (§7/§9 inputs) · Warden accord terms (§5/§8 inputs) · reference laptop for perf floor (§13.2) · analytics beacon design (§12.3/§14.4) · engine-confirm for physics needs (cannon-es TBD — runs may not need rigid bodies; decide in Phase 1).
+</div>
+
+<footer class="doc">
+<strong>Documentation Version:</strong> 0.1-docs |
+<strong>Last Updated:</strong> September 27, 2026 |
+<strong>Maintained by:</strong> Core Team (you + this session) |
+<strong>Next Review:</strong> when echo roster lands.
+Vault canon: <code>worlds/cinderfall/</code> · Pitch face: <a href="index.html">world site</a> · Tracker: <a href="progress.html">progress.html</a>
+</footer>
+</body>
+</html>

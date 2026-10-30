@@ -1,3 +1,20 @@
+import type {
+  BoundEchoEntry,
+  JossMemoryEntry,
+  NullspireFloorZone,
+  ParasiteTechId,
+  VestigeWhisperDeal,
+  WardenAccordEntry,
+} from '../data/nullspireData';
+import type {
+  ChoreographyPhase,
+  SwordStrikeArchetype,
+  SwordStrikeId,
+} from '../scene/combatChoreography';
+import type { PixelFxId } from '../scene/pixelFxEngine';
+
+export type { ChoreographyPhase, PixelFxId, SwordStrikeArchetype, SwordStrikeId };
+
 export type CameraProjectionAngle = 'dimetric-26.5' | 'isometric-30';
 
 export type RenderPassMode = 'final' | 'raw' | 'dapple-mask' | 'outlines-shadows';
@@ -226,6 +243,35 @@ export interface BestiaryEntry {
   totalEmbersHarvested: number;
 }
 
+export interface ActiveStrikeTelemetry {
+  strikeId: SwordStrikeId;
+  archetype: SwordStrikeArchetype;
+  strikeName: string;
+  subtitle: string;
+  phase: ChoreographyPhase;
+  normalizedProgress: number; // 0..1
+  windupEnd: number;
+  activeEnd: number;
+  cancelWindowStart: number;
+  comboStep: number;
+  durationSec: number;
+  hitstopMs: number;
+  postureDamage: number;
+  lungeSpeed: number;
+  canCancelIntoDefense: boolean;
+  canBufferNextStrike: boolean;
+  isDeflecting: boolean;
+}
+
+export interface PendingBindOffer {
+  enemyId: string;
+  enemyName: string;
+  echoId: string;
+  echoName: string;
+  echoEpithet: string;
+  chancePct: number; // default 73
+}
+
 export interface PlayerTelemetry {
   x: number;
   y: number;
@@ -247,7 +293,7 @@ export interface PlayerTelemetry {
   maxHp: number;
   stamina: number;
   maxStamina: number;
-  soulEmbers: number;
+  soulEmbers: number; // Pocket Scrip (in thousands or raw scrip)
   enemiesDefeated: number;
   totalEnemies: number;
   upgrades: PlayerUpgrades;
@@ -265,6 +311,27 @@ export interface PlayerTelemetry {
   nearestLandmarkDist: number;
   plateSeedHex: string;
   lastActionToast: string | null;
+
+  // NULLSPIRE: LEVEL ZERO Core Telemetry
+  jossLevel?: number;
+  scanReadout?: string; // "E · 11 · FLAT"
+  syncRotPct?: number; // 0..100
+  wrenScripFund?: number; // Progress toward 2,000,000 scrip
+  wrenScripGoal?: number; // 2,000,000
+  tableClock?: number; // 0..8 ("Find the Door-Breaker")
+  returnedClock?: number; // 0..6 ("Recruit the Door-Breaker")
+  activeZoneId?: NullspireFloorZone['id'];
+  redSecondRemaining?: number; // 0..3.5s
+  bloodwageRemaining?: number; // 0..8.0s
+  deflectWindowActive?: boolean;
+  activeStrike?: ActiveStrikeTelemetry;
+  boundEchoes?: BoundEchoEntry[];
+  activeWhisperDeal?: VestigeWhisperDeal | null;
+  pendingBindOffer?: PendingBindOffer | null;
+  memoryTithePending?: boolean;
+  memories?: JossMemoryEntry[];
+  wardenAccords?: WardenAccordEntry[];
+  truhoundEarState?: 'truth-up' | 'lie-flat' | 'neutral' | 'idle' | 'perked-truth' | 'drooped-lie';
 }
 
 export interface ContactSheetFrame {
@@ -297,7 +364,10 @@ export interface VignetteEnvApi {
     ndcX: number,
     ndcY: number
   ) => { hit: boolean; objectName: string; point: [number, number, number] | null };
-  triggerAttack: () => void;
+  triggerAttack: (archetype?: SwordStrikeArchetype) => void;
+  triggerStrikeArchetype?: (archetype: SwordStrikeArchetype) => void;
+  triggerDeflect?: () => void;
+  triggerPixelFx?: (fxId: PixelFxId) => void;
   triggerDodge: () => void;
   triggerInteract: () => void;
   purchaseUpgrade: (kind: 'sword' | 'lantern' | 'vitality') => void;
@@ -308,6 +378,20 @@ export interface VignetteEnvApi {
   reelFishing: () => void;
   respawnPlateProps: () => void;
   teleportTo: (x: number, z: number) => void;
+
+  // NULLSPIRE: LEVEL ZERO Actions
+  triggerParasiteTech?: (techId: ParasiteTechId) => void;
+  triggerRespectBow?: () => void;
+  attemptBindOffer?: () => void;
+  dismissBindOffer?: () => void;
+  resolveWhisperDeal?: (accept: boolean) => void;
+  triggerWhisperById?: (whisperId: string) => void;
+  resolveMemoryTithe?: (acceptTithe: boolean) => void;
+  washRotAtClinic?: () => void;
+  depositWrenScrip?: (amount: number) => void;
+  toggleEchoSummon?: (echoId: string) => void;
+  cycleEchoFsmOrder?: (echoId: string) => void;
+  toggleWardenAccord?: (accordId: string) => void;
 }
 
 declare global {
@@ -315,3 +399,4 @@ declare global {
     __env?: VignetteEnvApi;
   }
 }
+
